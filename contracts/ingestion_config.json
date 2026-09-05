@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "IngestionConfig",
+  "description": "Stream ingestion scheduler configuration schema enforcing pacing, backpressure, and backoff commandments (Commandments 1, 5, 8)",
+  "type": "object",
+  "properties": {
+    "max_concurrent_streams": {
+      "type": "integer",
+      "default": 5,
+      "minimum": 1,
+      "maximum": 50,
+      "description": "Maximum number of simultaneous active RTSP decoders allowed in memory (Commandment 8)"
+    },
+    "inference_fps": {
+      "type": "number",
+      "default": 1.0,
+      "minimum": 0.1,
+      "maximum": 30.0,
+      "description": "Paced inference sampling rate per stream in frames per second (Commandment 8: 1-2 FPS sub-sampling)"
+    },
+    "batch_size": {
+      "type": "integer",
+      "default": 5,
+      "minimum": 1,
+      "maximum": 20,
+      "description": "Number of camera streams grouped into each active round-robin processing batch"
+    },
+    "batch_rotation_interval_seconds": {
+      "type": "integer",
+      "default": 60,
+      "minimum": 5,
+      "maximum": 3600,
+      "description": "Duration in seconds before round-robin rotation switches to the next batch of camera streams"
+    },
+    "frame_queue_max_size": {
+      "type": "integer",
+      "default": 100,
+      "minimum": 10,
+      "maximum": 1000,
+      "description": "Bounded frame queue capacity between decoder workers and inference workers"
+    },
+    "backpressure_strategy": {
+      "type": "string",
+      "enum": ["drop_oldest", "drop_newest", "block"],
+      "default": "drop_oldest",
+      "description": "Queue policy applied when frame queue reaches frame_queue_max_size"
+    },
+    "gpu_memory_threshold_mb": {
+      "type": "integer",
+      "default": 2048,
+      "minimum": 512,
+      "maximum": 49152,
+      "description": "GPU VRAM ceiling in megabytes triggering automatic dynamic throttling or down-scaling"
+    },
+    "reconnect_initial_delay_ms": {
+      "type": "integer",
+      "default": 2000,
+      "minimum": 100,
+      "maximum": 10000,
+      "description": "Initial backoff delay in milliseconds before first reconnect attempt on stream drop (Commandment 5: 2s)"
+    },
+    "reconnect_max_delay_ms": {
+      "type": "integer",
+      "default": 30000,
+      "minimum": 1000,
+      "maximum": 300000,
+      "description": "Maximum exponential backoff delay ceiling in milliseconds (Commandment 5: 30s max)"
+    },
+    "reconnect_backoff_multiplier": {
+      "type": "number",
+      "default": 2.0,
+      "minimum": 1.1,
+      "maximum": 5.0,
+      "description": "Exponential multiplier applied to delay after each subsequent reconnect failure"
+    }
+  },
+  "required": [
+    "max_concurrent_streams",
+    "inference_fps",
+    "batch_size",
+    "batch_rotation_interval_seconds",
+    "frame_queue_max_size",
+    "backpressure_strategy",
+    "gpu_memory_threshold_mb",
+    "reconnect_initial_delay_ms",
+    "reconnect_max_delay_ms",
+    "reconnect_backoff_multiplier"
+  ]
+}

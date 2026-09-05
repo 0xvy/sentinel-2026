@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "VahanRecord",
+  "description": "VAHAN (National Vehicle Registry) table schema - stores vehicle registration, blacklist status, and theft alerts",
+  "type": "object",
+  "properties": {
+    "plate_number": {
+      "type": "string",
+      "pattern": "^[A-Z]{2}[0-9]{1,2}[A-Z]{0,3}[0-9]{1,4}$",
+      "description": "Primary Key: Normalized vehicle registration plate number (e.g. GJ01AB1234)"
+    },
+    "vehicle_class": {
+      "type": "string",
+      "description": "Vehicle classification e.g. Motor Car (LMV), 2 Wheeler, Heavy Goods Vehicle"
+    },
+    "owner_name": {
+      "type": "string",
+      "description": "Full name of the registered vehicle owner"
+    },
+    "chassis_number": {
+      "type": "string",
+      "description": "Vehicle Chassis / VIN Number"
+    },
+    "engine_number": {
+      "type": "string",
+      "description": "Vehicle engine serial number"
+    },
+    "registration_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of original vehicle registration (YYYY-MM-DD)"
+    },
+    "blacklist_status": {
+      "type": "string",
+      "enum": ["Clean", "Blacklisted", "RTO Seizure Notice"],
+      "description": "Current RTO blacklist or seizure enforcement notice"
+    },
+    "stolen_flag": {
+      "type": "boolean",
+      "description": "Flag set to true if vehicle has active theft report filed with police"
+    },
+    "linked_fir": {
+      "type": ["string", "null"],
+      "description": "Police First Information Report (FIR) reference if stolen or under investigation, else null"
+    }
+  },
+  "required": [
+    "plate_number",
+    "vehicle_class",
+    "owner_name",
+    "chassis_number",
+    "engine_number",
+    "registration_date",
+    "blacklist_status",
+    "stolen_flag"
+  ]
+}

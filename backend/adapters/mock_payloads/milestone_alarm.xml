@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Event xmlns="http://www.milestonesys.com/schemas/events/2026">
+  <EventHeader>
+    <ID>a7891234-b567-4c89-9def-0123456789ab</ID>
+    <Timestamp>2026-09-04T14:30:00.000Z</Timestamp>
+    <Type>AnalyticsEvent</Type>
+    <Class>LicensePlateRecognition</Class>
+    <Priority>5</Priority>
+    <Name>LPR Detection NH-48 Valsad</Name>
+  </EventHeader>
+  <EventBody>
+    <Source>
+      <Name>Highway Camera NH-48 Valsad</Name>
+      <DeviceId>CAM-RTO-VALSAD-04</DeviceId>
+      <Type>Camera</Type>
+    </Source>
+    <Data>
+      <LicensePlate>GJ01ER8842</LicensePlate>
+      <Confidence>0.94</Confidence>
+      <Country>IN</Country>
+      <State>Gujarat</State>
+      <VehicleType>Sedan</VehicleType>
+      <VehicleColor>White</VehicleColor>
+      <Direction>Northbound</Direction>
+      <ImagePath>/images/20260904/cam-rto-valsad-04/143000.jpg</ImagePath>
+    </Data>
+    <GeoLocation>
+      <Latitude>20.6128</Latitude>
+      <Longitude>72.9314</Longitude>
+      <Altitude>12.5</Altitude>
+    </GeoLocation>
+  </EventBody>
+</Event>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Event xmlns="http://www.milestonesys.com/schemas/events/2026">
+  <EventHeader>
+    <ID>d3b07384-d113-494b-9c87-8495f24f5a31</ID>
+    <Timestamp>2026-09-04T14:35:00.000Z</Timestamp>
+    <Type>AnalyticsEvent</Type>
+    <Class>MotionDetection</Class>
+    <Priority>3</Priority>
+    <Name>Vehicle Movement in Restricted Corridor</Name>
+  </EventHeader>
+  <EventBody>
+    <Source>
+      <Name>Surat Ring Road Junction 4</Name>
+      <DeviceId>CAM-SMC-SURAT-02</DeviceId>
+      <Type>Camera</Type>
+    </Source>
+    <Data>
+      <TriggerType>Motion</TriggerType>
+      <ObjectClassification>Vehicle</ObjectClassification>
+      <LicensePlate>GJ01ER8842</LicensePlate>
+      <Confidence>0.88</Confidence>
+      <SpeedKmh>48.5</SpeedKmh>
+      <BoundingBox>
+        <X>320</X>
+        <Y>180</Y>
+        <Width>240</Width>
+        <Height>160</Height>
+      </BoundingBox>
+      <ImagePath>/images/20260904/cam-smc-surat-02/143500.jpg</ImagePath>
+    </Data>
+    <GeoLocation>
+      <Latitude>21.1702</Latitude>
+      <Longitude>72.8311</Longitude>
+      <Altitude>15.0</Altitude>
+    </GeoLocation>
+  </EventBody>
+</Event>

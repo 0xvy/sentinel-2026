@@ -1,0 +1,28 @@
+{
+  "EventType": "LprRead",
+  "EventId": "550e8400-e29b-41d4-a716-446655440000",
+  "Timestamp": "2026-09-04T15:45:00.000+05:30",
+  "Source": {
+    "EntityId": "CAM-AMC-AHM-01",
+    "EntityName": "SG Highway Junction Camera",
+    "EntityType": "Camera",
+    "Department": "Municipal Corp",
+    "District": "Ahmedabad"
+  },
+  "LprData": {
+    "PlateRead": "GJ 01 ER 8842",
+    "Confidence": 96.5,
+    "PlateState": "Gujarat",
+    "Country": "India",
+    "Direction": "Inbound",
+    "LaneNumber": 2,
+    "VehicleType": "Sedan",
+    "Color": "White",
+    "ImageUri": "https://genetec-server/images/lpr/550e8400.jpg"
+  },
+  "Position": {
+    "Latitude": 23.0225,
+    "Longitude": 72.5714,
+    "Altitude": 53.0
+  }
+}

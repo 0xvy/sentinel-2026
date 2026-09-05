@@ -1,0 +1,34 @@
+{
+  "EventType": "AlarmTriggered",
+  "EventId": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+  "Timestamp": "2026-09-04T16:10:00.000+05:30",
+  "Alarm": {
+    "AlarmId": "ALM-9921",
+    "AlarmName": "Intrusion Perimeter Breach",
+    "Priority": "High",
+    "State": "Active",
+    "Category": "SecurityIntrusion"
+  },
+  "Source": {
+    "EntityId": "CAM-POL-GND-01",
+    "EntityName": "Gandhinagar Sector 10 Police Checkpost",
+    "EntityType": "Camera",
+    "Department": "Police",
+    "District": "Gandhinagar"
+  },
+  "VehicleData": {
+    "Plate": "GJ-01-ER-8842",
+    "Confidence": 92.0,
+    "Color": "White",
+    "Make": "Hyundai",
+    "SpeedKmh": 52.0
+  },
+  "Position": {
+    "Latitude": 23.2156,
+    "Longitude": 72.6369,
+    "Altitude": 81.0
+  },
+  "Snapshot": {
+    "Uri": "https://genetec-server/snapshots/alm9921.jpg"
+  }
+}

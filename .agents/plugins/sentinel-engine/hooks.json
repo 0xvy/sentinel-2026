@@ -1,0 +1,26 @@
+{
+  "hooks": [
+    {
+      "name": "sentinel-invariant-gate",
+      "trigger": "PostToolUse",
+      "matcher": "write_to_file|replace_file_content",
+      "command": "python .engine/invariants.py",
+      "timeout": 15,
+      "description": "AST-scans all Python files for sandbox rule violations after every file write"
+    },
+    {
+      "name": "sentinel-constraint-reminder",
+      "trigger": "PreInvocation",
+      "command": "python .engine/pre_invoke_reminder.py",
+      "timeout": 5,
+      "description": "Injects ephemeral sprint state reminder before each model turn"
+    },
+    {
+      "name": "sentinel-stop-guard",
+      "trigger": "Stop",
+      "command": "python .engine/stop_guard.py",
+      "timeout": 5,
+      "description": "Blocks premature agent completion if sprint tasks are not fully verified"
+    }
+  ]
+}

@@ -1,0 +1,181 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AlertEvent",
+  "description": "Unified alert event contract - emitted by vision engine, consumed by backend and frontend",
+  "type": "object",
+  "properties": {
+    "alert_id": {
+      "type": "string",
+      "pattern": "^ALT-[0-9]{4}-[0-9]{4}-[0-9]{4}$"
+    },
+    "timestamp_pts_ms": {
+      "type": "integer",
+      "description": "Presentation timestamp in milliseconds from cap.get(cv2.CAP_PROP_POS_MSEC)"
+    },
+    "timestamp_iso": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Human-readable ISO 8601 timestamp"
+    },
+    "camera_id": {
+      "type": "string"
+    },
+    "camera_dept": {
+      "type": "string"
+    },
+    "camera_lat": {
+      "type": "number"
+    },
+    "camera_lng": {
+      "type": "number"
+    },
+    "detected_plate": {
+      "type": "string",
+      "description": "Normalized plate number e.g. GJ01AB1234"
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "threat_level": {
+      "type": "string",
+      "enum": [
+        "CRITICAL",
+        "HIGH",
+        "MEDIUM",
+        "LOW",
+        "NORMAL"
+      ]
+    },
+    "source_databases": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "vahan_match": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "stolen_flag": {
+          "type": "boolean"
+        },
+        "blacklist_status": {
+          "type": "string"
+        },
+        "owner_name": {
+          "type": "string"
+        },
+        "vehicle_class": {
+          "type": "string"
+        }
+      }
+    },
+    "egujcop_match": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "fir_number": {
+          "type": "string"
+        },
+        "crime_head": {
+          "type": "string"
+        },
+        "wanted_status": {
+          "type": "string"
+        },
+        "police_station": {
+          "type": "string"
+        },
+        "threat_priority": {
+          "type": "string"
+        }
+      }
+    },
+    "sarthi_match": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "dl_number": {
+          "type": "string"
+        },
+        "license_status": {
+          "type": "string"
+        },
+        "driver_name": {
+          "type": "string"
+        }
+      }
+    },
+    "afis_match": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "state_afis_id": {
+          "type": "string"
+        },
+        "biometric_match_confidence": {
+          "type": "number"
+        },
+        "suspect_name": {
+          "type": "string"
+        },
+        "arrest_record": {
+          "type": "string"
+        }
+      }
+    },
+    "nafis_match": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "national_fingerprint_number": {
+          "type": "string"
+        },
+        "interstate_crime_record": {
+          "type": "string"
+        },
+        "cross_jurisdiction_flag": {
+          "type": "boolean"
+        },
+        "federal_linking_status": {
+          "type": "string"
+        }
+      }
+    },
+    "recommended_action": {
+      "type": "string"
+    },
+    "snapshot_url": {
+      "type": "string"
+    },
+    "snapshot_hash_sha256": {
+      "type": "string",
+      "description": "SHA-256 hash of snapshot for NFSU chain of custody"
+    },
+    "direction_of_travel": {
+      "type": "string",
+      "enum": ["N", "NE", "E", "SE", "S", "SW", "W", "NW", "Unknown"],
+      "description": "Estimated vehicle heading vector from Kalman tracking"
+    }
+  },
+  "required": [
+    "alert_id",
+    "timestamp_pts_ms",
+    "camera_id",
+    "detected_plate",
+    "confidence",
+    "threat_level"
+  ]
+}

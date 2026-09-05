@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CameraRegistryEntry",
+  "description": "Model 1 GIS Registry - Individual camera metadata for statewide CCTV asset inventory",
+  "type": "object",
+  "properties": {
+    "camera_id": {
+      "type": "string",
+      "description": "Unique camera identifier, e.g. CAM-AMC-AHM-01",
+      "pattern": "^CAM-[A-Z]+-[A-Z]+-[0-9]+$"
+    },
+    "camera_name": {
+      "type": "string",
+      "description": "Human-readable camera location name"
+    },
+    "department": {
+      "type": "string",
+      "enum": [
+        "Police",
+        "Transport (RTO)",
+        "GSRTC",
+        "Health",
+        "Municipal Corp",
+        "Panchayat",
+        "Private",
+        "Food & Civil Supplies"
+      ]
+    },
+    "district": {
+      "type": "string"
+    },
+    "lat": {
+      "type": "number",
+      "minimum": 20.0,
+      "maximum": 24.5,
+      "description": "Latitude (Gujarat range)"
+    },
+    "lng": {
+      "type": "number",
+      "minimum": 68.0,
+      "maximum": 74.5,
+      "description": "Longitude (Gujarat range)"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Online",
+        "Offline",
+        "Degraded"
+      ]
+    },
+    "stream_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "RTSP stream endpoint (fetched dynamically, never hardcoded)"
+    },
+    "vms_vendor": {
+      "type": "string",
+      "enum": [
+        "Milestone",
+        "Genetec",
+        "ONVIF_NVR",
+        "Analog_DVR",
+        "Direct_IP"
+      ]
+    },
+    "installed_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "resolution": {
+      "type": "string",
+      "enum": [
+        "1080p",
+        "720p",
+        "4K",
+        "480p",
+        "Analog"
+      ]
+    },
+    "ptz_capable": {
+      "type": "boolean"
+    },
+    "last_health_check": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "camera_id",
+    "camera_name",
+    "department",
+    "district",
+    "lat",
+    "lng",
+    "status"
+  ]
+}

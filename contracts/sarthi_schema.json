@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SarthiRecord",
+  "description": "SARTHI (National Driving License Registry) table schema - driver licensing records and identity linkings",
+  "type": "object",
+  "properties": {
+    "dl_number": {
+      "type": "string",
+      "description": "Primary Key: Unique Driving License Number (e.g. GJ0120150001234)"
+    },
+    "driver_name": {
+      "type": "string",
+      "description": "Full name of the licensed driver as registered with RTO"
+    },
+    "linked_aadhaar_hash": {
+      "type": "string",
+      "pattern": "^[a-fA-F0-9]{64}$",
+      "description": "SHA-256 cryptographic hash of Aadhaar number for privacy-compliant identity federation"
+    },
+    "license_status": {
+      "type": "string",
+      "enum": ["Active", "Suspended", "Disqualified"],
+      "description": "Current legal validity of driving privileges"
+    },
+    "linked_plate": {
+      "type": ["string", "null"],
+      "description": "Primary vehicle registration plate linked to this driver, or null"
+    },
+    "suspect_link_id": {
+      "type": ["string", "null"],
+      "description": "Cross-reference link ID to criminal or surveillance watchlist record, or null"
+    }
+  },
+  "required": [
+    "dl_number",
+    "driver_name",
+    "linked_aadhaar_hash",
+    "license_status"
+  ]
+}

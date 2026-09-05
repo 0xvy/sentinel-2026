@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EvaluationCsvSpecification",
+  "description": "Evaluation CSV output schema defining the official jury evaluation format for vehicle sightings and trajectory verification",
+  "type": "object",
+  "properties": {
+    "columns": {
+      "type": "array",
+      "description": "Ordered array of columns defining the evaluation CSV structure",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Column header name in CSV output"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["string", "integer", "number", "boolean"],
+            "description": "Data type of the column"
+          },
+          "format": {
+            "type": "string",
+            "description": "Standard data format (e.g. date-time for timestamps)"
+          },
+          "description": {
+            "type": "string",
+            "description": "Functional description of the column data"
+          },
+          "required": {
+            "type": "boolean",
+            "description": "Whether column value is mandatory for valid records"
+          }
+        },
+        "required": ["name", "type", "description", "required"]
+      },
+      "default": [
+        {
+          "name": "camera_id",
+          "type": "string",
+          "description": "Unique camera identifier (e.g. CAM-AMC-AHM-01)",
+          "required": true
+        },
+        {
+          "name": "camera_name",
+          "type": "string",
+          "description": "Human-readable camera location name",
+          "required": true
+        },
+        {
+          "name": "department",
+          "type": "string",
+          "description": "Camera owning department (e.g. Police, GSRTC, RTO)",
+          "required": true
+        },
+        {
+          "name": "license_plate",
+          "type": "string",
+          "description": "Detected and normalized vehicle license plate (e.g. GJ01AB1234)",
+          "required": true
+        },
+        {
+          "name": "pts_timestamp_ms",
+          "type": "integer",
+          "description": "Hardware presentation timestamp in milliseconds from video container: cap.get(cv2.CAP_PROP_POS_MSEC)",
+          "required": true
+        },
+        {
+          "name": "human_time",
+          "type": "string",
+          "format": "date-time",
+          "description": "Human-readable ISO 8601 UTC timestamp",
+          "required": true
+        },
+        {
+          "name": "watchlist_match_flag",
+          "type": "boolean",
+          "description": "Boolean flag indicating whether plate matched active criminal or stolen vehicle watchlist",
+          "required": true
+        },
+        {
+          "name": "associated_fir",
+          "type": "string",
+          "description": "Linked police First Information Report (FIR) number if watchlisted, or empty if clean",
+          "required": false
+        }
+      ]
+    },
+    "row": {
+      "type": "object",
+      "description": "Schema validating an individual row record in the evaluation CSV dataset",
+      "properties": {
+        "camera_id": {
+          "type": "string",
+          "pattern": "^CAM-[A-Z]+-[A-Z]+-[0-9]+$",
+          "description": "Unique camera identifier"
+        },
+        "camera_name": {
+          "type": "string",
+          "description": "Human-readable camera location"
+        },
+        "department": {
+          "type": "string",
+          "description": "Owning department or agency"
+        },
+        "license_plate": {
+          "type": "string",
+          "description": "Detected and normalized license plate number"
+        },
+        "pts_timestamp_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Hardware presentation timestamp in milliseconds"
+        },
+        "human_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 formatted timestamp"
+        },
+        "watchlist_match_flag": {
+          "type": "boolean",
+          "description": "Whether plate matched any watchlist entry"
+        },
+        "associated_fir": {
+          "type": ["string", "null"],
+          "description": "Linked FIR number or null"
+        }
+      },
+      "required": [
+        "camera_id",
+        "camera_name",
+        "department",
+        "license_plate",
+        "pts_timestamp_ms",
+        "human_time",
+        "watchlist_match_flag"
+      ]
+    }
+  },
+  "required": [
+    "columns",
+    "row"
+  ]
+}

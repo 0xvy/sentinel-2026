@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EGujCopRecord",
+  "description": "eGujCop (Gujarat Police CCTNS) table schema - stores First Information Reports, wanted criminal suspect records, and vehicle links",
+  "type": "object",
+  "properties": {
+    "fir_number": {
+      "type": "string",
+      "description": "Primary Key: First Information Report unique number (e.g. FIR-2026-AHM-CR-0089)"
+    },
+    "police_station": {
+      "type": "string",
+      "description": "Jurisdictional police station where FIR was lodged"
+    },
+    "district": {
+      "type": "string",
+      "description": "Gujarat police district or commissionerate (e.g. Ahmedabad City, Surat, Rajkot)"
+    },
+    "crime_head": {
+      "type": "string",
+      "description": "Statutory IPC / BNS crime classification (e.g. Armed Robbery, Kidnapping, Vehicle Theft, Homicide)"
+    },
+    "accused_name": {
+      "type": "string",
+      "description": "Name of accused suspect or person of interest"
+    },
+    "alias": {
+      "type": ["string", "null"],
+      "description": "Known alias, street name, or moniker of accused individual"
+    },
+    "wanted_status": {
+      "type": "string",
+      "enum": ["Absconding", "Active Warrant", "Surrendered", "Arrested"],
+      "description": "Current apprehension status of the accused"
+    },
+    "linked_plate": {
+      "type": ["string", "null"],
+      "description": "Vehicle registration number linked to the accused or crime commission"
+    },
+    "missing_person_flag": {
+      "type": "boolean",
+      "description": "True if this record corresponds to a missing person trace investigation"
+    },
+    "unidentified_body_flag": {
+      "type": "boolean",
+      "description": "True if record pertains to an unidentified deceased inquiry"
+    },
+    "threat_priority": {
+      "type": "string",
+      "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW"],
+      "description": "Tactical threat priority rating for automated intercept alerting"
+    }
+  },
+  "required": [
+    "fir_number",
+    "police_station",
+    "district",
+    "crime_head",
+    "accused_name",
+    "wanted_status",
+    "missing_person_flag",
+    "unidentified_body_flag",
+    "threat_priority"
+  ]
+}
