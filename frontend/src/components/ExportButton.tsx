@@ -46,10 +46,10 @@ export const ExportButton: React.FC<ExportButtonProps> = ({ currentPlate, classN
       type="button"
       onClick={handleExport}
       disabled={isExporting}
-      className={`relative inline-flex items-center gap-2 px-3.5 py-1.5 rounded text-xs font-semibold tracking-wide uppercase transition-all duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${
+      className={`relative inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-mono font-bold tracking-wide uppercase transition-all duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer focus:ring-2 focus:ring-cyan-500/50 focus:outline-none ${
         exportSuccess
-          ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-950/50'
-          : 'bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold shadow-lg shadow-cyan-950/50'
+          ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-950/60 border border-emerald-400/60'
+          : 'bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-extrabold shadow-lg shadow-cyan-950/60 border border-cyan-400/60'
       } ${className}`}
       title={currentPlate ? `Export trajectory log for ${currentPlate}` : 'Export statewide evaluation report CSV'}
     >
@@ -63,7 +63,7 @@ export const ExportButton: React.FC<ExportButtonProps> = ({ currentPlate, classN
         </>
       ) : exportSuccess ? (
         <>
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7"></path>
           </svg>
           <span>Downloaded!</span>

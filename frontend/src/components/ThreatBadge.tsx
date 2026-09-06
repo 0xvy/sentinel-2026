@@ -21,32 +21,32 @@ const LEVEL_STYLES: Record<
   }
 > = {
   CRITICAL: {
-    container: 'bg-red-500/20 text-red-400 border-red-500 shadow-sm shadow-red-950/50',
+    container: 'bg-red-950/70 text-red-300 border-red-500/80 shadow-sm shadow-red-950/80',
     pulseDot: 'bg-red-400',
     icon: ShieldAlert,
     defaultLabel: 'CRITICAL',
   },
   HIGH: {
-    container: 'bg-amber-500/20 text-amber-400 border-amber-500 shadow-sm shadow-amber-950/50',
+    container: 'bg-amber-950/70 text-amber-300 border-amber-500/80 shadow-sm shadow-amber-950/80',
     pulseDot: 'bg-amber-400',
     icon: AlertTriangle,
     defaultLabel: 'HIGH',
   },
   MEDIUM: {
-    container: 'bg-yellow-500/20 text-yellow-400 border-yellow-500 shadow-sm shadow-yellow-950/50',
+    container: 'bg-yellow-950/70 text-yellow-300 border-yellow-500/80 shadow-sm shadow-yellow-950/80',
     pulseDot: 'bg-yellow-400',
     icon: AlertCircle,
     defaultLabel: 'MEDIUM',
   },
   LOW: {
-    container: 'bg-blue-500/20 text-blue-400 border-blue-500 shadow-sm shadow-blue-950/50',
+    container: 'bg-blue-950/70 text-blue-300 border-blue-500/80 shadow-sm shadow-blue-950/80',
     pulseDot: 'bg-blue-400',
     icon: Info,
     defaultLabel: 'LOW',
   },
   NORMAL: {
-    container: 'bg-green-500/20 text-green-400 border-green-500 shadow-sm shadow-green-950/50',
-    pulseDot: 'bg-green-400',
+    container: 'bg-emerald-950/70 text-emerald-300 border-emerald-500/80 shadow-sm shadow-emerald-950/80',
+    pulseDot: 'bg-emerald-400',
     icon: ShieldCheck,
     defaultLabel: 'NORMAL',
   },

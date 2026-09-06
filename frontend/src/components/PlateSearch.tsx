@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { api } from '../services/api';
-import { VehicleSearchItem, ThreatLevel } from '../types';
+import { VehicleSearchItem } from '../types';
+import { ThreatBadge } from './ThreatBadge';
+import { PlateNumber } from './PlateNumber';
 
 interface PlateSearchProps {
   activePlate: string;
@@ -84,28 +86,6 @@ export const PlateSearch: React.FC<PlateSearchProps> = ({
     }
   };
 
-  const getThreatBadge = (level: ThreatLevel, stolen: boolean) => {
-    if (stolen || level === 'CRITICAL') {
-      return (
-        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-950 text-rose-400 border border-rose-600/60 font-mono">
-          {stolen ? 'STOLEN' : 'CRITICAL'}
-        </span>
-      );
-    }
-    if (level === 'HIGH') {
-      return (
-        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-950 text-amber-400 border border-amber-600/60 font-mono">
-          HIGH
-        </span>
-      );
-    }
-    return (
-      <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-950 text-emerald-400 border border-emerald-600/60 font-mono">
-        CLEAN
-      </span>
-    );
-  };
-
   return (
     <div ref={containerRef} className="relative w-full">
       {/* Search Input Box */}
@@ -130,7 +110,7 @@ export const PlateSearch: React.FC<PlateSearchProps> = ({
           onFocus={() => executeSearch(query)}
           onKeyDown={handleKeyDown}
           placeholder="SEARCH VEHICLE PLATE (e.g. GJ01ER8842)"
-          className="w-full pl-10 pr-24 py-2.5 bg-[#0a0f1d] border-2 border-cyan-500/60 focus:border-cyan-400 rounded-lg text-white font-plate text-sm md:text-base tracking-widest placeholder:text-gray-500 placeholder:font-sans placeholder:tracking-normal outline-none shadow-lg shadow-cyan-950/40 transition-all"
+          className="w-full pl-10 pr-24 py-2.5 bg-[#070b14] border-2 border-cyan-500/60 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/30 rounded-lg text-white font-plate text-sm md:text-base tracking-widest placeholder:text-slate-500 placeholder:font-sans placeholder:tracking-normal outline-none shadow-lg shadow-cyan-950/40 transition-all"
         />
 
         <div className="absolute right-2 flex items-center gap-1.5">
@@ -141,7 +121,7 @@ export const PlateSearch: React.FC<PlateSearchProps> = ({
                 setQuery('');
                 setSuggestions([]);
               }}
-              className="text-gray-500 hover:text-gray-300 p-1 text-xs"
+              className="text-slate-400 hover:text-white p-1 text-xs transition-colors"
               title="Clear search"
             >
               ✕
@@ -151,7 +131,7 @@ export const PlateSearch: React.FC<PlateSearchProps> = ({
             type="button"
             onClick={() => handleSelect(query)}
             disabled={!query.trim() || isLoadingTrajectory}
-            className="px-3 py-1 bg-cyan-500 hover:bg-cyan-400 disabled:opacity-50 text-slate-950 font-extrabold text-xs rounded tracking-wider transition-colors"
+            className="px-3 py-1 bg-cyan-500 hover:bg-cyan-400 disabled:opacity-50 text-slate-950 font-extrabold text-xs rounded tracking-wider transition-all duration-150 active:scale-95 cursor-pointer font-mono shadow-sm"
           >
             LOCATE
           </button>
@@ -159,16 +139,16 @@ export const PlateSearch: React.FC<PlateSearchProps> = ({
       </div>
 
       {/* Preset Quick Tags for Quick Evaluation / Jury Demonstration */}
-      <div className="flex items-center gap-1.5 mt-2 overflow-x-auto text-[11px] pb-1">
-        <span className="text-gray-400 text-[10px] uppercase font-bold tracking-wider mr-1">
-          Test Plates:
+      <div className="flex items-center gap-1.5 mt-2 overflow-x-auto text-xs pb-1 scrollbar-thin">
+        <span className="text-slate-400 text-[10px] uppercase font-mono font-bold tracking-wider mr-1 shrink-0">
+          Target Presets:
         </span>
         <button
           type="button"
           onClick={() => handleSelect('GJ01ER8842')}
-          className={`px-2 py-0.5 rounded font-mono font-bold transition-all border ${
+          className={`px-2 py-0.5 rounded font-mono text-xs font-bold transition-all duration-150 border cursor-pointer active:scale-95 shrink-0 ${
             activePlate === 'GJ01ER8842'
-              ? 'bg-rose-600 text-white border-rose-400 shadow'
+              ? 'bg-rose-600 text-white border-rose-400 shadow-md shadow-rose-950/60'
               : 'bg-rose-950/40 text-rose-300 border-rose-800/60 hover:bg-rose-900/60'
           }`}
           title="Core Jury Test Case: Armed Suspect Vikram Solanki"
@@ -178,9 +158,9 @@ export const PlateSearch: React.FC<PlateSearchProps> = ({
         <button
           type="button"
           onClick={() => handleSelect('GJ05CX9988')}
-          className={`px-2 py-0.5 rounded font-mono font-bold transition-all border ${
+          className={`px-2 py-0.5 rounded font-mono text-xs font-bold transition-all duration-150 border cursor-pointer active:scale-95 shrink-0 ${
             activePlate === 'GJ05CX9988'
-              ? 'bg-rose-600 text-white border-rose-400 shadow'
+              ? 'bg-rose-600 text-white border-rose-400 shadow-md shadow-rose-950/60'
               : 'bg-rose-950/30 text-rose-300 border-rose-900/40 hover:bg-rose-900/50'
           }`}
           title="Stolen Vehicle Surat: Amit Shah"
@@ -190,9 +170,9 @@ export const PlateSearch: React.FC<PlateSearchProps> = ({
         <button
           type="button"
           onClick={() => handleSelect('GJ03KJ4521')}
-          className={`px-2 py-0.5 rounded font-mono font-bold transition-all border ${
+          className={`px-2 py-0.5 rounded font-mono text-xs font-bold transition-all duration-150 border cursor-pointer active:scale-95 shrink-0 ${
             activePlate === 'GJ03KJ4521'
-              ? 'bg-amber-600 text-white border-amber-400 shadow'
+              ? 'bg-amber-600 text-white border-amber-400 shadow-md shadow-amber-950/60'
               : 'bg-amber-950/30 text-amber-300 border-amber-900/40 hover:bg-amber-900/50'
           }`}
           title="Blacklisted Vehicle Rajkot"
@@ -202,9 +182,9 @@ export const PlateSearch: React.FC<PlateSearchProps> = ({
         <button
           type="button"
           onClick={() => handleSelect('GJ01AB1234')}
-          className={`px-2 py-0.5 rounded font-mono font-bold transition-all border ${
+          className={`px-2 py-0.5 rounded font-mono text-xs font-bold transition-all duration-150 border cursor-pointer active:scale-95 shrink-0 ${
             activePlate === 'GJ01AB1234'
-              ? 'bg-emerald-600 text-white border-emerald-400 shadow'
+              ? 'bg-emerald-600 text-white border-emerald-400 shadow-md shadow-emerald-950/60'
               : 'bg-emerald-950/30 text-emerald-300 border-emerald-900/40 hover:bg-emerald-900/50'
           }`}
           title="Clean Vehicle Ahmedabad"
@@ -215,9 +195,9 @@ export const PlateSearch: React.FC<PlateSearchProps> = ({
 
       {/* Autocomplete Dropdown */}
       {isOpen && suggestions.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-1.5 bg-[#111827] border border-cyan-500/50 rounded-lg shadow-2xl z-50 max-h-72 overflow-y-auto">
-          <div className="p-2 border-b border-[#1f2937] text-[10px] text-gray-400 uppercase tracking-wider flex justify-between">
-            <span>Registration & Surveillance Matches ({suggestions.length})</span>
+        <div className="absolute top-full left-0 right-0 mt-2 bg-[#0d1424] border border-cyan-500/60 rounded-xl shadow-2xl z-50 max-h-72 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700">
+          <div className="p-2.5 border-b border-slate-800 text-[10px] text-slate-400 font-mono uppercase tracking-wider flex justify-between bg-[#070b14]/80">
+            <span>Surveillance Registries Matches ({suggestions.length})</span>
             <span>Press Enter to select</span>
           </div>
 
@@ -225,27 +205,25 @@ export const PlateSearch: React.FC<PlateSearchProps> = ({
             <div
               key={item.plate_number}
               onClick={() => handleSelect(item.plate_number)}
-              className="p-2.5 hover:bg-[#1f2937] cursor-pointer border-b border-gray-800/60 last:border-0 transition-colors flex items-center justify-between"
+              className="p-3 hover:bg-[#111827] cursor-pointer border-b border-slate-800/80 last:border-0 transition-colors flex items-center justify-between"
             >
-              <div className="flex flex-col">
+              <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-2">
-                  <span className="font-plate text-sm font-bold text-white">
-                    {item.plate_number}
-                  </span>
-                  {getThreatBadge(item.threat_level, item.stolen_flag)}
+                  <PlateNumber plate={item.plate_number} size="sm" interactive={false} />
+                  <ThreatBadge level={item.threat_level} size="sm" />
                 </div>
-                <div className="text-[11px] text-gray-400 mt-0.5">
-                  {item.owner_name && <span className="text-gray-300 font-medium">{item.owner_name} • </span>}
+                <div className="text-[11px] text-slate-400 font-mono">
+                  {item.owner_name && <span className="text-slate-200 font-bold">{item.owner_name} &bull; </span>}
                   <span>{item.vehicle_class || 'Motor Car'}</span>
                 </div>
               </div>
 
-              <div className="text-right">
-                <div className="text-xs font-mono text-cyan-400 font-semibold">
+              <div className="text-right font-mono">
+                <div className="text-xs text-cyan-400 font-bold">
                   {item.total_sightings} sightings
                 </div>
                 {item.last_seen && (
-                  <div className="text-[10px] text-gray-400">
+                  <div className="text-[10px] text-slate-400 mt-0.5">
                     {new Date(item.last_seen).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </div>
                 )}

@@ -124,9 +124,9 @@ export const App: React.FC = () => {
   const onlineCamerasCount = cameras.filter((c) => c.status === 'Online').length;
 
   return (
-    <div className="flex flex-col h-screen w-screen bg-[#0a0f1d] text-[#f9fafb] font-sans select-none overflow-hidden">
+    <div className="flex flex-col h-screen w-screen bg-[#070b14] text-[#f9fafb] font-sans select-none overflow-hidden">
       {/* 1. TOP COMMAND HEADER */}
-      <header className="h-14 bg-[#0d1424] border-b border-[#1f2937] px-4 flex items-center justify-between z-30 shadow-xl shrink-0">
+      <header className="h-14 bg-[#0d1424] border-b border-slate-800 px-4 flex items-center justify-between z-30 shadow-xl shrink-0">
         {/* Left: Emblem & Platform Title */}
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-cyan-950/80 border border-cyan-500/60 flex items-center justify-center text-cyan-400 shadow-md shadow-cyan-950/50">
@@ -139,40 +139,40 @@ export const App: React.FC = () => {
               <h1 className="font-heading font-extrabold text-base md:text-lg tracking-wider text-white">
                 SENTINEL <span className="text-cyan-400 font-mono">2026</span>
               </h1>
-              <span className="bg-cyan-950/70 border border-cyan-800/60 text-cyan-300 font-mono text-[10px] px-1.5 py-0.2 rounded hidden sm:inline-block">
+              <span className="bg-cyan-950/80 border border-cyan-800/80 text-cyan-300 font-mono text-[10px] px-1.5 py-0.5 rounded hidden sm:inline-block">
                 GUJARAT POLICE INTELLIGENCE
               </span>
             </div>
-            <p className="text-[10px] text-gray-400 hidden sm:block tracking-wide">
-              Cross-Agency CCTV Intelligence & AI Plate Trajectory Command
+            <p className="text-[10px] text-slate-400 hidden sm:block tracking-wide font-mono">
+              Cross-Agency CCTV Intelligence &amp; AI Plate Trajectory Command
             </p>
           </div>
         </div>
 
         {/* Center: System Status & Time */}
         <div className="hidden lg:flex items-center gap-4 text-xs font-mono">
-          <div className="flex items-center gap-2 px-2.5 py-1 bg-[#0a0f1d] rounded border border-[#1f2937]">
+          <div className="flex items-center gap-2 px-3 py-1 bg-[#070b14] rounded-lg border border-slate-800 shadow-inner">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span className="text-gray-300">NFSU FORENSIC AUDIT:</span>
-            <span className="text-emerald-400 font-bold">TAMPER-EVIDENT</span>
+            <span className="text-slate-400">NFSU FORENSIC AUDIT:</span>
+            <span className="text-emerald-400 font-bold tracking-wider">TAMPER-EVIDENT</span>
           </div>
 
-          <div className="text-gray-400 text-[11px]">
-            {currentTime || 'Synchronizing Clock...'}
+          <div className="text-slate-400 text-xs font-mono">
+            {currentTime || 'Synchronizing Clock (IST)...'}
           </div>
         </div>
 
         {/* Right: Mode Switcher & Status Controls */}
         <div className="flex items-center gap-2.5">
           {/* Mode Tabs: GIS Map vs Video Wall */}
-          <div className="flex items-center bg-[#111827] p-1 rounded-lg border border-[#1f2937]">
+          <div className="flex items-center bg-[#070b14] p-1 rounded-lg border border-slate-800 shadow-inner">
             <button
               type="button"
               onClick={() => setViewMode('map')}
-              className={`flex items-center gap-1.5 px-3 py-1 rounded text-xs font-bold transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1 rounded text-xs font-bold transition-all cursor-pointer active:scale-95 ${
                 viewMode === 'map'
-                  ? 'bg-cyan-600 text-slate-950 shadow'
-                  : 'text-gray-400 hover:text-white'
+                  ? 'bg-cyan-600 text-slate-950 shadow-sm'
+                  : 'text-slate-400 hover:text-white'
               }`}
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -183,10 +183,10 @@ export const App: React.FC = () => {
             <button
               type="button"
               onClick={() => setViewMode('videowall')}
-              className={`flex items-center gap-1.5 px-3 py-1 rounded text-xs font-bold transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1 rounded text-xs font-bold transition-all cursor-pointer active:scale-95 ${
                 viewMode === 'videowall'
-                  ? 'bg-cyan-600 text-slate-950 shadow'
-                  : 'text-gray-400 hover:text-white'
+                  ? 'bg-cyan-600 text-slate-950 shadow-sm'
+                  : 'text-slate-400 hover:text-white'
               }`}
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -198,7 +198,7 @@ export const App: React.FC = () => {
 
           {/* WebSocket Status Indicator */}
           <div
-            className={`hidden sm:flex items-center gap-1.5 px-2 py-1 rounded border text-[11px] font-mono ${
+            className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-mono ${
               connectionStatus === 'connected'
                 ? 'border-emerald-500/50 bg-emerald-950/40 text-emerald-300'
                 : 'border-amber-500/50 bg-amber-950/40 text-amber-300'
@@ -210,7 +210,7 @@ export const App: React.FC = () => {
                 connectionStatus === 'connected' ? 'bg-emerald-400 animate-ping' : 'bg-amber-400'
               }`}
             ></span>
-            <span className="uppercase">{connectionStatus}</span>
+            <span className="uppercase font-bold">{connectionStatus}</span>
           </div>
 
           {/* Top Quick Export CSV */}
@@ -221,7 +221,7 @@ export const App: React.FC = () => {
       {/* 2. MAIN SPLIT BODY (60% Map / Left vs 40% Alerts & Search / Right) */}
       <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
         {/* LEFT PANEL: 60% Width — GIS Map or Video Wall */}
-        <div className="w-full md:w-[60%] h-1/2 md:h-full flex flex-col relative border-r border-[#1f2937]">
+        <div className="w-full md:w-[60%] h-1/2 md:h-full flex flex-col relative border-r border-slate-800">
           {viewMode === 'map' ? (
             <div className="relative w-full h-full">
               <GISMap
@@ -241,7 +241,7 @@ export const App: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowFilterModal(!showFilterModal)}
-                  className="px-3 py-1.5 rounded-lg bg-[#0d1424]/90 border border-cyan-500/60 hover:border-cyan-400 text-cyan-300 font-bold text-xs shadow-xl backdrop-blur flex items-center gap-1.5 transition-all"
+                  className="px-3 py-1.5 rounded-lg bg-[#0d1424]/90 border border-cyan-500/60 hover:border-cyan-400 text-cyan-300 font-bold text-xs shadow-xl backdrop-blur flex items-center gap-1.5 transition-all cursor-pointer active:scale-95"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
@@ -274,9 +274,9 @@ export const App: React.FC = () => {
         </div>
 
         {/* RIGHT PANEL: 40% Width — Search, Trajectory & Live Alert Feed */}
-        <div className="w-full md:w-[40%] h-1/2 md:h-full flex flex-col bg-[#0a0f1d] overflow-hidden p-3 gap-3">
+        <div className="w-full md:w-[40%] h-1/2 md:h-full flex flex-col bg-[#070b14] overflow-hidden p-3 gap-3">
           {/* Top Search Bar */}
-          <div className="shrink-0 bg-[#0d1424] p-3 rounded-lg border border-[#1f2937] shadow-lg">
+          <div className="shrink-0 bg-[#0d1424] p-3 rounded-xl border border-slate-800 shadow-xl">
             <PlateSearch
               activePlate={activePlate}
               onSelectPlate={fetchTrajectory}
@@ -296,14 +296,14 @@ export const App: React.FC = () => {
           )}
 
           {/* Tab Navigation for Right Panel (Trajectory vs Live Alert Stream) */}
-          <div className="flex items-center gap-2 border-b border-[#1f2937] pb-1.5 shrink-0">
+          <div className="flex items-center gap-2 border-b border-slate-800 pb-2 shrink-0">
             <button
               type="button"
               onClick={() => setRightPanelTab('trajectory')}
-              className={`flex items-center gap-1.5 px-3 py-1 rounded text-xs font-bold uppercase tracking-wider transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer active:scale-95 ${
                 rightPanelTab === 'trajectory'
-                  ? 'bg-cyan-950 text-cyan-300 border border-cyan-600/60 shadow'
-                  : 'text-gray-400 hover:text-gray-200'
+                  ? 'bg-cyan-950 text-cyan-300 border border-cyan-600/60 shadow-md shadow-cyan-950/40'
+                  : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -315,10 +315,10 @@ export const App: React.FC = () => {
             <button
               type="button"
               onClick={() => setRightPanelTab('alerts')}
-              className={`flex items-center gap-1.5 px-3 py-1 rounded text-xs font-bold uppercase tracking-wider transition-all relative ${
+              className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider transition-all relative cursor-pointer active:scale-95 ${
                 rightPanelTab === 'alerts'
-                  ? 'bg-cyan-950 text-cyan-300 border border-cyan-600/60 shadow'
-                  : 'text-gray-400 hover:text-gray-200'
+                  ? 'bg-cyan-950 text-cyan-300 border border-cyan-600/60 shadow-md shadow-cyan-950/40'
+                  : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -326,7 +326,7 @@ export const App: React.FC = () => {
               </svg>
               <span>Live Alerts ({alerts.length})</span>
               {criticalAlertCount > 0 && (
-                <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping absolute -top-1 -right-1"></span>
+                <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping absolute -top-1 -right-1"></span>
               )}
             </button>
           </div>
@@ -353,8 +353,8 @@ export const App: React.FC = () => {
       </div>
 
       {/* 3. TACTICAL STATUS FOOTER BAR */}
-      <footer className="h-9 bg-[#0d1424] border-t border-[#1f2937] px-4 flex items-center justify-between text-[11px] font-mono shrink-0 z-30">
-        <div className="flex items-center gap-4 text-gray-400 overflow-x-auto">
+      <footer className="h-9 bg-[#0d1424] border-t border-slate-800 px-4 flex items-center justify-between text-xs font-mono shrink-0 z-30">
+        <div className="flex items-center gap-4 text-slate-400 overflow-x-auto">
           <div className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
             <span>CCTV CAMERAS:</span>
@@ -362,20 +362,20 @@ export const App: React.FC = () => {
           </div>
 
           <div className="hidden sm:flex items-center gap-1.5">
-            <span className="text-gray-500">•</span>
+            <span className="text-slate-600">•</span>
             <span>ACTIVE CRITICAL ALERTS:</span>
             <span className="text-rose-400 font-bold">{criticalAlertCount}</span>
           </div>
 
           <div className="hidden md:flex items-center gap-1.5">
-            <span className="text-gray-500">•</span>
+            <span className="text-slate-600">•</span>
             <span>TARGET:</span>
-            <span className="text-cyan-400 font-plate font-bold">{activePlate}</span>
+            <span className="text-cyan-300 font-plate font-bold tracking-wider">{activePlate}</span>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="text-gray-500 hidden lg:inline">
+          <span className="text-slate-500 hidden lg:inline font-mono text-[11px]">
             NFSU DIGITAL CHAIN OF CUSTODY VERIFIED
           </span>
           <ExportButton currentPlate={activePlate} />

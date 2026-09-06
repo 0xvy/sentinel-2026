@@ -31,71 +31,105 @@ const MapController: React.FC<{
   return null;
 };
 
-// Create tactical camera DivIcon
+// Department SVG Icon and Color mappings
+const DEPT_ICONS: Record<string, { color: string; svg: string }> = {
+  Police: {
+    color: '#3b82f6',
+    svg: `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
+  },
+  'Transport (RTO)': {
+    color: '#8b5cf6',
+    svg: `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>`,
+  },
+  GSRTC: {
+    color: '#06b6d4',
+    svg: `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 11h18"/><circle cx="7.5" cy="15" r="1.5"/><circle cx="16.5" cy="15" r="1.5"/><path d="M5 18v2"/><path d="M19 18v2"/></svg>`,
+  },
+  'Municipal Corp': {
+    color: '#f59e0b',
+    svg: `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><path d="M9 9h1"/><path d="M9 13h1"/><path d="M9 17h1"/></svg>`,
+  },
+  Health: {
+    color: '#10b981',
+    svg: `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>`,
+  },
+  Panchayat: {
+    color: '#f97316',
+    svg: `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L7 10h3l-4 7h6v5h2v-5h6l-4-7h3z"/></svg>`,
+  },
+  'Food & Civil Supplies': {
+    color: '#ec4899',
+    svg: `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>`,
+  },
+  Private: {
+    color: '#94a3b8',
+    svg: `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>`,
+  },
+};
+
+// Create tactical camera DivIcon with distinct department SVGs and status dot
 function createCameraIcon(camera: Camera) {
   let statusColor = '#22c55e'; // Online
-  let pulseClass = '';
+  let pulseHtml = '';
 
   if (camera.status === 'Offline') {
     statusColor = '#ef4444';
   } else if (camera.status === 'Degraded') {
     statusColor = '#f59e0b';
   } else {
-    pulseClass = 'animate-ping';
+    pulseHtml = `<span style="position: absolute; top: -1px; right: -1px; width: 7px; height: 7px; border-radius: 50%; background-color: #22c55e; opacity: 0.75;" class="animate-ping"></span>`;
   }
 
-  const deptShort = camera.department.slice(0, 3).toUpperCase();
+  const deptMeta = DEPT_ICONS[camera.department] || DEPT_ICONS.Police;
 
   return L.divIcon({
     className: 'custom-camera-marker',
     html: `
-      <div style="position: relative; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center;">
-        ${
-          camera.status === 'Online'
-            ? `<span style="position: absolute; width: 22px; height: 22px; border-radius: 50%; background-color: ${statusColor}; opacity: 0.35;" class="${pulseClass}"></span>`
-            : ''
-        }
-        <div style="width: 20px; height: 20px; border-radius: 50%; background-color: #0a0f1d; border: 2px solid ${statusColor}; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 8px rgba(0,0,0,0.8); z-index: 2;">
-          <span style="font-size: 8px; font-family: 'JetBrains Mono', monospace; font-weight: 800; color: ${statusColor};">
-            ${deptShort === 'POL' ? 'P' : deptShort === 'TRA' ? 'R' : deptShort === 'GSR' ? 'G' : 'C'}
-          </span>
+      <div style="position: relative; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">
+        <div style="width: 24px; height: 24px; border-radius: 6px; background-color: #070b14; border: 1.5px solid ${deptMeta.color}; color: ${deptMeta.color}; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.8), 0 0 4px ${deptMeta.color}40; z-index: 2;">
+          ${deptMeta.svg}
         </div>
+        ${pulseHtml}
+        <span style="position: absolute; top: -1px; right: -1px; width: 6px; height: 6px; border-radius: 50%; background-color: ${statusColor}; border: 1px solid #070b14; z-index: 4;"></span>
       </div>
     `,
-    iconSize: [26, 26],
-    iconAnchor: [13, 13],
-    popupAnchor: [0, -14],
+    iconSize: [28, 28],
+    iconAnchor: [14, 14],
+    popupAnchor: [0, -16],
   });
 }
 
-// Create tactical waypoint DivIcon for vehicle trajectory
+// Create tactical waypoint DivIcon with numbered milestones and critical halo glow
 function createWaypointIcon(
   _sighting: Sighting,
   index: number,
   isLatest: boolean,
   threatLevel: ThreatLevel
 ) {
-  const color =
-    threatLevel === 'CRITICAL' ? '#ef4444' : threatLevel === 'HIGH' ? '#f59e0b' : '#22c55e';
+  const isCritical = threatLevel === 'CRITICAL';
+  const color = isCritical ? '#ef4444' : threatLevel === 'HIGH' ? '#f59e0b' : '#22c55e';
+  const haloBoxShadow = isCritical
+    ? 'box-shadow: 0 0 12px rgba(239, 68, 68, 0.8), 0 0 24px rgba(239, 68, 68, 0.4);'
+    : `box-shadow: 0 0 10px ${color}80;`;
 
   return L.divIcon({
     className: 'custom-waypoint-marker',
     html: `
-      <div style="position: relative; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+      <div style="position: relative; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;">
         ${
-          isLatest
-            ? `<span style="position: absolute; width: 30px; height: 30px; border-radius: 50%; background-color: ${color}; opacity: 0.5;" class="animate-ping"></span>`
+          isLatest || isCritical
+            ? `<span style="position: absolute; width: 32px; height: 32px; border-radius: 50%; background-color: ${color}; opacity: 0.4;" class="animate-ping"></span>`
             : ''
         }
-        <div style="width: 26px; height: 26px; border-radius: 50%; background-color: ${color}; border: 2px solid #ffffff; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 0 12px ${color}; z-index: 5;">
-          <span style="font-size: 10px; font-family: 'JetBrains Mono', monospace; font-weight: 900; color: #0a0f1d; line-height: 1;">
+        <div style="width: 26px; height: 26px; border-radius: 50%; background-color: ${color}; border: 2px solid #ffffff; display: flex; align-items: center; justify-content: center; ${haloBoxShadow} z-index: 5;">
+          <span style="font-size: 11px; font-family: 'JetBrains Mono', monospace; font-weight: 900; color: #070b14; line-height: 1;">
             ${index + 1}
           </span>
         </div>
       </div>
     `,
-    iconSize: [32, 32],
-    iconAnchor: [16, 16],
+    iconSize: [34, 34],
+    iconAnchor: [17, 17],
     popupAnchor: [0, -18],
   });
 }
@@ -209,15 +243,16 @@ export const GISMap: React.FC<GISMapProps> = ({
           </Marker>
         ))}
 
-        {/* Trajectory Polyline overlay */}
+        {/* Trajectory Polyline overlay with dashArray animation */}
         {trajectoryCoordinates.length > 1 && (
           <Polyline
             positions={trajectoryCoordinates}
             pathOptions={{
               color: trajectoryColor,
               weight: 4,
-              opacity: 0.9,
-              dashArray: '8, 8',
+              opacity: 0.95,
+              dashArray: '10, 10',
+              className: 'leaflet-animated-polyline',
               lineJoin: 'round',
             }}
           />
@@ -275,21 +310,30 @@ export const GISMap: React.FC<GISMapProps> = ({
       </MapContainer>
 
       {/* Tactical Map Overlay HUD */}
-      <div className="absolute top-3 left-3 pointer-events-none z-[1000] flex flex-col gap-1">
-        <div className="bg-[#0a0f1d]/85 backdrop-blur px-2.5 py-1.5 rounded border border-[#1f2937] text-[11px] font-mono text-gray-300 shadow-lg">
-          <span className="text-cyan-400 font-bold">GUJARAT STATE POLICE GIS</span>
-          <div className="text-[10px] text-gray-400">
-            {visibleCameras.length} of {cameras.length} CCTV Feeds Online
+      <div className="absolute top-3 left-3 pointer-events-none z-[1000] flex flex-col gap-2">
+        <div className="bg-[#070b14]/90 backdrop-blur-md px-3 py-2 rounded-lg border border-slate-700/60 text-xs font-mono text-slate-300 shadow-xl">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+            <span className="text-cyan-400 font-bold tracking-wider">GUJARAT POLICE GIS GRID</span>
+          </div>
+          <div className="text-[11px] text-slate-400 mt-0.5">
+            {visibleCameras.length} of {cameras.length} Feeds Monitored
           </div>
         </div>
 
         {activeTrajectory && (
-          <div className="bg-[#0a0f1d]/90 backdrop-blur px-2.5 py-1.5 rounded border border-cyan-500/50 text-[11px] text-gray-200 shadow-lg">
-            <span className="text-[10px] text-gray-400 block uppercase font-bold">Active Reconstruction</span>
-            <span className="font-plate text-cyan-400 font-bold tracking-wider">
-              {activeTrajectory.plate_number}
+          <div className="bg-[#070b14]/90 backdrop-blur-md px-3 py-2 rounded-lg border border-cyan-500/40 text-xs text-slate-200 shadow-xl">
+            <span className="text-[10px] text-slate-400 block uppercase font-mono tracking-wider">
+              Active Reconnaissance
             </span>
-            <span className="text-gray-400 ml-1">({activeTrajectory.sightings.length} waypoints)</span>
+            <div className="flex items-center gap-2 mt-0.5">
+              <span className="font-plate text-cyan-400 font-extrabold tracking-wider text-sm">
+                {activeTrajectory.plate_number}
+              </span>
+              <span className="text-[10px] font-mono text-slate-400 px-1.5 py-0.5 rounded bg-slate-900 border border-slate-700">
+                {activeTrajectory.sightings.length} waypoints
+              </span>
+            </div>
           </div>
         )}
       </div>
