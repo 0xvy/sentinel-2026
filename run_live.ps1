@@ -38,7 +38,7 @@ Write-Host "         Node:   $nodeVer" -ForegroundColor DarkGray
 # --- Step 2: Install backend dependencies ---
 Write-Host "  [2/4] Installing backend dependencies..." -ForegroundColor Yellow
 Push-Location "$ROOT\backend"
-& pip install -q fastapi uvicorn aiosqlite python-multipart websockets pydantic pydantic-settings 2>&1 | Out-Null
+& pip install -q --disable-pip-version-check --no-warn-script-location fastapi uvicorn aiosqlite python-multipart websockets pydantic pydantic-settings 2>&1 | Out-Null
 Pop-Location
 Write-Host "         Done" -ForegroundColor DarkGray
 
