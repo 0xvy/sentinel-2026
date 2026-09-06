@@ -50,14 +50,14 @@ timeout /t 4 /nobreak >nul
 
 REM ─── Step 4: Open browser ─────────────────────────────────────────
 echo   [4/4] Opening browser...
-start http://localhost:5173
+start http://127.0.0.1:5173
 
 echo.
 echo ================================================================
 echo   SENTINEL 2026 IS LIVE!
 echo ================================================================
 echo.
-echo   Frontend:  http://localhost:5173
+echo   Frontend:  http://127.0.0.1:5173
 echo   Backend:   http://127.0.0.1:8000
 echo   API Docs:  http://127.0.0.1:8000/docs
 echo.
