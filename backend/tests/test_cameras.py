@@ -1,17 +1,18 @@
+import re
 import jsonschema
 import pytest
 from httpx import AsyncClient
 
 
 @pytest.mark.asyncio
-async def test_get_cameras_returns_50_cameras(client: AsyncClient, load_contract_schema):
-    """Test GET /api/cameras returns list of 50 cameras and conforms to contract."""
+async def test_get_cameras_returns_80_cameras(client: AsyncClient, load_contract_schema):
+    """Test GET /api/cameras returns list of 80 cameras and conforms to contract."""
     response = await client.get("/api/cameras")
     assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
 
     cameras = response.json()
     assert isinstance(cameras, list), f"Expected list of cameras, got {type(cameras)}"
-    assert len(cameras) == 50, f"Expected exactly 50 cameras across Gujarat, got {len(cameras)}"
+    assert len(cameras) == 80, f"Expected exactly 80 cameras across Gujarat, got {len(cameras)}"
 
     schema = load_contract_schema("camera_registry.json")
 
@@ -34,8 +35,8 @@ async def test_cameras_required_fields_and_types(client: AsyncClient):
             assert field in cam, f"Camera missing required field '{field}': {cam}"
             assert cam[field] is not None, f"Field '{field}' should not be None: {cam}"
 
-        # Verify camera ID pattern
-        assert cam["camera_id"].startswith("CAM-"), f"Invalid camera_id format: {cam['camera_id']}"
+        # Verify camera ID pattern strictly
+        assert re.match(r"^(CAM-[A-Z]+-[A-Z]+-[0-9]+|cam[0-9]{2})$", cam["camera_id"]), f"Invalid camera_id format: {cam['camera_id']}"
         assert isinstance(cam["camera_name"], str) and len(cam["camera_name"]) > 0
         assert isinstance(cam["department"], str) and len(cam["department"]) > 0
         assert isinstance(cam["district"], str) and len(cam["district"]) > 0
@@ -104,7 +105,7 @@ async def test_cameras_status_filter(client: AsyncClient):
 
 @pytest.mark.asyncio
 async def test_cameras_multi_department_representation(client: AsyncClient):
-    """Test that all key Gujarat government departments are represented in the 50 cameras."""
+    """Test that all key Gujarat government departments are represented in the 80 cameras."""
     response = await client.get("/api/cameras")
     assert response.status_code == 200
     cameras = response.json()

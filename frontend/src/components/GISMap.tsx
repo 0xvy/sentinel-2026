@@ -152,10 +152,23 @@ export const GISMap: React.FC<GISMapProps> = ({
     return cameras.filter((cam) => selectedDepartments.includes(cam.department));
   }, [cameras, selectedDepartments]);
 
-  // Trajectory polyline coordinates
+  // Trajectory polyline coordinates (chronologically sorted and deduplicated)
   const trajectoryCoordinates = useMemo(() => {
     if (!activeTrajectory || !activeTrajectory.sightings) return [];
-    return activeTrajectory.sightings.map((s) => [s.lat, s.lng] as [number, number]);
+    // Sort by timestamp chronologically
+    const sorted = [...activeTrajectory.sightings].sort(
+      (a, b) => new Date(a.timestamp_iso || 0).getTime() - new Date(b.timestamp_iso || 0).getTime()
+    );
+    // Deduplicate consecutive identical coordinates (same camera)
+    const deduped: [number, number][] = [];
+    for (const s of sorted) {
+      const coord: [number, number] = [s.lat, s.lng];
+      const last = deduped[deduped.length - 1];
+      if (!last || last[0] !== coord[0] || last[1] !== coord[1]) {
+        deduped.push(coord);
+      }
+    }
+    return deduped;
   }, [activeTrajectory]);
 
   // Color for the trajectory line
@@ -175,11 +188,11 @@ export const GISMap: React.FC<GISMapProps> = ({
         className="w-full h-full"
         zoomControl={false}
       >
-        {/* Dark Matter tiles from CartoDB */}
+        {/* Dark tactical tiles — Esri Dark Gray Canvas (no API key needed) */}
         <TileLayer
-          attribution='&copy; <a href="https://carto.com/">CARTO</a> &bull; Gujarat Police GIS'
-          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-          maxZoom={19}
+          attribution='&copy; <a href="https://www.esri.com/">Esri</a> &bull; Gujarat Police GIS'
+          url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}"
+          maxZoom={16}
         />
 
         {/* Map Controller for programmatic flyTo */}

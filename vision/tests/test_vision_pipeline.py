@@ -132,6 +132,7 @@ class TestPlateDetector(unittest.TestCase):
 
     def test_detect_fallback(self):
         detector = PlateDetector()
+        detector.model = None  # Explicitly test deterministic fallback mode
         frame = np.zeros((720, 1280, 3), dtype=np.uint8)
         dets = detector.detect(frame)
         self.assertTrue(len(dets) >= 1)

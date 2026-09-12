@@ -7,6 +7,9 @@ import pytest
 import pytest_asyncio
 import aiosqlite
 
+# Disable live RTSP pre-warming daemon threads during pytest execution
+os.environ["SENTINEL_PREWARM"] = "0"
+
 # Add backend to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 

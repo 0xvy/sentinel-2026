@@ -21,8 +21,8 @@ CameraResolution = Literal["1080p", "720p", "4K", "480p", "Analog"]
 class CameraRegistryEntry(BaseModel):
     camera_id: str = Field(
         ...,
-        pattern=r"^CAM-[A-Z]+-[A-Z]+-[0-9]+$",
-        description="Unique camera identifier, e.g. CAM-AMC-AHM-01",
+        pattern=r"^(CAM-[A-Z]+-[A-Z]+-[0-9]+|cam[0-9]{2})$",
+        description="Unique camera identifier, e.g. CAM-AMC-AHM-01 or cam01",
     )
     camera_name: str = Field(..., description="Human-readable camera location name")
     department: CameraDepartment = Field(..., description="Camera owning department")

@@ -1,0 +1,38 @@
+{
+  "timestamp": "2026-09-12T11:29:16.005248+00:00",
+  "demo_ready": "NO",
+  "errors": [
+    "Phase F Playwright failed: \nRunning 3 tests using 1 worker\n\n  x  1 [chromium] \u00e2\u20ac\u00ba e2e\\tactical_dashboard.spec.ts:36:3 \u00e2\u20ac\u00ba Sentinel 2026: Tactical Dashboard Sensory E2E Audit \u00e2\u20ac\u00ba TC-E2E-01: Live Video Wall MJPEG Stream Canvas Pixel Sampling (3.8s)\n  x  2 [chromium] \u00e2\u20ac\u00ba e2e\\tactical_dashboard.spec.ts:125:3 \u00e2\u20ac\u00ba Sentinel 2026: Tactical Dashboard Sensory E2E Audit \u00e2\u20ac\u00ba TC-E2E-02: GIS Trajectory Polyline Vector & SVG Path Geometry (1.5s)\n  ok 3 [chromium] \u00e2\u20ac\u00ba e2e\\tactical_dashboard.spec.ts:178:3 \u00e2\u20ac\u00ba Sentinel 2026: Tactical Dashboard Sensory E2E Audit \u00e2\u20ac\u00ba TC-E2E-03: Real-Time WebSocket Latency < 250ms (1.3s)\n\n\n  1) [chromium] \u00e2\u20ac\u00ba e2e\\tactical_dashboard.spec.ts:36:3 \u00e2\u20ac\u00ba Sentinel 2026: Tactical Dashboard Sensory E2E Audit \u00e2\u20ac\u00ba TC-E2E-01: Live Video Wall MJPEG Stream Canvas Pixel Sampling \n\n    Error: Stream feed is completely frozen\n\n    expect(received).toBeGreaterThan(expected)\n\n    Expected: > 0.1\n    Received:   0\n\n      120 |     expect(pixelAnalysis.valid, pixelAnalysis.error).toBe(true);\n      121 |     expect(pixelAnalysis.stdDev, 'Stream feed is flat black or flat gray').toBeGreaterThan(8.0);\n    > 122 |     expect(pixelAnalysis.changedPixelPercent, 'Stream feed is completely frozen').toBeGreaterThan(0.1);\n          |                                                                                   ^\n      123 |   });\n      124 |\n      125 |   test('TC-E2E-02: GIS Trajectory Polyline Vector & SVG Path Geometry', async ({ page }) => {\n        at C:\\Users\\Vansh\\.gemini\\antigravity\\scratch\\sentinel_2026\\frontend\\e2e\\tactical_dashboard.spec.ts:122:83\n\n    Error Context: test-results\\tactical_dashboard-Sentine-01531-tream-Canvas-Pixel-Sampling-chromium\\error-context.md\n\n  2) [chromium] \u00e2\u20ac\u00ba e2e\\tactical_dashboard.spec.ts:125:3 \u00e2\u20ac\u00ba Sentinel 2026: Tactical Dashboard Sensory E2E Audit \u00e2\u20ac\u00ba TC-E2E-02: GIS Trajectory Polyline Vector & SVG Path Geometry \n\n    Error: Too few waypoints rendered: 2\n\n    expect(received).toBe(expected) // Object.is equality\n\n    Expected: true\n    Received: false\n\n      172 |     });\n      173 |\n    > 174 |     expect(polylineValid.valid, polylineValid.reason).toBe(true);\n          |                                                       ^\n      175 |     expect(polylineValid.count).toBeGreaterThanOrEqual(3);\n      176 |   });\n      177 |\n        at C:\\Users\\Vansh\\.gemini\\antigravity\\scratch\\sentinel_2026\\frontend\\e2e\\tactical_dashboard.spec.ts:174:55\n\n    Error Context: test-results\\tactical_dashboard-Sentine-96794-ne-Vector-SVG-Path-Geometry-chromium\\error-context.md\n\n  2 failed\n    [chromium] \u00e2\u20ac\u00ba e2e\\tactical_dashboard.spec.ts:36:3 \u00e2\u20ac\u00ba Sentinel 2026: Tactical Dashboard Sensory E2E Audit \u00e2\u20ac\u00ba TC-E2E-01: Live Video Wall MJPEG Stream Canvas Pixel Sampling \n    [chromium] \u00e2\u20ac\u00ba e2e\\tactical_dashboard.spec.ts:125:3 \u00e2\u20ac\u00ba Sentinel 2026: Tactical Dashboard Sensory E2E Audit \u00e2\u20ac\u00ba TC-E2E-02: GIS Trajectory Polyline Vector & SVG Path Geometry \n  1 passed (25.7s)\n"
+  ],
+  "phases": {
+    "Phase_A_Connectivity": {
+      "passed": true,
+      "tests_run": 8
+    },
+    "Phase_B_Contracts": {
+      "passed": true,
+      "csv_contract_valid": true,
+      "tests_run": 31
+    },
+    "Phase_C_Kinematics": {
+      "passed": true,
+      "tests_run": 6
+    },
+    "Phase_D_CV_Liveness": {
+      "passed": true,
+      "stream_smoke_passed": true,
+      "cam04_metrics": {
+        "frames_received": 5,
+        "resolution": "854x480"
+      }
+    },
+    "Phase_E_Chaos_Concurrency": {
+      "passed": true,
+      "tests_run": 3
+    },
+    "Phase_F_Playwright_E2E": {
+      "passed": false,
+      "output_summary": "  1 passed (25.7s)"
+    }
+  }
+}

@@ -126,12 +126,14 @@ async def init_db(db_path: str = None) -> None:
     path = db_path or settings.DB_PATH
     os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
     async with aiosqlite.connect(path) as db:
+        await db.execute("PRAGMA journal_mode=WAL")
         await db.executescript(INIT_SQL)
         await db.commit()
 
 async def get_db() -> AsyncGenerator[aiosqlite.Connection, None]:
     """FastAPI dependency for obtaining an aiosqlite connection."""
     db = await aiosqlite.connect(settings.DB_PATH)
+    await db.execute("PRAGMA journal_mode=WAL")
     db.row_factory = aiosqlite.Row
     try:
         yield db

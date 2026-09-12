@@ -1,0 +1,38 @@
+{
+  "timestamp": "2026-09-12T11:27:11.233920+00:00",
+  "demo_ready": "NO",
+  "errors": [
+    "Phase F Playwright failed: \nRunning 3 tests using 1 worker\n\n  x  1 [chromium] \u00e2\u20ac\u00ba e2e\\tactical_dashboard.spec.ts:28:3 \u00e2\u20ac\u00ba Sentinel 2026: Tactical Dashboard Sensory E2E Audit \u00e2\u20ac\u00ba TC-E2E-01: Live Video Wall MJPEG Stream Canvas Pixel Sampling (11.7s)\n  ok 2 [chromium] \u00e2\u20ac\u00ba e2e\\tactical_dashboard.spec.ts:109:3 \u00e2\u20ac\u00ba Sentinel 2026: Tactical Dashboard Sensory E2E Audit \u00e2\u20ac\u00ba TC-E2E-02: GIS Trajectory Polyline Vector & SVG Path Geometry (1.5s)\n  x  3 [chromium] \u00e2\u20ac\u00ba e2e\\tactical_dashboard.spec.ts:162:3 \u00e2\u20ac\u00ba Sentinel 2026: Tactical Dashboard Sensory E2E Audit \u00e2\u20ac\u00ba TC-E2E-03: Real-Time WebSocket Latency < 250ms (2.9s)\n\n\n  1) [chromium] \u00e2\u20ac\u00ba e2e\\tactical_dashboard.spec.ts:28:3 \u00e2\u20ac\u00ba Sentinel 2026: Tactical Dashboard Sensory E2E Audit \u00e2\u20ac\u00ba TC-E2E-01: Live Video Wall MJPEG Stream Canvas Pixel Sampling \n\n    Error: Stream feed is flat black or flat gray\n\n    expect(received).toBeGreaterThan(expected)\n\n    Expected: > 8\n    Received:   0\n\n      103 |\n      104 |     expect(pixelAnalysis.valid, pixelAnalysis.error).toBe(true);\n    > 105 |     expect(pixelAnalysis.stdDev, 'Stream feed is flat black or flat gray').toBeGreaterThan(8.0);\n          |                                                                            ^\n      106 |     expect(pixelAnalysis.changedPixelPercent, 'Stream feed is completely frozen').toBeGreaterThan(0.1);\n      107 |   });\n      108 |\n        at C:\\Users\\Vansh\\.gemini\\antigravity\\scratch\\sentinel_2026\\frontend\\e2e\\tactical_dashboard.spec.ts:105:76\n\n    Error: \"route.fetch: Test ended.\n    Call log:\n      - \u00e2\u2020\u2019 GET https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/7/55/89\n        - user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36\n        - accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8\n        - accept-encoding: gzip,deflate,br\n        - accept-language: en-US\n        - referer: http://127.0.0.1:5173/\n        - sec-ch-ua: \"HeadlessChrome\";v=\"153\", \"Not_A Brand\";v=\"8\", \"Chromium\";v=\"153\"\n        - sec-ch-ua-mobile: ?0\n        - sec-ch-ua-platform: \"Windows\"\n    \" while running route callback.\n    Consider awaiting `await page.unrouteAll({ behavior: 'ignoreErrors' })`\n    before the end of the test to ignore remaining routes in flight.\n\n      20 |     // Intercept Esri Tile Layer Network Traffic\n      21 |     await page.route('**/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/**', async (route) => {\n    > 22 |       const response = await route.fetch();\n         |                                    ^\n      23 |       expect(response.status(), `Esri Map tile failed with HTTP ${response.status()}`).toBeLessThan(400);\n      24 |       await route.fulfill({ response });\n      25 |     });\n        at C:\\Users\\Vansh\\.gemini\\antigravity\\scratch\\sentinel_2026\\frontend\\e2e\\tactical_dashboard.spec.ts:22:36\n\n    Error Context: test-results\\tactical_dashboard-Sentine-01531-tream-Canvas-Pixel-Sampling-chromium\\error-context.md\n\n  2) [chromium] \u00e2\u20ac\u00ba e2e\\tactical_dashboard.spec.ts:162:3 \u00e2\u20ac\u00ba Sentinel 2026: Tactical Dashboard Sensory E2E Audit \u00e2\u20ac\u00ba TC-E2E-03: Real-Time WebSocket Latency < 250ms \n\n    Error: \"route.fetch: Test ended.\n    Call log:\n      - \u00e2\u2020\u2019 GET https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/7/55/89\n        - user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36\n        - accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8\n        - accept-encoding: gzip,deflate,br\n        - accept-language: en-US\n        - referer: http://127.0.0.1:5173/\n        - sec-ch-ua: \"HeadlessChrome\";v=\"153\", \"Not_A Brand\";v=\"8\", \"Chromium\";v=\"153\"\n        - sec-ch-ua-mobile: ?0\n        - sec-ch-ua-platform: \"Windows\"\n    \" while running route callback.\n    Consider awaiting `await page.unrouteAll({ behavior: 'ignoreErrors' })`\n    before the end of the test to ignore remaining routes in flight.\n\n      20 |     // Intercept Esri Tile Layer Network Traffic\n      21 |     await page.route('**/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/**', async (route) => {\n    > 22 |       const response = await route.fetch();\n         |                                    ^\n      23 |       expect(response.status(), `Esri Map tile failed with HTTP ${response.status()}`).toBeLessThan(400);\n      24 |       await route.fulfill({ response });\n      25 |     });\n        at C:\\Users\\Vansh\\.gemini\\antigravity\\scratch\\sentinel_2026\\frontend\\e2e\\tactical_dashboard.spec.ts:22:36\n\n    Error: expect(locator).toBeVisible() failed\n\n    Locator: locator('text=GJ01WS9988')\n    Expected: visible\n    Timeout: 2000ms\n    Error: element(s) not found\n\n    Call log:\n      - Expect \"toBeVisible\" locator('text=GJ01WS9988') with timeout 2000ms\n      - waiting for locator('text=GJ01WS9988')\n\n\n      196 |     // Wait for tactical alert card with plate GJ01WS9988 to render in DOM\n      197 |     const alertCard = page.locator('text=GJ01WS9988');\n    > 198 |     await expect(alertCard).toBeVisible({ timeout: 2000 });\n          |                             ^\n      199 |     const tRender = Date.now();\n      200 |\n      201 |     const latency = tRender - t0;\n        at C:\\Users\\Vansh\\.gemini\\antigravity\\scratch\\sentinel_2026\\frontend\\e2e\\tactical_dashboard.spec.ts:198:29\n\n    Error Context: test-results\\tactical_dashboard-Sentine-a2579-ime-WebSocket-Latency-250ms-chromium\\error-context.md\n\n  2 failed\n    [chromium] \u00e2\u20ac\u00ba e2e\\tactical_dashboard.spec.ts:28:3 \u00e2\u20ac\u00ba Sentinel 2026: Tactical Dashboard Sensory E2E Audit \u00e2\u20ac\u00ba TC-E2E-01: Live Video Wall MJPEG Stream Canvas Pixel Sampling \n    [chromium] \u00e2\u20ac\u00ba e2e\\tactical_dashboard.spec.ts:162:3 \u00e2\u20ac\u00ba Sentinel 2026: Tactical Dashboard Sensory E2E Audit \u00e2\u20ac\u00ba TC-E2E-03: Real-Time WebSocket Latency < 250ms \n  1 passed (35.4s)\n"
+  ],
+  "phases": {
+    "Phase_A_Connectivity": {
+      "passed": true,
+      "tests_run": 8
+    },
+    "Phase_B_Contracts": {
+      "passed": true,
+      "csv_contract_valid": true,
+      "tests_run": 31
+    },
+    "Phase_C_Kinematics": {
+      "passed": true,
+      "tests_run": 6
+    },
+    "Phase_D_CV_Liveness": {
+      "passed": true,
+      "stream_smoke_passed": true,
+      "cam04_metrics": {
+        "frames_received": 5,
+        "resolution": "854x480"
+      }
+    },
+    "Phase_E_Chaos_Concurrency": {
+      "passed": true,
+      "tests_run": 3
+    },
+    "Phase_F_Playwright_E2E": {
+      "passed": false,
+      "output_summary": "  1 passed (35.4s)"
+    }
+  }
+}

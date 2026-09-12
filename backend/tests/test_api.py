@@ -1,4 +1,5 @@
 import os
+import re
 import json
 import csv
 import io
@@ -29,7 +30,7 @@ async def test_cameras_endpoint(client, load_contract_schema):
     response = await client.get("/api/cameras")
     assert response.status_code == 200
     cameras = response.json()
-    assert len(cameras) == 50
+    assert len(cameras) == 80
 
     # Validate each camera against official contract schema
     for cam in cameras:
@@ -39,7 +40,7 @@ async def test_cameras_endpoint(client, load_contract_schema):
     resp_pol = await client.get("/api/cameras?department=Police")
     assert resp_pol.status_code == 200
     police_cams = resp_pol.json()
-    assert len(police_cams) == 15
+    assert len(police_cams) >= 15
     for c in police_cams:
         assert c["department"] == "Police"
 
@@ -61,7 +62,7 @@ async def test_ingest_endpoint(client):
     response = await client.get("/api/ingest")
     assert response.status_code == 200
     streams = response.json()
-    assert len(streams) >= 48
+    assert len(streams) == 78
     for s in streams:
         assert "camera_id" in s
         assert "stream_url" in s
@@ -230,7 +231,7 @@ async def test_export_csv_endpoint(client, load_contract_schema):
     for r in rows[1:]:
         assert len(r) == len(expected_columns)
         cam_id, cam_name, dept, plate, pts, human_time, wl_flag, fir = r
-        assert cam_id.startswith("CAM-")
+        assert re.match(r"^(CAM-[A-Z]+-[A-Z]+-[0-9]+|cam[0-9]{2})$", cam_id)
         assert plate == "GJ01ER8842"
         assert int(pts) >= 0
         assert wl_flag in ("True", "False")

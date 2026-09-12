@@ -1,5 +1,6 @@
 import csv
 import io
+import re
 from datetime import datetime
 import pytest
 from httpx import AsyncClient
@@ -74,7 +75,7 @@ async def test_export_csv_valid_row_data_types(client: AsyncClient):
     for idx, row in enumerate(rows):
         # 1. camera_id: Non-empty string matching standard pattern
         cam_id = row["camera_id"]
-        assert cam_id.startswith("CAM-"), f"Row {idx}: invalid camera_id {cam_id}"
+        assert re.match(r"^(CAM-[A-Z]+-[A-Z]+-[0-9]+|cam[0-9]{2})$", cam_id), f"Row {idx}: invalid camera_id {cam_id}"
 
         # 2. camera_name: Non-empty string
         assert len(row["camera_name"].strip()) > 0, f"Row {idx}: empty camera_name"

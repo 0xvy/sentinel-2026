@@ -1,5 +1,6 @@
 import os
 import time
+import asyncio
 import logging
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
@@ -11,7 +12,7 @@ from fastapi.responses import JSONResponse
 from app.config import settings
 from db.database import init_db
 from db.seed import seed_database
-from app.routers import health, cameras, vehicles, alerts, export
+from app.routers import health, cameras, vehicles, alerts, export, streams
 
 logging.basicConfig(
     level=logging.INFO,
@@ -40,9 +41,19 @@ async def lifespan(app: FastAPI):
         "db_path": settings.DB_PATH,
     })
 
+    # 4. Launch background detection queue drainer task
+    drainer_task = asyncio.create_task(streams.drain_detection_queue())
+
+    # 5. Pre-warm RTSP connections for default 2x2 Video Wall grid
+    if os.environ.get("SENTINEL_PREWARM", "1") != "0":
+        for cam_id in ["cam01", "cam02", "cam03", "cam04"]:
+            streams._ensure_worker(cam_id)
+        logger.info("Pre-warming 4 RTSP streams for Video Wall default grid")
+
     yield
 
     # Shutdown
+    drainer_task.cancel()
     alerts.append_audit_log("SYSTEM_SHUTDOWN", {"status": "graceful"})
     logger.info("Sentinel 2026 platform shut down successfully.")
 
@@ -97,6 +108,7 @@ app.include_router(cameras.router)
 app.include_router(vehicles.router)
 app.include_router(alerts.router)
 app.include_router(export.router)
+app.include_router(streams.router)
 
 
 @app.get("/", tags=["Root"])

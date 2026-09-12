@@ -11,7 +11,7 @@ from db.queries import (
 async def test_seed_record_counts(db_conn):
     """Verify all 6 tables plus sightings table have expected record counts."""
     async with db_conn.execute("SELECT COUNT(*) FROM cameras") as cur:
-        assert (await cur.fetchone())[0] == 50
+        assert (await cur.fetchone())[0] == 80
 
     async with db_conn.execute("SELECT COUNT(*) FROM vahan") as cur:
         assert (await cur.fetchone())[0] >= 25
