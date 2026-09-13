@@ -202,8 +202,13 @@ def _stream_worker(camera_id: str, stop_event: threading.Event):
     logger.info(f"Stream worker started for {camera_id}")
     sm = StreamManager()
     
-    # Initialize DualModePipeline in DL mode
-    pipeline = DualModePipeline(mode="dl")
+    # Initialize DualModePipeline with specialized model and configurable mode
+    detection_mode = os.getenv("DETECTION_MODE", "deterministic")
+    pipeline = DualModePipeline(
+        mode=detection_mode,
+        yolo_model="morsetechlab/yolov11-license-plate-detection",
+        confidence_threshold=0.25,
+    )
     rtsp_url = settings.build_rtsp_url(camera_id)
 
     # Initialize buffer with tactical connecting frame

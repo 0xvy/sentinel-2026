@@ -27,8 +27,8 @@ class VisionConfig:
 
     # Detection & OCR pipeline configuration
     DETECTION_MODE: str = os.getenv("DETECTION_MODE", "deterministic")  # 'dl' or 'deterministic'
-    YOLO_MODEL: str = os.getenv("YOLO_MODEL", "yolov8n")  # 'yolov8n' or 'yolov8s'
-    CONFIDENCE_THRESHOLD: float = float(os.getenv("CONFIDENCE_THRESHOLD", "0.5"))
+    YOLO_MODEL: str = os.getenv("YOLO_MODEL", "morsetechlab/yolov11-license-plate-detection")
+    CONFIDENCE_THRESHOLD: float = float(os.getenv("CONFIDENCE_THRESHOLD", "0.25"))
 
     # Forensic snapshot parameters (NFSU Chain of Custody)
     SNAPSHOT_DIR: str = os.getenv("SNAPSHOT_DIR", "snapshots")
