@@ -1,0 +1,36 @@
+{
+  "timestamp": "2026-09-12T16:23:31.953570+00:00",
+  "demo_ready": "YES",
+  "errors": [],
+  "phases": {
+    "Phase_A_Connectivity": {
+      "passed": true,
+      "tests_run": 8
+    },
+    "Phase_B_Contracts": {
+      "passed": true,
+      "csv_contract_valid": true,
+      "tests_run": 31
+    },
+    "Phase_C_Kinematics": {
+      "passed": true,
+      "tests_run": 6
+    },
+    "Phase_D_CV_Liveness": {
+      "passed": true,
+      "stream_smoke_passed": true,
+      "cam04_metrics": {
+        "frames_received": 5,
+        "resolution": "854x480"
+      }
+    },
+    "Phase_E_Chaos_Concurrency": {
+      "passed": true,
+      "tests_run": 3
+    },
+    "Phase_F_Playwright_E2E": {
+      "passed": true,
+      "output_summary": "  3 passed (16.7s)"
+    }
+  }
+}

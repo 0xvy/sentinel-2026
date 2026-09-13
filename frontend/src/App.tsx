@@ -10,6 +10,7 @@ import { CameraFilter } from './components/CameraFilter';
 import { PCRDispatchCard } from './components/PCRDispatchCard';
 import { VideoWall } from './components/VideoWall';
 import { ExportButton } from './components/ExportButton';
+import { ForensicDrawer } from './components/ForensicDrawer';
 
 const INITIAL_DEPARTMENTS = [
   'Police',
@@ -36,6 +37,12 @@ export const App: React.FC = () => {
   const [currentTime, setCurrentTime] = useState<string>('');
   const [rightPanelTab, setRightPanelTab] = useState<'alerts' | 'trajectory'>('trajectory');
   const [showFilterModal, setShowFilterModal] = useState<boolean>(false);
+
+  // Forensic Deep-Dive Drawer States
+  const [isForensicOpen, setIsForensicOpen] = useState<boolean>(false);
+  const [forensicSighting, setForensicSighting] = useState<Sighting | null>(null);
+  const [forensicAlert, setForensicAlert] = useState<AlertEvent | null>(null);
+  const [forensicPlate, setForensicPlate] = useState<string>('GJ01ER8842');
 
   // Live Alerts via WebSocket
   const { alerts, connectionStatus } = useAlertWebSocket();
@@ -119,14 +126,29 @@ export const App: React.FC = () => {
     fetchTrajectory(plate);
   };
 
+  // Open Forensic Deep-Dive Drawer handlers
+  const handleOpenForensicSighting = (sighting: Sighting) => {
+    setForensicSighting(sighting);
+    setForensicAlert(null);
+    setForensicPlate(activePlate);
+    setIsForensicOpen(true);
+  };
+
+  const handleOpenForensicAlert = (alert: AlertEvent) => {
+    setForensicAlert(alert);
+    setForensicSighting(null);
+    setForensicPlate(alert.detected_plate);
+    setIsForensicOpen(true);
+  };
+
   // Counts for tactical HUD
   const criticalAlertCount = alerts.filter((a) => a.threat_level === 'CRITICAL').length;
   const onlineCamerasCount = cameras.filter((c) => c.status === 'Online').length;
 
   return (
-    <div className="flex flex-col h-screen w-screen bg-[#070b14] text-[#f9fafb] font-sans select-none overflow-hidden">
+    <div className="flex flex-col h-screen w-screen bg-tactical-viewport bg-[#070b14] text-[#f9fafb] font-sans select-none overflow-hidden">
       {/* 1. TOP COMMAND HEADER */}
-      <header className="h-14 bg-[#0d1424] border-b border-slate-800 px-4 flex items-center justify-between z-30 shadow-xl shrink-0">
+      <header className="h-12 bg-tactical-surface bg-[#0d1424] border-b border-tactical-border border-slate-800 px-4 flex items-center justify-between z-30 shadow-xl shrink-0">
         {/* Left: Emblem & Platform Title */}
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-cyan-950/80 border border-cyan-500/60 flex items-center justify-center text-cyan-400 shadow-md shadow-cyan-950/50">
@@ -151,13 +173,13 @@ export const App: React.FC = () => {
 
         {/* Center: System Status & Time */}
         <div className="hidden lg:flex items-center gap-4 text-xs font-mono">
-          <div className="flex items-center gap-2 px-3 py-1 bg-[#070b14] rounded-lg border border-slate-800 shadow-inner">
+          <div className="flex items-center gap-2 px-3 py-1 bg-tactical-viewport bg-[#070b14] rounded-lg border border-slate-800 shadow-inner">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
             <span className="text-slate-400">NFSU FORENSIC AUDIT:</span>
             <span className="text-emerald-400 font-bold tracking-wider">TAMPER-EVIDENT</span>
           </div>
 
-          <div className="text-slate-400 text-xs font-mono">
+          <div className="text-slate-400 text-xs font-mono tabular-nums">
             {currentTime || 'Synchronizing Clock (IST)...'}
           </div>
         </div>
@@ -165,11 +187,11 @@ export const App: React.FC = () => {
         {/* Right: Mode Switcher & Status Controls */}
         <div className="flex items-center gap-2.5">
           {/* Mode Tabs: GIS Map vs Video Wall */}
-          <div className="flex items-center bg-[#070b14] p-1 rounded-lg border border-slate-800 shadow-inner">
+          <div className="flex items-center bg-tactical-viewport bg-[#070b14] p-1 rounded-lg border border-slate-800 shadow-inner">
             <button
               type="button"
               onClick={() => setViewMode('map')}
-              className={`flex items-center gap-1.5 px-3 py-1 rounded text-xs font-bold transition-all cursor-pointer active:scale-95 ${
+              className={`tactile-active-press flex items-center gap-1.5 px-3 py-1 rounded text-xs font-bold transition-transform duration-75 cursor-pointer active:scale-[0.96] focus-visible:ring-2 focus-visible:ring-cyan-500/70 focus-visible:outline-none ${
                 viewMode === 'map'
                   ? 'bg-cyan-600 text-slate-950 shadow-sm'
                   : 'text-slate-400 hover:text-white'
@@ -183,7 +205,7 @@ export const App: React.FC = () => {
             <button
               type="button"
               onClick={() => setViewMode('videowall')}
-              className={`flex items-center gap-1.5 px-3 py-1 rounded text-xs font-bold transition-all cursor-pointer active:scale-95 ${
+              className={`tactile-active-press flex items-center gap-1.5 px-3 py-1 rounded text-xs font-bold transition-transform duration-75 cursor-pointer active:scale-[0.96] focus-visible:ring-2 focus-visible:ring-cyan-500/70 focus-visible:outline-none ${
                 viewMode === 'videowall'
                   ? 'bg-cyan-600 text-slate-950 shadow-sm'
                   : 'text-slate-400 hover:text-white'
@@ -198,7 +220,7 @@ export const App: React.FC = () => {
 
           {/* WebSocket Status Indicator */}
           <div
-            className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-mono ${
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-mono ${
               connectionStatus === 'connected'
                 ? 'border-emerald-500/50 bg-emerald-950/40 text-emerald-300'
                 : 'border-amber-500/50 bg-amber-950/40 text-amber-300'
@@ -210,8 +232,27 @@ export const App: React.FC = () => {
                 connectionStatus === 'connected' ? 'bg-emerald-400 animate-ping' : 'bg-amber-400'
               }`}
             ></span>
-            <span className="uppercase font-bold">{connectionStatus}</span>
+            <span className="uppercase font-bold">
+              {connectionStatus === 'connected' ? 'CONNECTED' : 'DISCONNECTED'}
+            </span>
           </div>
+
+          {/* NFSU Forensic Dossier Trigger */}
+          <button
+            type="button"
+            onClick={() => {
+              const latest =
+                activeTrajectory?.sightings?.[activeTrajectory.sightings.length - 1] || null;
+              setForensicSighting(latest);
+              setForensicAlert(null);
+              setForensicPlate(activePlate);
+              setIsForensicOpen(true);
+            }}
+            className="tactile-active-press hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/60 text-cyan-300 font-mono text-xs font-bold transition-transform duration-75 cursor-pointer shadow-sm active:scale-[0.96] focus-visible:ring-2 focus-visible:ring-cyan-500/70 focus-visible:outline-none"
+            title="Inspect NFSU Forensic Evidence & Algorithm Exploder"
+          >
+            <span>🔬 NFSU Dossier</span>
+          </button>
 
           {/* Top Quick Export CSV */}
           <ExportButton currentPlate={activePlate} />
@@ -274,9 +315,9 @@ export const App: React.FC = () => {
         </div>
 
         {/* RIGHT PANEL: 40% Width — Search, Trajectory & Live Alert Feed */}
-        <div className="w-full md:w-[40%] h-1/2 md:h-full flex flex-col bg-[#070b14] overflow-hidden p-3 gap-3">
+        <div className="w-full md:w-[40%] h-1/2 md:h-full flex flex-col bg-tactical-viewport bg-[#070b14] overflow-hidden p-3 gap-3">
           {/* Top Search Bar */}
-          <div className="shrink-0 bg-[#0d1424] p-3 rounded-xl border border-slate-800 shadow-xl">
+          <div className="shrink-0 bg-tactical-surface bg-[#0d1424] p-3 rounded-xl border border-tactical-border border-slate-800 shadow-xl">
             <PlateSearch
               activePlate={activePlate}
               onSelectPlate={fetchTrajectory}
@@ -296,11 +337,11 @@ export const App: React.FC = () => {
           )}
 
           {/* Tab Navigation for Right Panel (Trajectory vs Live Alert Stream) */}
-          <div className="flex items-center gap-2 border-b border-slate-800 pb-2 shrink-0">
+          <div className="flex items-center gap-2 border-b border-tactical-border border-slate-800 pb-2 shrink-0">
             <button
               type="button"
               onClick={() => setRightPanelTab('trajectory')}
-              className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer active:scale-95 ${
+              className={`tactile-active-press flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider transition-transform duration-75 cursor-pointer active:scale-[0.96] ${
                 rightPanelTab === 'trajectory'
                   ? 'bg-cyan-950 text-cyan-300 border border-cyan-600/60 shadow-md shadow-cyan-950/40'
                   : 'text-slate-400 hover:text-slate-200'
@@ -315,7 +356,7 @@ export const App: React.FC = () => {
             <button
               type="button"
               onClick={() => setRightPanelTab('alerts')}
-              className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider transition-all relative cursor-pointer active:scale-95 ${
+              className={`tactile-active-press flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider transition-transform duration-75 relative cursor-pointer active:scale-[0.96] ${
                 rightPanelTab === 'alerts'
                   ? 'bg-cyan-950 text-cyan-300 border border-cyan-600/60 shadow-md shadow-cyan-950/40'
                   : 'text-slate-400 hover:text-slate-200'
@@ -339,6 +380,7 @@ export const App: React.FC = () => {
                 onSelectWaypoint={handleSelectWaypoint}
                 selectedWaypointId={selectedSighting?.sighting_id}
                 onClose={() => setRightPanelTab('alerts')}
+                onOpenForensicDrawer={handleOpenForensicSighting}
               />
             ) : (
               <AlertFeed
@@ -346,6 +388,7 @@ export const App: React.FC = () => {
                 selectedAlert={selectedAlert}
                 onSelectAlert={handleSelectAlert}
                 onSelectPlate={handleSelectPlate}
+                onOpenForensicDrawer={handleOpenForensicAlert}
               />
             )}
           </div>
@@ -353,18 +396,18 @@ export const App: React.FC = () => {
       </div>
 
       {/* 3. TACTICAL STATUS FOOTER BAR */}
-      <footer className="h-9 bg-[#0d1424] border-t border-slate-800 px-4 flex items-center justify-between text-xs font-mono shrink-0 z-30">
+      <footer className="h-8 bg-tactical-surface bg-[#0d1424] border-t border-tactical-border border-slate-800 px-4 flex items-center justify-between text-xs font-mono shrink-0 z-30">
         <div className="flex items-center gap-4 text-slate-400 overflow-x-auto">
           <div className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
             <span>CCTV CAMERAS:</span>
-            <span className="text-white font-bold">{onlineCamerasCount}/50 ONLINE</span>
+            <span className="text-white font-bold tabular-nums">{onlineCamerasCount}/50 ONLINE</span>
           </div>
 
           <div className="hidden sm:flex items-center gap-1.5">
             <span className="text-slate-600">•</span>
             <span>ACTIVE CRITICAL ALERTS:</span>
-            <span className="text-rose-400 font-bold">{criticalAlertCount}</span>
+            <span className="text-rose-400 font-bold tabular-nums">{criticalAlertCount}</span>
           </div>
 
           <div className="hidden md:flex items-center gap-1.5">
@@ -375,12 +418,22 @@ export const App: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="text-slate-500 hidden lg:inline font-mono text-[11px]">
+          <span className="text-slate-400 hidden lg:inline font-mono text-[11px]">
             NFSU DIGITAL CHAIN OF CUSTODY VERIFIED
           </span>
           <ExportButton currentPlate={activePlate} />
         </div>
       </footer>
+
+      {/* 4. NFSU FORENSIC DEEP-DIVE DOSSIER & AI EXPLODER DRAWER */}
+      <ForensicDrawer
+        isOpen={isForensicOpen}
+        onClose={() => setIsForensicOpen(false)}
+        sighting={forensicSighting}
+        alert={forensicAlert}
+        plateNumber={forensicPlate}
+        threatLevel={activeTrajectory?.watchlist_status?.threat_level || forensicAlert?.threat_level || 'CRITICAL'}
+      />
     </div>
   );
 };

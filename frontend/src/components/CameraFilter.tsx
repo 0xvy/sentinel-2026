@@ -36,7 +36,7 @@ export const CameraFilter: React.FC<CameraFilterProps> = ({
   return (
     <div className="bg-[#0d1424]/95 backdrop-blur-md border border-slate-700/80 rounded-xl p-3 text-xs shadow-2xl">
       {/* Header with Title & Action Buttons */}
-      <div className="flex items-center justify-between mb-2.5 pb-2 border-b border-slate-800">
+      <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-800">
         <div className="flex items-center gap-2">
           <span className="inline-block w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
           <span className="font-heading font-bold text-slate-100 uppercase tracking-wider text-xs">
@@ -49,14 +49,14 @@ export const CameraFilter: React.FC<CameraFilterProps> = ({
           <button
             type="button"
             onClick={onSelectAll}
-            className="text-cyan-300 hover:text-cyan-200 transition-colors font-bold px-2 py-0.5 rounded bg-cyan-950/70 border border-cyan-600/50 hover:bg-cyan-900/60 active:scale-95 cursor-pointer"
+            className="text-cyan-300 hover:text-cyan-200 transition-colors font-bold px-2 py-0.5 rounded bg-cyan-950/70 border border-cyan-600/50 hover:bg-cyan-900/60 active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/70"
           >
             Select All
           </button>
           <button
             type="button"
             onClick={onClearAll}
-            className="text-slate-400 hover:text-slate-200 transition-colors font-medium px-2 py-0.5 rounded bg-slate-900 border border-slate-700 hover:bg-slate-800 active:scale-95 cursor-pointer"
+            className="text-slate-400 hover:text-slate-200 transition-colors font-medium px-2 py-0.5 rounded bg-slate-900 border border-slate-700 hover:bg-slate-800 active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/70"
           >
             Clear All
           </button>
@@ -64,7 +64,7 @@ export const CameraFilter: React.FC<CameraFilterProps> = ({
       </div>
 
       {/* Checkboxes List */}
-      <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 pr-1">
+      <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto tactical-scrollbar pr-1">
         {ALL_DEPARTMENTS.map((dept) => {
           const count = getDepartmentCount(dept);
           const isSelected = selectedDepartments.includes(dept);
@@ -97,10 +97,10 @@ export const CameraFilter: React.FC<CameraFilterProps> = ({
 
               {/* Camera Count Badge */}
               <span
-                className={`ml-1 text-[10px] font-mono px-1.5 py-0.2 rounded font-bold ${
+                className={`ml-1 text-[10px] font-mono px-1.5 py-0.2 rounded font-bold tabular-nums ${
                   isSelected
                     ? 'bg-slate-800 text-cyan-300 border border-slate-700'
-                    : 'bg-slate-900/80 text-slate-500'
+                    : 'bg-slate-900/80 text-slate-400'
                 }`}
               >
                 {count}

@@ -154,7 +154,7 @@ export const StatusBar: React.FC<StatusBarProps> = ({
               />
             </span>
             <Radio className="w-3.5 h-3.5 shrink-0" />
-            <span className="font-bold tracking-wider">{wsConnected ? 'LIVE FEED' : 'DISCONNECTED'}</span>
+            <span className="font-bold tracking-wider">{wsConnected ? 'CONNECTED' : 'DISCONNECTED'}</span>
           </div>
 
           {/* Camera Network Health Status */}

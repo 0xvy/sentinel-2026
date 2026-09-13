@@ -59,7 +59,7 @@ export const PCRDispatchCard: React.FC<PCRDispatchCardProps> = ({ alert, onClose
         <button
           type="button"
           onClick={onClose}
-          className="text-slate-400 hover:text-white p-1 rounded hover:bg-slate-800 transition-colors"
+          className="text-slate-400 hover:text-white p-1 rounded hover:bg-slate-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500/70"
           title="Close PCR Card"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -70,7 +70,7 @@ export const PCRDispatchCard: React.FC<PCRDispatchCardProps> = ({ alert, onClose
 
       {/* Grid Content: Suspect Vehicle & Registration Dossier */}
       <div className="grid grid-cols-2 gap-3 text-xs mb-3">
-        <div className="bg-[#070b14]/90 rounded-lg p-2.5 border border-slate-800 flex flex-col justify-between">
+        <div className="bg-[#070b14]/90 rounded-lg p-3 border border-slate-800 flex flex-col justify-between">
           <div>
             <div className="text-[10px] text-slate-400 uppercase tracking-wider font-mono font-medium">Suspect Vehicle</div>
             <div className="mt-1">
@@ -82,12 +82,12 @@ export const PCRDispatchCard: React.FC<PCRDispatchCardProps> = ({ alert, onClose
           </div>
         </div>
 
-        <div className="bg-[#070b14]/90 rounded-lg p-2.5 border border-slate-800">
+        <div className="bg-[#070b14]/90 rounded-lg p-3 border border-slate-800">
           <div className="text-[10px] text-slate-400 uppercase tracking-wider font-mono font-medium">Registered Owner &amp; FIR</div>
           <div className="text-white font-bold mt-1 text-xs truncate">{ownerName}</div>
           <div className="text-rose-400 text-[11px] font-mono truncate">{firNumber}</div>
           <div className="text-[10px] text-slate-400 font-mono mt-1">
-            <span className="text-slate-400">Reg Date:</span> <span className="text-slate-200 font-medium">{registrationDate}</span>
+            <span className="text-slate-400">Reg Date:</span> <span className="text-slate-200 font-medium tabular-nums">{registrationDate}</span>
           </div>
         </div>
       </div>
@@ -100,7 +100,7 @@ export const PCRDispatchCard: React.FC<PCRDispatchCardProps> = ({ alert, onClose
             <button
               type="button"
               onClick={() => onFocusMap && onFocusMap(alert.camera_lat!, alert.camera_lng!)}
-              className="text-cyan-400 hover:text-cyan-300 text-[11px] font-mono flex items-center gap-1 transition-colors"
+              className="text-cyan-400 hover:text-cyan-300 text-[11px] font-mono flex items-center gap-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/70 rounded"
             >
               <span>Fly to Camera</span>
               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -133,7 +133,7 @@ export const PCRDispatchCard: React.FC<PCRDispatchCardProps> = ({ alert, onClose
           <div className="text-slate-100 font-bold text-xs mt-0.5">
             PCR Vanguard-04 (Sector 2 Patrol)
           </div>
-          <div className="text-[11px] text-slate-400 font-mono mt-0.5">
+          <div className="text-[11px] text-slate-400 font-mono mt-0.5 tabular-nums">
             Distance: 1.2 km &bull; <span className="text-emerald-400 font-bold">Intercept ETA: ~3 mins</span>
           </div>
         </div>
@@ -151,7 +151,7 @@ export const PCRDispatchCard: React.FC<PCRDispatchCardProps> = ({ alert, onClose
             </svg>
             <span>PATROL UNIT DISPATCHED — EN ROUTE TO INTERCEPT</span>
           </div>
-          <div className="text-[11px] text-slate-300 font-mono mt-1">
+          <div className="text-[11px] text-slate-300 font-mono mt-1 tabular-nums">
             Broadcast to PCR Vanguard-04 at {dispatchTime} &bull; Radio: CH-09 TacNet
           </div>
         </div>
@@ -159,7 +159,7 @@ export const PCRDispatchCard: React.FC<PCRDispatchCardProps> = ({ alert, onClose
         <button
           type="button"
           onClick={handleDispatch}
-          className="w-full bg-rose-600 hover:bg-rose-500 text-white font-extrabold py-3 px-4 rounded-lg shadow-xl shadow-rose-950/80 transition-all duration-150 transform active:scale-[0.97] hover:shadow-rose-900/50 flex items-center justify-center gap-2 uppercase tracking-wider text-xs cursor-pointer border border-rose-400/50"
+          className="tactile-active-press w-full bg-rose-600 hover:bg-rose-500 text-white font-extrabold py-3 px-4 rounded-lg shadow-xl shadow-rose-950/80 hover:shadow-rose-900/50 flex items-center justify-center gap-2 uppercase tracking-wider text-xs cursor-pointer border border-rose-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
         >
           <svg className="w-4 h-4 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>

@@ -7,17 +7,26 @@
   --color-slate-850: #0d1424;
   --color-slate-800: #111827;
   --color-slate-700: #1e293b;
+  --color-slate-600: #334155;
+
+  /* Tactical Tokens */
   --color-tactical-bg: #070b14;
+  --color-tactical-surface: #0a0f1d;
+  --color-tactical-elevated: #0d1424;
   --color-tactical-card: #111827;
-  --color-tactical-panel: #0a0f1d;
-  --color-tactical-header: #0d1424;
   --color-tactical-border: #1e293b;
-  --color-tactical-border-cyan: rgba(6, 182, 212, 0.2);
+  --color-tactical-border-hi: #334155;
+  --color-tactical-border-cyan: rgba(6, 182, 212, 0.25);
+  
+  /* Status & Threat Tokens */
   --color-tactical-cyan: #06b6d4;
   --color-tactical-amber: #f59e0b;
   --color-tactical-red: #ef4444;
-  --color-tactical-green: #22c55e;
-  --font-mono: "JetBrains Mono", "Fira Code", monospace;
+  --color-tactical-green: #10b981;
+  --color-tactical-police: #3b82f6;
+
+  /* Typography */
+  --font-mono: "JetBrains Mono", monospace;
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-heading: "Chakra Petch", sans-serif;
 }
@@ -25,12 +34,38 @@
 /* Custom Tactical Command Center Styles */
 :root {
   color-scheme: dark;
+
+  /* Tactical Canvas Bases */
+  --color-obsidian-viewport : #070b14;
+  --color-obsidian-surface  : #0a0f1d;
+  --color-obsidian-elevated : #0d1424;
+  --color-obsidian-subtle   : #111827;
+  --color-tactical-border   : #1e293b;
+  --color-tactical-border-hi: #334155;
+
+  /* Operational Status & Threat Tokens */
+  --color-threat-critical   : #ef4444;
+  --color-threat-high       : #f59e0b;
+  --color-threat-normal     : #10b981;
+  --color-threat-info       : #06b6d4;
+  --color-threat-dept-police: #3b82f6;
+
+  /* Alpha Glow Overlays */
+  --glow-threat-critical    : 0 0 16px rgba(239, 68, 68, 0.45);
+  --glow-threat-high        : 0 0 16px rgba(245, 158, 11, 0.40);
+  --glow-tactical-cyan      : 0 0 16px rgba(6, 182, 212, 0.35);
+
+  /* Typography System */
+  --font-display            : "Chakra Petch", -apple-system, sans-serif;
+  --font-body               : "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono-telemetry     : "JetBrains Mono", monospace;
+  --font-hsrp-plate         : "DIN 1451 Mittelschrift", "JetBrains Mono", monospace;
 }
 
 body {
-  background-color: #070b14;
+  background-color: var(--color-obsidian-viewport);
   color: #f9fafb;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body);
   overflow: hidden;
   margin: 0;
   padding: 0;
@@ -38,20 +73,31 @@ body {
 
 /* Monospace Plate Font */
 .font-plate {
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-family: var(--font-mono-telemetry);
   letter-spacing: 0.14em;
   font-weight: 800;
 }
 
 .font-heading {
-  font-family: 'Chakra Petch', 'Inter', sans-serif;
+  font-family: var(--font-display);
   letter-spacing: 0.05em;
 }
 
-/* Custom Scrollbar for Tactical Feeds */
+/* Tactical Monospace & Tabular Number Alignment */
+.tabular-nums,
+.font-mono,
+.font-plate,
+code,
+pre {
+  font-variant-numeric: tabular-nums;
+  -webkit-font-feature-settings: "tnum" 1;
+  font-feature-settings: "tnum" 1;
+}
+
+/* Custom Tactical Scrollbars (Check 3 Audit) */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 4px;
+  height: 4px;
 }
 
 ::-webkit-scrollbar-track {
@@ -60,10 +106,29 @@ body {
 
 ::-webkit-scrollbar-thumb {
   background: #1e293b;
-  border-radius: 4px;
+  border-radius: 2px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* Tactical Dedicated Scrollbar Class */
+.tactical-scrollbar::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.tactical-scrollbar::-webkit-scrollbar-track {
+  background: #070b14;
+}
+
+.tactical-scrollbar::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 2px;
+}
+
+.tactical-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #334155;
 }
 
@@ -73,24 +138,84 @@ body {
   scrollbar-color: #1e293b #070b14;
 }
 
-/* Radar Pulse Animations */
-@keyframes radar-pulse {
-  0% {
-    transform: scale(0.9);
-    opacity: 0.85;
-  }
-  50% {
-    transform: scale(1.6);
-    opacity: 0.3;
-  }
-  100% {
-    transform: scale(2.2);
-    opacity: 0;
-  }
+/* Tactical Focus-Visible Ring (Check 4 Audit) */
+.tactical-focus-ring:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.6);
 }
 
-.animate-radar {
-  animation: radar-pulse 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+/* Authentic High Security Registration Plate (HSRP) Component */
+.hsrp-plate-surface {
+  background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 40%, #e2e8f0 100%);
+  border: 2px solid #64748b;
+  border-radius: 6px;
+  box-shadow: 
+    0 1px 3px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.2);
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+}
+
+.hsrp-plate-surface-yellow {
+  background: linear-gradient(180deg, #fef08a 0%, #fde047 40%, #eab308 100%);
+  border: 2px solid #ca8a04;
+  border-radius: 6px;
+  box-shadow: 
+    0 1px 3px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.2);
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* Stamped Embossed Character Text */
+.hsrp-embossed-text {
+  font-family: var(--font-hsrp-plate);
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  color: #070b14;
+  text-shadow: 
+    0 1px 0 rgba(255, 255, 255, 0.8),
+    0 -1px 1px rgba(0, 0, 0, 0.6);
+}
+
+/* 20mm Blue International Identifier Strip */
+.hsrp-ind-strip {
+  background: #0038a8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-right: 1.5px solid #002575;
+  color: #ffffff;
+}
+
+/* Holographic Chromium Security Seal */
+.hsrp-chromium-hologram {
+  border-radius: 2px;
+  background: linear-gradient(135deg, #cbd5e1 0%, #38bdf8 25%, #f472b6 50%, #34d399 75%, #94a3b8 100%);
+  background-size: 200% 200%;
+  animation: hologram-sheen 4s ease infinite;
+  box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes hologram-sheen {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 /* Urgent Critical Threat Glowing Halo Effect */
@@ -124,7 +249,7 @@ body {
 /* Leaflet Map Dark Theme Overrides */
 .leaflet-container {
   background-color: #070b14 !important;
-  font-family: 'Inter', sans-serif !important;
+  font-family: var(--font-body) !important;
 }
 
 .leaflet-popup-content-wrapper,
@@ -156,21 +281,176 @@ body {
   background-size: 24px 24px;
 }
 
-/* Hologram foil sheen */
-@keyframes hologram-sheen {
+/* ==========================================================================
+   PASS 3: EMIL-DESIGN-ENG MOTION & GOOGLE SPATIAL CONTINUITY ENGINE
+   ========================================================================== */
+
+/* 1. Google Maps Geospatial Dragnet Radar Wavefront */
+@keyframes geospatial-radar-sweep {
   0% {
-    background-position: 0% 50%;
+    transform: translate(-50%, -50%) scale(0.04);
+    opacity: 0.95;
+    border-width: 3.5px;
   }
-  50% {
-    background-position: 100% 50%;
+  60% {
+    opacity: 0.65;
+    border-width: 2px;
   }
   100% {
-    background-position: 0% 50%;
+    transform: translate(-50%, -50%) scale(2.85);
+    opacity: 0.0;
+    border-width: 0.5px;
   }
 }
 
-.hologram-shimmer {
-  background: linear-gradient(135deg, #cbd5e1 0%, #38bdf8 25%, #f472b6 50%, #34d399 75%, #94a3b8 100%);
-  background-size: 200% 200%;
-  animation: hologram-sheen 4s ease infinite;
+/* Tactical Canvas Token Utilities */
+.bg-tactical-viewport { background-color: var(--color-obsidian-viewport); }
+.bg-tactical-surface  { background-color: var(--color-obsidian-surface); }
+.bg-tactical-elevated { background-color: var(--color-obsidian-elevated); }
+.border-tactical-border { border-color: var(--color-tactical-border); }
+.text-tactical-cyan   { color: var(--color-threat-info); }
+.text-tactical-red    { color: var(--color-threat-critical); }
+.text-tactical-amber  { color: var(--color-threat-high); }
+.text-tactical-green  { color: var(--color-threat-normal); }
+
+.geospatial-sweep-wave {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 480px;
+  height: 480px;
+  border-radius: 50%;
+  border: 2px solid var(--color-threat-info);
+  box-shadow: 0 0 32px var(--color-threat-info), inset 0 0 20px rgba(6, 182, 212, 0.35);
+  pointer-events: none;
+  z-index: 1000;
+  will-change: transform, opacity;
+  transform: translate3d(-50%, -50%, 0);
+  animation: geospatial-radar-sweep 850ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+.geospatial-sweep-wave-echo {
+  animation-delay: 150ms;
+  border-color: #38bdf8;
+  box-shadow: 0 0 24px rgba(56, 189, 248, 0.45), inset 0 0 14px rgba(56, 189, 248, 0.25);
+}
+
+/* 2. Target Cam04 Triple Crimson Ripple */
+@keyframes target-crimson-ripple {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.95), 0 0 12px rgba(239, 68, 68, 0.8);
+  }
+  50% {
+    transform: scale(1.12);
+    box-shadow: 0 0 0 16px rgba(239, 68, 68, 0), 0 0 28px rgba(239, 68, 68, 0.5);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0), 0 0 12px rgba(239, 68, 68, 0.8);
+  }
+}
+
+.target-locked-cam04 {
+  animation: target-crimson-ripple 1.3s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  border-color: var(--color-threat-critical) !important;
+  will-change: transform, box-shadow;
+}
+
+/* 3. Camera Node Excitation Pulse during Dragnet Sweep */
+@keyframes node-scanning-pulse {
+  0% {
+    opacity: 0.4;
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.18);
+    box-shadow: 0 0 16px rgba(6, 182, 212, 0.85);
+  }
+  100% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+}
+
+.node-scanning-excitation {
+  animation: node-scanning-pulse 800ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 4. Live Street Stream Blur-to-Sharp Crossfade */
+@keyframes street-stream-crossfade {
+  0% {
+    opacity: 0;
+    filter: blur(8px);
+    transform: scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0px);
+    transform: scale(1);
+  }
+}
+
+.street-stream-blossom {
+  animation: street-stream-crossfade 450ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity, filter;
+}
+
+/* 5. Tactical Reticle Snap Animation */
+@keyframes tactical-reticle-snap {
+  0% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.tactical-reticle-box {
+  animation: tactical-reticle-snap 320ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+/* 6. Alert Feed Spring Arrival Physics */
+@keyframes alert-card-spring {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -16px, 0) scale(0.97);
+  }
+  65% {
+    opacity: 0.95;
+    transform: translate3d(0, 2px, 0) scale(1.005);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+.alert-card-spring-enter {
+  animation: alert-card-spring 220ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+/* 7. Forensic Drawer Hardware-Accelerated Slide-Out */
+.forensic-drawer-enter {
+  will-change: transform;
+  transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 8. Tactile Pointer Down-State Scale */
+.tactile-active-press {
+  transition: transform 75ms ease-out;
+}
+
+.tactile-active-press:active {
+  transform: scale(0.96);
+}
+

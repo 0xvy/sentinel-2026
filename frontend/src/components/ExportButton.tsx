@@ -46,7 +46,7 @@ export const ExportButton: React.FC<ExportButtonProps> = ({ currentPlate, classN
       type="button"
       onClick={handleExport}
       disabled={isExporting}
-      className={`relative inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-mono font-bold tracking-wide uppercase transition-all duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer focus:ring-2 focus:ring-cyan-500/50 focus:outline-none ${
+      className={`tactile-active-press relative inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-mono font-bold tracking-wide uppercase transition-transform duration-75 active:scale-[0.96] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer focus:ring-2 focus:ring-cyan-500/50 focus:outline-none ${
         exportSuccess
           ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-950/60 border border-emerald-400/60'
           : 'bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-extrabold shadow-lg shadow-cyan-950/60 border border-cyan-400/60'

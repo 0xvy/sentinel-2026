@@ -35,7 +35,7 @@ export const VideoWall: React.FC<VideoWallProps> = ({ cameras, onSelectCamera })
   return (
     <div className="flex flex-col h-full bg-[#070b14] p-3 text-xs overflow-hidden">
       {/* Control Bar */}
-      <div className="flex items-center justify-between mb-3 pb-2.5 border-b border-slate-800 shrink-0">
+      <div className="flex items-center justify-between mb-3 pb-3 border-b border-slate-800 shrink-0">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
@@ -50,7 +50,7 @@ export const VideoWall: React.FC<VideoWallProps> = ({ cameras, onSelectCamera })
                 key={dim}
                 type="button"
                 onClick={() => setGridSize(dim)}
-                className={`px-2.5 py-0.5 rounded font-mono text-xs font-bold transition-all ${
+                className={`px-2.5 py-0.5 rounded font-mono text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/70 ${
                   gridSize === dim
                     ? 'bg-cyan-600 text-slate-950 shadow-sm'
                     : 'text-slate-400 hover:text-white'
@@ -67,7 +67,7 @@ export const VideoWall: React.FC<VideoWallProps> = ({ cameras, onSelectCamera })
           <select
             value={selectedDept}
             onChange={(e) => setSelectedDept(e.target.value)}
-            className="bg-[#0d1424] border border-slate-800 text-slate-200 rounded-lg px-2.5 py-1 text-xs outline-none focus:border-cyan-500 font-mono"
+            className="bg-[#0d1424] border border-slate-800 text-slate-200 rounded-lg px-3 py-1 text-xs outline-none focus:border-cyan-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/70 font-mono"
           >
             <option value="ALL">All Departments</option>
             <option value="Police">Police</option>
@@ -81,12 +81,20 @@ export const VideoWall: React.FC<VideoWallProps> = ({ cameras, onSelectCamera })
       </div>
 
       {/* Grid Matrix with 16:9 Aspect Ratio Cells */}
-      <div className={`grid ${getGridClass()} gap-3 flex-1 min-h-0 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700`}>
+      <div className={`grid ${getGridClass()} gap-3 flex-1 min-h-0 overflow-y-auto tactical-scrollbar`}>
         {filteredCameras.map((cam) => (
           <div
             key={cam.camera_id}
+            role="button"
+            tabIndex={0}
             onClick={() => onSelectCamera && onSelectCamera(cam)}
-            className="relative bg-[#0d1424] border border-slate-800 rounded-lg overflow-hidden flex flex-col group hover:border-cyan-500/80 transition-all duration-150 cursor-pointer shadow-lg aspect-video"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onSelectCamera && onSelectCamera(cam);
+              }
+            }}
+            className="relative bg-[#0d1424] border border-slate-800 rounded-lg overflow-hidden flex flex-col group hover:border-cyan-500/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/70 transition-all duration-150 cursor-pointer shadow-lg aspect-video"
           >
             {/* Camera Viewport (16:9) with Real Video Feed */}
             <div className="relative w-full h-full bg-[#070b14] flex items-center justify-center overflow-hidden tactical-grid-bg">
