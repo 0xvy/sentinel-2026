@@ -132,6 +132,14 @@ class PlateDetector:
                             gx2 = max(gx1 + 1, min(w, vx1 + px2))
                             gy2 = max(gy1 + 1, min(h, vy1 + py2))
 
+                            pw = gx2 - gx1
+                            ph = gy2 - gy1
+                            if pw < 28 or ph < 10:
+                                continue
+                            ar = pw / float(ph)
+                            if ar < 1.3 or ar > 6.5:
+                                continue
+
                             detections.append({
                                 "bbox": [gx1, gy1, gx2, gy2],
                                 "confidence": round(p_conf, 4),
@@ -145,14 +153,25 @@ class PlateDetector:
                     for pb in direct_res.boxes:
                         p_conf = float(pb.conf[0])
                         x1, y1, x2, y2 = [int(round(c)) for c in pb.xyxy[0].tolist()]
+                        gx1 = max(0, x1)
+                        gy1 = max(0, y1)
+                        gx2 = min(w, x2)
+                        gy2 = min(h, y2)
+                        pw = gx2 - gx1
+                        ph = gy2 - gy1
+                        if pw < 28 or ph < 10:
+                            continue
+                        ar = pw / float(ph)
+                        if ar < 1.3 or ar > 6.5:
+                            continue
+
                         detections.append({
-                            "bbox": [max(0, x1), max(0, y1), min(w, x2), min(h, y2)],
+                            "bbox": [gx1, gy1, gx2, gy2],
                             "confidence": round(p_conf, 4),
                             "class": "license_plate",
                         })
 
-                if detections:
-                    return detections
+                return detections
 
             except Exception as exc:
                 logger.error(f"Neural detection error: {exc}. Invoking deterministic fallback.")

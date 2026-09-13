@@ -7,6 +7,8 @@ from typing import Any, Dict, List, Optional, Tuple
 import cv2
 import numpy as np
 
+from vision.detector.enhancement import enhance_plate_crop
+
 logger = logging.getLogger(__name__)
 
 # Character disambiguation dictionaries for Indian HSRP standard
@@ -157,7 +159,15 @@ class OCREngine:
         # TIER 1: Fast-Plate-OCR CCT Model
         if self.fast_recognizer is not None:
             try:
-                pred = self.fast_recognizer.run_one(plate_image, return_confidence=True)
+                # 1. Apply adaptive day/night glare-crusher enhancement
+                enhanced = enhance_plate_crop(plate_image)
+                # 2. Convert BGR to RGB (Fast-Plate-OCR expects RGB channels)
+                if len(enhanced.shape) == 3 and enhanced.shape[2] == 3:
+                    rgb_input = cv2.cvtColor(enhanced, cv2.COLOR_BGR2RGB)
+                else:
+                    rgb_input = enhanced
+
+                pred = self.fast_recognizer.run_one(rgb_input, return_confidence=True)
                 text = pred.plate.strip()
                 probs = pred.char_probs.tolist() if pred.char_probs is not None else [0.9] * len(text)
                 if text:
