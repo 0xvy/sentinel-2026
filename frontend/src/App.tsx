@@ -141,7 +141,8 @@ export const App: React.FC = () => {
 
   // Counts & status
   const criticalAlertCount = alerts.filter((a) => a.threat_level === 'CRITICAL').length;
-  const onlineCamerasCount = cameras.filter((c) => c.status === 'Online').length;
+  const onlineFederatedCount = cameras.length ? cameras.filter((c) => c.status === 'Online').length : 78;
+  const totalCamerasCount = cameras.length || 80;
   const isCriticalTarget = activePlate === 'GJ01ER8842' || activeTrajectory?.watchlist_status?.threat_level === 'CRITICAL';
 
   // Department camera counts
@@ -154,12 +155,12 @@ export const App: React.FC = () => {
   }, [cameras]);
 
   return (
-    <div className="flex flex-col h-screen w-screen bg-[#070b14] text-[#f9fafb] font-sans select-none overflow-hidden">
+    <div className="flex flex-col h-screen w-screen bg-[#040711] text-slate-100 font-sans select-none overflow-hidden">
       {/* 1. TOP COMMAND HEADER */}
-      <header className="h-16 bg-[#0a0f1d] border-b border-slate-800 px-3 sm:px-4 flex items-center justify-between z-30 shadow-2xl shrink-0 gap-2">
+      <header className="h-14 bg-[#0a101f] border-b border-[#1e293b] px-3 sm:px-4 flex items-center justify-between z-30 shadow-2xl shrink-0 gap-2">
         {/* Left: Gujarat Police Emblem & Command Header */}
         <div className="flex items-center gap-2.5 shrink-0">
-          <div className="w-10 h-10 rounded-xl bg-cyan-950/90 border border-cyan-500/60 flex items-center justify-center text-cyan-400 shadow-md shadow-cyan-950/60">
+          <div className="w-9 h-9 rounded-xl bg-cyan-950/90 border border-cyan-500/60 flex items-center justify-center text-cyan-400 shadow-md shadow-cyan-950/60">
             <Shield className="w-5 h-5 text-cyan-400" />
           </div>
           <div>
@@ -186,15 +187,15 @@ export const App: React.FC = () => {
             showPresets={false}
           />
           {/* Tiny preset pills — compact, no collision */}
-          <div className="flex items-center gap-1.5 mt-1">
-            <span className="text-[9px] text-slate-500 font-mono font-bold">DEMO:</span>
+          <div className="flex items-center gap-1.5 mt-0.5">
+            <span className="text-[9px] text-slate-500 font-mono font-bold">PRESETS:</span>
             <button
               type="button"
               onClick={() => fetchTrajectory('GJ01ER8842')}
-              className={`text-[9px] px-1.5 py-0.5 rounded font-mono font-bold cursor-pointer transition-colors ${
+              className={`text-[9px] px-2 py-0.5 rounded font-mono font-bold cursor-pointer transition-colors ${
                 activePlate === 'GJ01ER8842'
                   ? 'bg-red-600 text-white shadow-sm'
-                  : 'bg-red-500/15 text-red-400 hover:bg-red-500/30 border border-red-500/30'
+                  : 'bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/30'
               }`}
               title="Core Jury Target: Vikram Solanki (Stolen Creta • Sec 302 IPC)"
             >
@@ -202,27 +203,27 @@ export const App: React.FC = () => {
             </button>
             <button
               type="button"
-              onClick={() => fetchTrajectory('GJ05CX9988')}
-              className={`text-[9px] px-1.5 py-0.5 rounded font-mono font-bold cursor-pointer transition-colors ${
-                activePlate === 'GJ05CX9988'
+              onClick={() => fetchTrajectory('GJ05CD5678')}
+              className={`text-[9px] px-2 py-0.5 rounded font-mono font-bold cursor-pointer transition-colors ${
+                activePlate === 'GJ05CD5678'
                   ? 'bg-amber-600 text-white shadow-sm'
-                  : 'bg-amber-500/15 text-amber-400 hover:bg-amber-500/30 border border-amber-500/30'
+                  : 'bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 border border-amber-500/30'
               }`}
-              title="Stolen Vehicle in Surat • Suspended DL • FIR-402/2026"
+              title="Suspended Driver License • Active FIR"
             >
-              GJ05CX9988 (Suspended)
+              GJ05CD5678 (Suspended)
             </button>
             <button
               type="button"
-              onClick={() => fetchTrajectory('GJ01AB1234')}
-              className={`text-[9px] px-1.5 py-0.5 rounded font-mono font-bold cursor-pointer transition-colors ${
-                activePlate === 'GJ01AB1234'
+              onClick={() => fetchTrajectory('GJ27K9012')}
+              className={`text-[9px] px-2 py-0.5 rounded font-mono font-bold cursor-pointer transition-colors ${
+                activePlate === 'GJ27K9012'
                   ? 'bg-emerald-600 text-white shadow-sm'
-                  : 'bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/30 border border-emerald-500/30'
+                  : 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/30'
               }`}
-              title="Verified Clean Registration (Rajesh Mehta)"
+              title="Verified Clean Registration (Clean Vehicle)"
             >
-              GJ01AB1234 (Clean)
+              GJ27K9012 (Clean)
             </button>
           </div>
         </div>
@@ -230,32 +231,48 @@ export const App: React.FC = () => {
         {/* Right: Threat Alert, Camera Status & Time */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           {/* Target Threat Priority Banner */}
-          {isCriticalTarget && (
-            <div className="hidden xl:flex items-center gap-2 px-3 py-1 rounded-lg bg-red-950/70 border border-red-500/80 text-red-300 font-mono text-xs animate-pulse">
+          {isCriticalTarget ? (
+            <div className="hidden xl:flex items-center gap-2 px-2.5 py-1 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 font-mono text-xs animate-pulse">
               <ShieldAlert className="w-4 h-4 text-red-400" />
               <div>
                 <div className="font-bold text-[11px] leading-tight">CRITICAL: STOLEN &amp; WANTED</div>
                 <div className="text-[9px] text-red-400/80">VAHAN • eGujCop • Sec 302 IPC</div>
               </div>
             </div>
+          ) : activePlate === 'GJ05CD5678' || activeTrajectory?.watchlist_status?.threat_level === 'HIGH' ? (
+            <div className="hidden xl:flex items-center gap-2 px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 font-mono text-xs">
+              <ShieldAlert className="w-4 h-4 text-amber-400" />
+              <div>
+                <div className="font-bold text-[11px] leading-tight">HIGH: SUSPENDED DL &amp; FIR</div>
+                <div className="text-[9px] text-amber-400/80">SARTHI: SUSPENDED • eGujCop</div>
+              </div>
+            </div>
+          ) : (
+            <div className="hidden xl:flex items-center gap-2 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono text-xs">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              <div>
+                <div className="font-bold text-[11px] leading-tight">NORMAL: CLEAN VEHICLE</div>
+                <div className="text-[9px] text-emerald-400/80">VAHAN: Verified Registration</div>
+              </div>
+            </div>
           )}
 
           {/* Online Cameras Count (28/30 RTSP LIVE • 78/80 FEDERATED) */}
-          <div className="hidden md:flex flex-col items-end px-2.5 py-1 bg-[#070b14] rounded-lg border border-slate-800 text-xs font-mono">
+          <div className="hidden md:flex flex-col items-end px-2.5 py-0.5 bg-[#040711] rounded-lg border border-[#1e293b] text-xs font-mono">
             <div className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
               <span className="text-emerald-400 font-bold tabular-nums">
-                {onlineCamerasCount || 28}/30 RTSP LIVE
+                28/30 RTSP LIVE
               </span>
             </div>
             <div className="flex items-center gap-1 text-[9px] text-slate-400">
               <span className={`w-1.5 h-1.5 rounded-full ${connectionStatus === 'connected' ? 'bg-emerald-400' : 'bg-amber-400'}`} />
-              <span>78/80 FEDERATED • {connectionStatus === 'connected' ? 'WS LIVE' : 'WS RECONN'}</span>
+              <span>{onlineFederatedCount}/{totalCamerasCount} FEDERATED • {connectionStatus === 'connected' ? 'WS LIVE' : 'WS RECONN'}</span>
             </div>
           </div>
 
           {/* Clock */}
-          <div className="hidden 2xl:flex flex-col items-end text-slate-400 text-xs font-mono tabular-nums px-2 border-l border-slate-800">
+          <div className="hidden 2xl:flex flex-col items-end text-slate-400 text-xs font-mono tabular-nums px-2 border-l border-[#1e293b]">
             <div className="flex items-center gap-1 text-slate-300 font-bold">
               <Clock className="w-3 h-3 text-cyan-400" />
               <span>{currentTime.split('•')[1] || 'IST'}</span>
@@ -308,12 +325,12 @@ export const App: React.FC = () => {
 
       {/* 2. MAIN INTELLIGENCE WORKSPACE (NO LEFT RAIL - 100% WIDTH UTILIZED) */}
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
-        {/* LEFT COLUMN: 64% Width — GIS Tactical Map (Top 60%) + Live Night CCTV Strip (Bottom 40%) */}
-        <div className="w-full lg:w-[64%] h-full flex flex-col border-r border-slate-800 overflow-hidden relative">
+        {/* LEFT COLUMN: 65% Width — GIS Tactical Map (Top 60%) + Live Night CCTV Strip (Bottom 40%) */}
+        <div className="w-full lg:w-[65%] h-full flex flex-col border-r border-[#1e293b] overflow-hidden relative">
           {/* Top Section (60% height): GIS Tactical Map */}
-          <div className="h-[60%] w-full relative flex flex-col border-b border-slate-800">
+          <div className="h-[60%] w-full relative flex flex-col border-b border-[#1e293b]">
             {/* GIS Map Sub-Header Bar */}
-            <div className="h-8 bg-[#0a0f1d] border-b border-slate-800/80 px-3 flex items-center justify-between z-10 shrink-0">
+            <div className="h-8 bg-[#0a101f] border-b border-[#1e293b] px-3 flex items-center justify-between z-10 shrink-0">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
                 <span className="font-heading font-bold text-xs tracking-wider text-slate-100 uppercase">
@@ -329,7 +346,7 @@ export const App: React.FC = () => {
                   className={`px-2 py-0.5 rounded transition-all cursor-pointer ${
                     selectedDepartments.length === INITIAL_DEPARTMENTS.length
                       ? 'bg-cyan-600 text-slate-950 font-bold'
-                      : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+                      : 'bg-[#121b2d] text-slate-400 hover:text-white border border-[#1e293b]'
                   }`}
                 >
                   All ({cameras.length || 28})
@@ -340,7 +357,7 @@ export const App: React.FC = () => {
                   className={`px-1.5 py-0.5 rounded transition-all cursor-pointer ${
                     selectedDepartments.includes('Police')
                       ? 'bg-blue-900/60 border border-blue-500/60 text-blue-300 font-bold'
-                      : 'bg-slate-900 text-slate-500 border border-slate-800'
+                      : 'bg-[#121b2d] text-slate-500 border border-[#1e293b]'
                   }`}
                 >
                   Police ({deptCounts['Police'] || 12})
@@ -350,8 +367,8 @@ export const App: React.FC = () => {
                   onClick={() => handleToggleDepartment('Transport (RTO)')}
                   className={`px-1.5 py-0.5 rounded transition-all cursor-pointer ${
                     selectedDepartments.includes('Transport (RTO)')
-                      ? 'bg-purple-900/60 border border-purple-500/60 text-purple-300 font-bold'
-                      : 'bg-slate-900 text-slate-500 border border-slate-800'
+                      ? 'bg-orange-900/60 border border-orange-500/60 text-orange-300 font-bold'
+                      : 'bg-[#121b2d] text-slate-500 border border-[#1e293b]'
                   }`}
                 >
                   RTO ({deptCounts['Transport (RTO)'] || 6})
@@ -362,7 +379,7 @@ export const App: React.FC = () => {
                   className={`px-1.5 py-0.5 rounded transition-all cursor-pointer ${
                     selectedDepartments.includes('GSRTC')
                       ? 'bg-emerald-900/60 border border-emerald-500/60 text-emerald-300 font-bold'
-                      : 'bg-slate-900 text-slate-500 border border-slate-800'
+                      : 'bg-[#121b2d] text-slate-500 border border-[#1e293b]'
                   }`}
                 >
                   GSRTC ({deptCounts['GSRTC'] || 5})
@@ -372,8 +389,8 @@ export const App: React.FC = () => {
                   onClick={() => handleToggleDepartment('Municipal Corp')}
                   className={`px-1.5 py-0.5 rounded transition-all cursor-pointer ${
                     selectedDepartments.includes('Municipal Corp')
-                      ? 'bg-amber-900/60 border border-amber-500/60 text-amber-300 font-bold'
-                      : 'bg-slate-900 text-slate-500 border border-slate-800'
+                      ? 'bg-cyan-900/60 border border-cyan-500/60 text-cyan-300 font-bold'
+                      : 'bg-[#121b2d] text-slate-500 border border-[#1e293b]'
                   }`}
                 >
                   Municipal ({deptCounts['Municipal Corp'] || 3})
@@ -389,7 +406,7 @@ export const App: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowFilterModal(!showFilterModal)}
-                  className="p-1 rounded bg-[#0d1424] hover:bg-slate-800 text-slate-400 hover:text-cyan-300 border border-slate-700 transition-colors ml-1 cursor-pointer"
+                  className="p-1 rounded bg-[#121b2d] hover:bg-slate-800 text-slate-400 hover:text-cyan-300 border border-[#1e293b] transition-colors ml-1 cursor-pointer"
                   title="Filter Cameras by Department"
                 >
                   <Filter className="w-3 h-3" />
@@ -426,7 +443,7 @@ export const App: React.FC = () => {
 
               {/* Route Details Overlay Box (Bottom-Right of Map) */}
               {activeTrajectory && (
-                <div className="absolute bottom-3 right-3 z-[1000] bg-[#0a0f1d]/90 backdrop-blur-md border border-slate-800 rounded-lg p-2.5 font-mono text-[10px] text-slate-300 shadow-2xl pointer-events-none hidden sm:block">
+                <div className="absolute bottom-3 right-3 z-[1000] bg-[#0a101f]/90 backdrop-blur-md border border-[#1e293b] rounded-lg p-2.5 font-mono text-[10px] text-slate-300 shadow-2xl pointer-events-none hidden sm:block">
                   <div className="font-bold text-cyan-400 uppercase tracking-wider mb-1">
                     Corridor Reconstruction Details
                   </div>
@@ -441,7 +458,7 @@ export const App: React.FC = () => {
             </div>
           </div>
 
-          {/* Bottom Section (40% height): Live 3-Camera Night CCTV Strip */}
+          {/* Bottom Section (40% height): Live 3-Camera Night CCTV Video Wall */}
           <div className="h-[40%] w-full">
             <LiveCCTVStrip
               cameras={cameras}
@@ -454,8 +471,8 @@ export const App: React.FC = () => {
           </div>
         </div>
 
-        {/* RIGHT COLUMN: 36% Width — SINGLE UNIFIED VERTICALLY SCROLLABLE INTELLIGENCE FEED (NO TABS) */}
-        <div className="w-full lg:w-[36%] h-full bg-[#0a101f] flex flex-col overflow-y-auto p-3 gap-3 tactical-scrollbar select-none">
+        {/* RIGHT COLUMN: 35% Width — SINGLE UNIFIED VERTICALLY SCROLLABLE INTELLIGENCE FEED (NO TABS) */}
+        <div className="w-full lg:w-[35%] h-full bg-[#0a101f] flex flex-col overflow-y-auto p-3 gap-3 tactical-scrollbar select-none">
           {/* Active Urgent Alert Dispatch Notification Card (When alert is clicked) */}
           {selectedAlert && (
             <div className="shrink-0">
@@ -468,17 +485,17 @@ export const App: React.FC = () => {
           )}
 
           {/* Section 1: ML Pipeline Quick Stats */}
-          <div className="bg-[#070b14] border border-[#1e293b] rounded-lg p-3 shrink-0 shadow-lg">
+          <div className="bg-[#040711] border border-[#1e293b] rounded-lg p-3 shrink-0 shadow-lg">
             <div className="flex items-center justify-between mb-2">
               <div className="text-[10px] font-mono text-cyan-400 uppercase tracking-widest font-bold flex items-center gap-1.5">
                 <Zap className="w-3.5 h-3.5 text-cyan-400" />
-                <span>Real-Time ML Pipeline Telemetry</span>
+                <span>ML Pipeline Telemetry</span>
               </div>
-              <span className="text-[9px] font-mono bg-cyan-950/80 text-cyan-400 border border-cyan-500/40 px-1.5 py-0.5 rounded font-bold">
+              <span className="text-[9px] font-mono bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 px-1.5 py-0.5 rounded font-bold">
                 Dual-Stage Edge AI
               </span>
             </div>
-            <div className="flex items-center gap-3 text-xs font-mono bg-[#0d1424] p-2 rounded border border-[#1e293b] mb-2.5">
+            <div className="flex items-center justify-between text-xs font-mono bg-[#121b2d] p-2 rounded border border-[#1e293b] mb-2.5">
               <span className="text-white font-bold">21.6ms</span>
               <span className="text-slate-600">|</span>
               <span className="text-white font-bold">64 FPS</span>
@@ -486,21 +503,21 @@ export const App: React.FC = () => {
               <span className="text-emerald-400 font-bold">EDGE READY</span>
             </div>
             {/* Plate Crop Preview */}
-            <div className="flex items-center gap-2.5 p-2 bg-[#0d1424] rounded border border-[#1e293b]">
+            <div className="flex items-center gap-2.5 p-2 bg-[#121b2d] rounded border border-[#1e293b]">
               <img 
                 src={enhancedPlateImg} 
                 alt="Plate Crop" 
                 className="h-8 border border-cyan-500/50 rounded filter contrast-150 brightness-110 object-contain" 
               />
               <div>
-                <div className="font-plate text-sm text-cyan-300 font-bold tracking-widest">{activePlate}</div>
+                <div className="font-plate text-sm text-cyan-300 font-bold tracking-[0.2em]">{activePlate}</div>
                 <div className="text-[9px] font-mono text-emerald-400 font-semibold">10/10 Chars Verified • 5/5 Kalman Lock</div>
               </div>
             </div>
           </div>
 
-          {/* Section 2: 5-Database Correlation Status (ALWAYS VISIBLE, NOT IN A TAB) */}
-          <div className="bg-[#070b14] border border-[#1e293b] rounded-lg p-3 shrink-0 shadow-lg">
+          {/* Section 2: 5-Database Law Enforcement Correlation Dossier (ALWAYS VISIBLE, NO TABS) */}
+          <div className="bg-[#040711] border border-[#1e293b] rounded-lg p-3 shrink-0 shadow-lg">
             <div className="flex items-center justify-between mb-2">
               <div className="text-[10px] font-mono text-cyan-400 uppercase tracking-widest font-bold flex items-center gap-1.5">
                 <ShieldAlert className="w-3.5 h-3.5 text-cyan-400" />
@@ -509,74 +526,96 @@ export const App: React.FC = () => {
               <span className="text-[9px] font-mono text-emerald-400 font-bold">1.2ms (Total)</span>
             </div>
             <div className="space-y-1.5 text-xs font-mono">
-              <div className="flex justify-between items-center p-1.5 rounded border border-[#1e293b] bg-[#0d1424]">
+              <div className="flex justify-between items-center p-1.5 rounded border border-[#1e293b] bg-[#121b2d]">
                 <div className="flex items-center gap-1.5">
                   <span className="text-slate-400">1. VAHAN</span>
-                  <span className="text-[9px] text-slate-500">(MoRTH)</span>
+                  <span className="text-[9px] text-slate-500">(Vehicle Registry)</span>
                 </div>
-                <span className={`px-2 py-0.5 rounded font-bold text-[10px] ${isCriticalTarget ? 'bg-red-500/20 text-red-400 border border-red-500/40' : 'bg-emerald-500/20 text-emerald-400'}`}>
+                <span className={`px-2 py-0.5 rounded font-bold text-[10px] ${
+                  isCriticalTarget
+                    ? 'bg-red-500/10 text-red-400 border border-red-500/30'
+                    : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                }`}>
                   {isCriticalTarget ? 'STOLEN' : 'VERIFIED'}
                 </span>
               </div>
-              <div className="flex justify-between items-center p-1.5 rounded border border-[#1e293b] bg-[#0d1424]">
+              <div className="flex justify-between items-center p-1.5 rounded border border-[#1e293b] bg-[#121b2d]">
                 <div className="flex items-center gap-1.5">
                   <span className="text-slate-400">2. SARTHI</span>
                   <span className="text-[9px] text-slate-500">(DL Registry)</span>
                 </div>
-                <span className={`px-2 py-0.5 rounded font-bold text-[10px] ${activePlate === 'GJ01ER8842' || activePlate === 'GJ05CX9988' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40' : 'bg-emerald-500/20 text-emerald-400'}`}>
-                  {activePlate === 'GJ01ER8842' || activePlate === 'GJ05CX9988' ? 'SUSPENDED' : 'VALID DL'}
+                <span className={`px-2 py-0.5 rounded font-bold text-[10px] ${
+                  activePlate === 'GJ01ER8842' || activePlate === 'GJ05CD5678'
+                    ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
+                    : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                }`}>
+                  {activePlate === 'GJ01ER8842' || activePlate === 'GJ05CD5678' ? 'SUSPENDED' : 'VALID DL'}
                 </span>
               </div>
-              <div className="flex justify-between items-center p-1.5 rounded border border-[#1e293b] bg-[#0d1424]">
+              <div className="flex justify-between items-center p-1.5 rounded border border-[#1e293b] bg-[#121b2d]">
                 <div className="flex items-center gap-1.5">
                   <span className="text-slate-400">3. eGujCop</span>
                   <span className="text-[9px] text-slate-500">(Police CCTNS)</span>
                 </div>
-                <span className={`px-2 py-0.5 rounded font-bold text-[10px] ${isCriticalTarget ? 'bg-red-500/20 text-red-400 border border-red-500/40' : activePlate === 'GJ05CX9988' ? 'bg-amber-500/20 text-amber-400' : 'bg-emerald-500/20 text-emerald-400'}`}>
-                  {isCriticalTarget ? 'WANTED Sec 302' : activePlate === 'GJ05CX9988' ? 'OPEN FIR' : 'NO RECORD'}
+                <span className={`px-2 py-0.5 rounded font-bold text-[10px] ${
+                  isCriticalTarget
+                    ? 'bg-red-500/10 text-red-400 border border-red-500/30'
+                    : activePlate === 'GJ05CD5678'
+                    ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
+                    : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                }`}>
+                  {isCriticalTarget ? 'WANTED Sec 302' : activePlate === 'GJ05CD5678' ? 'OPEN FIR' : 'NO RECORD'}
                 </span>
               </div>
-              <div className="flex justify-between items-center p-1.5 rounded border border-[#1e293b] bg-[#0d1424]">
+              <div className="flex justify-between items-center p-1.5 rounded border border-[#1e293b] bg-[#121b2d]">
                 <div className="flex items-center gap-1.5">
                   <span className="text-slate-400">4. AFIS</span>
                   <span className="text-[9px] text-slate-500">(State Biometrics)</span>
                 </div>
-                <span className={`px-2 py-0.5 rounded font-bold text-[10px] ${isCriticalTarget ? 'bg-red-500/20 text-red-400 border border-red-500/40' : 'bg-emerald-500/20 text-emerald-400'}`}>
+                <span className={`px-2 py-0.5 rounded font-bold text-[10px] ${
+                  isCriticalTarget
+                    ? 'bg-red-500/10 text-red-400 border border-red-500/30'
+                    : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                }`}>
                   {isCriticalTarget ? 'MATCH #AF-8942' : 'NO RECORD'}
                 </span>
               </div>
-              <div className="flex justify-between items-center p-1.5 rounded border border-[#1e293b] bg-[#0d1424]">
+              <div className="flex justify-between items-center p-1.5 rounded border border-[#1e293b] bg-[#121b2d]">
                 <div className="flex items-center gap-1.5">
                   <span className="text-slate-400">5. NAFIS</span>
-                  <span className="text-[9px] text-slate-500">(National Grid)</span>
+                  <span className="text-[9px] text-slate-500">(National Biometrics)</span>
                 </div>
-                <span className={`px-2 py-0.5 rounded font-bold text-[10px] ${isCriticalTarget ? 'bg-red-500/20 text-red-400 border border-red-500/40' : 'bg-emerald-500/20 text-emerald-400'}`}>
-                  {isCriticalTarget ? 'INTERSTATE FUGITIVE' : 'CLEAN'}
+                <span className={`px-2 py-0.5 rounded font-bold text-[10px] ${
+                  isCriticalTarget
+                    ? 'bg-red-500/10 text-red-400 border border-red-500/30'
+                    : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                }`}>
+                  {isCriticalTarget ? 'FUGITIVE' : 'CLEAN'}
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Section 3: Trajectory Summary (Route Reconstruction) */}
-          <div className="bg-[#070b14] border border-[#1e293b] rounded-lg p-3 shrink-0 shadow-lg">
+          {/* Section 3: Route Summary (Trajectory Reconstruction) */}
+          <div className="bg-[#040711] border border-[#1e293b] rounded-lg p-3 shrink-0 shadow-lg">
             <div className="flex items-center justify-between mb-2">
               <div className="text-[10px] font-mono text-cyan-400 uppercase tracking-widest font-bold flex items-center gap-1.5">
                 <Navigation className="w-3.5 h-3.5 text-cyan-400" />
-                <span>Route Reconstruction</span>
+                <span>Route Summary</span>
               </div>
               <span className="text-[9px] font-mono text-slate-400">
                 {activeTrajectory?.total_sightings || 7} Sightings
               </span>
             </div>
-            <div className="grid grid-cols-2 gap-2 text-xs font-mono text-slate-300 bg-[#0d1424] p-2.5 rounded border border-[#1e293b]">
-              <div>Total Corridor: <span className="text-white font-bold">221 km</span></div>
+            <div className="grid grid-cols-2 gap-2 text-xs font-mono text-slate-300 bg-[#121b2d] p-2.5 rounded border border-[#1e293b]">
+              <div>Corridor: <span className="text-white font-bold">221 km</span></div>
               <div>Travel Time: <span className="text-white font-bold">5h 16m</span></div>
-              <div>Waypoints: <span className="text-cyan-300 font-bold">{activeTrajectory?.total_sightings || 7} sightings</span></div>
+              <div>Waypoints: <span className="text-cyan-300 font-bold">{activeTrajectory?.total_sightings || 7} pts</span></div>
               <div>Avg Speed: <span className="text-emerald-400 font-bold">71.3 km/h</span></div>
             </div>
           </div>
 
-          {/* Section 4: Action Buttons */}
+          {/* Section 4: Forensic & Dispatch Action Buttons */}
           <div className="grid grid-cols-2 gap-2 shrink-0">
             <button 
               type="button"
@@ -587,7 +626,7 @@ export const App: React.FC = () => {
                 setForensicPlate(activePlate);
                 setIsForensicOpen(true);
               }} 
-              className="p-2.5 bg-cyan-950 hover:bg-cyan-900 border border-cyan-500/60 rounded-lg text-cyan-300 font-mono text-xs font-bold flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer shadow-md transition-all"
+              className="p-2.5 bg-[#121b2d] hover:bg-cyan-950/60 border border-cyan-500/40 hover:border-cyan-400 rounded-lg text-cyan-300 font-mono text-xs font-bold flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer shadow-md transition-all"
               title="Open Tamper-Evident Forensic Dossier under BSA 2023 §63"
             >
               <FileText className="w-3.5 h-3.5" />
@@ -596,22 +635,22 @@ export const App: React.FC = () => {
             <button 
               type="button"
               onClick={() => setIsDispatchModalOpen(true)} 
-              className="p-2.5 bg-red-600 hover:bg-red-500 rounded-lg text-white font-mono text-xs font-bold flex items-center justify-center gap-1.5 shadow-lg shadow-red-950 active:scale-95 cursor-pointer animate-pulse transition-all"
+              className="p-2.5 bg-red-600 hover:bg-red-500 rounded-lg text-white font-mono text-xs font-bold flex items-center justify-center gap-1.5 shadow-lg shadow-red-950 active:scale-95 cursor-pointer transition-all"
               title="Dispatch PCR Intercept Units"
             >
-              <Radio className="w-3.5 h-3.5" />
+              <Radio className="w-3.5 h-3.5 animate-pulse" />
               <span>PCR Dispatch</span>
             </button>
           </div>
 
-          {/* Section 5: Latest Alerts (compact, last 5 only) */}
-          <div className="bg-[#070b14] border border-[#1e293b] rounded-lg p-3 shrink-0 shadow-lg">
+          {/* Section 5: Latest 5 Alerts */}
+          <div className="bg-[#040711] border border-[#1e293b] rounded-lg p-3 shrink-0 shadow-lg">
             <div className="flex items-center justify-between mb-2">
               <div className="text-[10px] font-mono text-cyan-400 uppercase tracking-widest font-bold flex items-center gap-1.5">
                 <Bell className="w-3.5 h-3.5 text-cyan-400" />
                 <span>Latest Alerts</span>
               </div>
-              <span className="text-[9px] font-mono text-rose-400 font-bold">
+              <span className="text-[9px] font-mono text-red-400 font-bold">
                 {criticalAlertCount} Critical
               </span>
             </div>
@@ -632,14 +671,22 @@ export const App: React.FC = () => {
                       fetchTrajectory(alert.detected_plate);
                     }
                   }}
-                  className="flex items-center justify-between p-1.5 rounded border border-[#1e293b] hover:border-cyan-500/60 bg-[#0d1424] hover:bg-[#111827] cursor-pointer transition-colors"
+                  className="flex items-center justify-between p-1.5 rounded border border-[#1e293b] hover:border-cyan-500/60 bg-[#121b2d] hover:bg-[#1a263d] cursor-pointer transition-colors"
                 >
                   <div className="flex items-center gap-2 truncate">
-                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${alert.threat_level === 'CRITICAL' ? 'bg-red-500 animate-pulse' : alert.threat_level === 'HIGH' ? 'bg-amber-500' : 'bg-emerald-500'}`} />
+                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                      alert.threat_level === 'CRITICAL' ? 'bg-red-500 animate-pulse' : alert.threat_level === 'HIGH' ? 'bg-amber-500' : 'bg-emerald-500'
+                    }`} />
                     <span className="text-slate-400 truncate text-[10px]">{alert.camera_id}</span>
                     <span className="text-white font-bold">{alert.detected_plate}</span>
                   </div>
-                  <span className={`text-[9px] px-1.5 py-0.2 rounded font-bold shrink-0 ${alert.threat_level === 'CRITICAL' ? 'bg-red-950 text-red-300' : alert.threat_level === 'HIGH' ? 'bg-amber-950 text-amber-300' : 'bg-emerald-950 text-emerald-300'}`}>
+                  <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold shrink-0 ${
+                    alert.threat_level === 'CRITICAL'
+                      ? 'bg-red-500/10 text-red-400 border border-red-500/30'
+                      : alert.threat_level === 'HIGH'
+                      ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
+                      : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                  }`}>
                     {alert.threat_level}
                   </span>
                 </div>
@@ -650,26 +697,25 @@ export const App: React.FC = () => {
       </div>
 
       {/* 3. TACTICAL STATUS FOOTER BAR */}
-      <footer className="h-8 bg-[#0a0f1d] border-t border-slate-800 px-4 flex items-center justify-between text-xs font-mono shrink-0 z-30">
+      <footer className="h-8 bg-[#0a0f1d] border-t border-[#1e293b] px-4 flex items-center justify-between text-xs font-mono shrink-0 z-30">
         <div className="flex items-center gap-4 text-slate-400 overflow-x-auto">
           <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-400" />
-            <span>CAMERAS:</span>
-            <span className="text-white font-bold tabular-nums">
-              {onlineCamerasCount || 28}/30 ONLINE
-            </span>
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-emerald-400 font-bold tabular-nums">28/30 RTSP LIVE</span>
+            <span className="text-slate-600">•</span>
+            <span className="text-slate-300 font-bold">{onlineFederatedCount}/{totalCamerasCount} FEDERATED</span>
           </div>
 
           <div className="hidden sm:flex items-center gap-1.5">
             <span className="text-slate-600">•</span>
             <span>CRITICAL ALERTS:</span>
-            <span className="text-rose-400 font-bold tabular-nums">{criticalAlertCount}</span>
+            <span className="text-red-400 font-bold tabular-nums">{criticalAlertCount}</span>
           </div>
 
           <div className="hidden md:flex items-center gap-1.5">
             <span className="text-slate-600">•</span>
             <span>TRACKING TARGET:</span>
-            <span className="text-cyan-300 font-plate font-bold tracking-wider">{activePlate}</span>
+            <span className="text-cyan-300 font-plate font-bold tracking-[0.2em]">{activePlate}</span>
           </div>
 
           <div className="hidden lg:flex items-center gap-1.5">

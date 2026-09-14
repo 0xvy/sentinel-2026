@@ -26,13 +26,22 @@ interface DefaultCCTVFeed {
   }>;
 }
 
+const DEPT_BORDER_COLORS: Record<string, string> = {
+  Police: 'border-[#3b82f6]/70 hover:border-[#3b82f6] shadow-[0_0_12px_rgba(59,130,246,0.15)]',
+  'Transport (RTO)': 'border-[#f97316]/70 hover:border-[#f97316] shadow-[0_0_12px_rgba(249,115,22,0.15)]',
+  GSRTC: 'border-[#10b981]/70 hover:border-[#10b981] shadow-[0_0_12px_rgba(16,185,129,0.15)]',
+  'Municipal Corp': 'border-[#06b6d4]/70 hover:border-[#06b6d4] shadow-[0_0_12px_rgba(6,182,212,0.15)]',
+  Health: 'border-[#10b981]/70 hover:border-[#10b981] shadow-[0_0_12px_rgba(16,185,129,0.15)]',
+  Panchayat: 'border-[#f97316]/70 hover:border-[#f97316] shadow-[0_0_12px_rgba(249,115,22,0.15)]',
+};
+
 const DEFAULT_FEEDS: DefaultCCTVFeed[] = [
   {
     id: 'cam04',
     name: 'CAM-POL-AHM-04',
-    location: 'S.G. Highway • Thaltej Circle, Ahmedabad',
-    lat: 23.0532,
-    lng: 72.5086,
+    location: '04 Paldi Circle • SG Highway, Ahmedabad',
+    lat: 23.0125,
+    lng: 72.5620,
     dept: 'Police',
     boxes: [
       { label: 'Car 96%', conf: '96%', top: '48%', left: '16%', width: '28%', height: '34%' },
@@ -41,24 +50,24 @@ const DEFAULT_FEEDS: DefaultCCTVFeed[] = [
     ],
   },
   {
-    id: 'cam12',
-    name: 'CAM-RTO-BOR-12',
-    location: 'Bopal Circle • Sanand Highway, Ahmedabad',
-    lat: 23.0336,
-    lng: 72.4647,
-    dept: 'Transport (RTO)',
+    id: 'cam10',
+    name: 'CAM-MUN-JUN-10',
+    location: '10 Char Chowk Road • Junagadh',
+    lat: 21.5190,
+    lng: 70.4590,
+    dept: 'Municipal Corp',
     boxes: [
       { label: 'Bus 92%', conf: '92%', top: '42%', left: '44%', width: '38%', height: '42%' },
       { label: 'Car 89%', conf: '89%', top: '60%', left: '18%', width: '24%', height: '28%' },
     ],
   },
   {
-    id: 'cam16',
-    name: 'CAM-MUN-SUR-16',
-    location: 'Madhapar Chowkadi • Ring Road, Rajkot',
-    lat: 22.3168,
-    lng: 70.7812,
-    dept: 'Municipal Corp',
+    id: 'cam13',
+    name: 'CAM-POL-AHM-13',
+    location: '13 CN Vidhyalaya • Ambawadi, Ahmedabad',
+    lat: 23.0230,
+    lng: 72.5480,
+    dept: 'Police',
     boxes: [
       { label: 'Car 94%', conf: '94%', top: '52%', left: '22%', width: '26%', height: '30%' },
       { label: 'Auto 81%', conf: '81%', top: '58%', left: '58%', width: '16%', height: '22%' },
@@ -141,7 +150,7 @@ export const LiveCCTVStrip: React.FC<LiveCCTVStripProps> = ({
                 onSelectCamera && onSelectCamera(item.camera);
               }
             }}
-            className="group relative bg-[#0a0f1d] border border-slate-800 hover:border-cyan-500/80 rounded-lg overflow-hidden flex flex-col transition-all cursor-pointer shadow-lg aspect-video sm:aspect-auto h-full"
+            className={`group relative bg-[#0a0f1d] border ${DEPT_BORDER_COLORS[item.dept] || 'border-slate-800'} rounded-lg overflow-hidden flex flex-col transition-all cursor-pointer shadow-lg aspect-video sm:aspect-auto h-full`}
             title={`Click to focus map on ${item.name}`}
           >
             {/* Video Viewport Container */}
