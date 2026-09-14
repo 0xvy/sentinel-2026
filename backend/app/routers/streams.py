@@ -339,7 +339,7 @@ def _stream_worker(camera_id: str, stop_event: threading.Event):
                 cv2.putText(frame, hud_text, (20, h - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 255, 255), 1)
 
                 # Encode frame to JPEG and update shared buffer
-                success, jpeg = cv2.imencode(".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, 75])
+                success, jpeg = cv2.imencode(".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, 88])
                 if success:
                     _frame_buffers[camera_id] = jpeg.tobytes()
 

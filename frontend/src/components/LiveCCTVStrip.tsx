@@ -114,7 +114,8 @@ export const LiveCCTVStrip: React.FC<LiveCCTVStripProps> = ({
               <img
                 src={`/api/streams/${item.id}/feed`}
                 alt={item.name}
-                className="absolute inset-0 w-full h-full object-cover z-0 filter grayscale contrast-125 brightness-90"
+                className="absolute inset-0 w-full h-full object-cover z-0"
+                style={{ imageRendering: 'auto' }}
                 onError={(e) => {
                   (e.target as HTMLImageElement).style.opacity = '0.5';
                 }}
