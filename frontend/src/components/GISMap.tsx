@@ -200,12 +200,16 @@ export const GISMap: React.FC<GISMapProps> = ({
         className="w-full h-full"
         zoomControl={false}
       >
-        {/* CartoDB Dark Matter: Crisp vector-rendered dark tiles */}
+        {/* Esri World Dark Gray Canvas: High-tech dark tactical basemap (Zero Watermarks, No API Key) */}
         <TileLayer
-          attribution='&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-          subdomains="abcd"
-          maxZoom={19}
+          attribution='&copy; <a href="https://www.esri.com/">Esri</a> &bull; Gujarat Police'
+          url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}"
+          maxZoom={16}
+        />
+        {/* Esri World Dark Gray Reference: Clean city and highway labels */}
+        <TileLayer
+          url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}"
+          maxZoom={16}
         />
 
         {/* Map Controller for programmatic flyTo & statewide trajectory auto-fitting */}
@@ -420,7 +424,7 @@ export const GISMap: React.FC<GISMapProps> = ({
 
       {/* Bottom-Right Attribution */}
       <div className="absolute bottom-2 right-3 z-[1000] pointer-events-none text-[10px] font-mono text-slate-500">
-        CartoDB Dark Matter &bull; Gujarat Police
+        Esri Dark Canvas &bull; Gujarat Police GIS
       </div>
     </div>
   );
