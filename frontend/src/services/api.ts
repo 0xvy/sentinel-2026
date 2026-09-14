@@ -75,7 +75,11 @@ export const api = {
     try {
       const res = await fetch(`${API_BASE}/api/vehicles/${cleanPlate}/trajectory`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return await res.json();
+      const data = await res.json();
+      if (data && (!data.sightings || data.sightings.length === 0) && MOCK_TRAJECTORIES[cleanPlate]) {
+        return MOCK_TRAJECTORIES[cleanPlate];
+      }
+      return data;
     } catch (err) {
       console.warn(`API getTrajectory (${cleanPlate}) fallback to mock:`, err);
       if (MOCK_TRAJECTORIES[cleanPlate]) {
