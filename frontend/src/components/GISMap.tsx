@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { MapContainer, TileLayer, Marker, Tooltip, Popup, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import { Layers, LocateFixed, ChevronLeft, ChevronRight, Eye, Crosshair } from 'lucide-react';
+import { LocateFixed, ChevronLeft, ChevronRight, Eye, Crosshair } from 'lucide-react';
 import { Camera, Sighting, TrajectoryResponse } from '../types';
 
 interface GISMapProps {
@@ -82,50 +82,56 @@ function createSightingWaypointIcon(
       className: 'sighting-node-latest',
       html: `
         <div style="position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer;">
-          <!-- Active Pulsing Target Halo -->
-          <div style="position: absolute; top: -5px; width: 34px; height: 34px; border-radius: 50%; background: rgba(239, 68, 68, 0.25); border: 1.5px solid #ef4444; animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>
+          <!-- Active Pulsing Target Radar Halo -->
+          <div style="position: absolute; top: -8px; width: 40px; height: 40px; border-radius: 50%; background: rgba(239, 68, 68, 0.25); border: 1.5px solid #ef4444; animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>
           
-          <!-- Red Target Node -->
-          <div style="position: relative; width: 24px; height: 24px; border-radius: 50%; background: #070b14; border: 2.5px solid #ef4444; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 16px rgba(239, 68, 68, 0.9);">
-            <div style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444;"></div>
-          </div>
-
-          <!-- Crisp Target Tag -->
-          <div style="margin-top: 3px; background: rgba(7, 11, 20, 0.95); border: 1px solid #ef4444; border-radius: 4px; padding: 1px 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.9); display: flex; align-items: center; gap: 4px; white-space: nowrap;">
-            <span style="font-size: 9px; font-family: monospace; font-weight: 800; color: #ef4444; letter-spacing: 0.05em;">#${index + 1} LATEST</span>
+          <!-- Red Target Jewel -->
+          <div style="position: relative; width: 24px; height: 24px; border-radius: 50%; background: #070b14; border: 2.5px solid #ef4444; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 16px rgba(239, 68, 68, 0.95), 0 0 6px #ffffff;">
+            <span style="font-size: 10px; font-family: monospace; font-weight: 900; color: #ff4d4f; line-height: 1;">${index + 1}</span>
           </div>
         </div>
       `,
-      iconSize: [70, 48],
-      iconAnchor: [35, 12],
+      iconSize: [40, 40],
+      iconAnchor: [20, 20],
       popupAnchor: [0, -14],
     });
   }
 
-  const ringColor = isStart ? '#10b981' : isSelected ? '#38bdf8' : '#ef4444';
-  const label = isStart ? 'START' : `#${index + 1}`;
+  if (isStart) {
+    return L.divIcon({
+      className: 'sighting-node-start',
+      html: `
+        <div style="position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer;">
+          <div style="width: 22px; height: 22px; border-radius: 50%; background: #070b14; border: 2.5px solid #10b981; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 12px rgba(16, 185, 129, 0.85);">
+            <span style="font-size: 10px; font-family: monospace; font-weight: 900; color: #10b981; line-height: 1;">1</span>
+          </div>
+        </div>
+      `,
+      iconSize: [24, 24],
+      iconAnchor: [12, 12],
+      popupAnchor: [0, -12],
+    });
+  }
+
+  const ringColor = isSelected ? '#38bdf8' : '#ef4444';
 
   return L.divIcon({
     className: 'sighting-node',
     html: `
       <div style="position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer;">
-        <div style="width: 22px; height: 22px; border-radius: 50%; background: #070b14; border: 2px solid ${ringColor}; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 10px ${ringColor}99, 0 2px 4px rgba(0,0,0,0.8); transition: transform 0.15s ease;">
-          <span style="font-size: 9px; font-family: monospace; font-weight: 800; color: ${ringColor}; line-height: 1;">
+        <div style="width: 20px; height: 20px; border-radius: 50%; background: #070b14; border: 1.5px solid ${ringColor}; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 8px ${ringColor}88; transition: transform 0.15s ease;">
+          <span style="font-size: 9px; font-family: monospace; font-weight: 800; color: ${isSelected ? '#38bdf8' : '#ffffff'}; line-height: 1;">
             ${index + 1}
           </span>
         </div>
-        ${isSelected ? `
-          <div style="margin-top: 2px; background: rgba(7, 11, 20, 0.95); border: 1px solid ${ringColor}; border-radius: 3px; padding: 0.5px 4px; font-size: 8px; font-family: monospace; font-weight: 800; color: ${ringColor}; white-space: nowrap;">
-            ${label}
-          </div>
-        ` : ''}
       </div>
     `,
-    iconSize: [24, 24],
-    iconAnchor: [12, 11],
-    popupAnchor: [0, -12],
+    iconSize: [22, 22],
+    iconAnchor: [11, 11],
+    popupAnchor: [0, -11],
   });
 }
+
 
 // Background non-sighting cameras: Unobtrusive micro-dot to keep map clean
 function createBackgroundCameraDot(camera: Camera, isFullMode: boolean) {
@@ -138,29 +144,30 @@ function createBackgroundCameraDot(camera: Camera, isFullMode: boolean) {
   const color = deptColors[camera.department] || '#64748b';
 
   if (!isFullMode) {
-    // Ultra-minimal 4px dim dot: Zero visual clutter
+    // Clean, subtle 5px tactical micro-dot
     return L.divIcon({
       className: 'bg-camera-dim',
-      html: `<div style="width: 4px; height: 4px; border-radius: 50%; background: ${color}; opacity: 0.25; cursor: pointer;"></div>`,
-      iconSize: [4, 4],
-      iconAnchor: [2, 2],
+      html: `<div style="width: 5px; height: 5px; border-radius: 50%; background: ${color}; opacity: 0.35; box-shadow: 0 0 3px ${color}; cursor: pointer;"></div>`,
+      iconSize: [5, 5],
+      iconAnchor: [2.5, 2.5],
       popupAnchor: [0, -4],
     });
   }
 
-  // Full Grid Mode: Clean 12px jewel node
+  // Full Grid Mode: Clean 13px jewel node
   return L.divIcon({
     className: 'bg-camera-node',
     html: `
-      <div style="width: 12px; height: 12px; border-radius: 50%; background: #070b14; border: 1.5px solid ${color}; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 5px ${color}66; cursor: pointer;">
+      <div style="width: 13px; height: 13px; border-radius: 50%; background: #070b14; border: 1.5px solid ${color}; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 8px ${color}88; cursor: pointer;">
         <div style="width: 4px; height: 4px; border-radius: 50%; background: ${color};"></div>
       </div>
     `,
-    iconSize: [12, 12],
-    iconAnchor: [6, 6],
+    iconSize: [13, 13],
+    iconAnchor: [6.5, 6.5],
     popupAnchor: [0, -8],
   });
 }
+
 
 export const GISMap: React.FC<GISMapProps> = ({
   cameras,
@@ -174,6 +181,7 @@ export const GISMap: React.FC<GISMapProps> = ({
   // Focus Mode: When tracking a suspect vehicle, default to "Route Focus" to eliminate clutter!
   const [showAllCameras, setShowAllCameras] = useState<boolean>(false);
   const [activeStepIndex, setActiveStepIndex] = useState<number>(0);
+  const [mapTheme, setMapTheme] = useState<'satellite' | 'dark'>('satellite');
 
   // Center of Gujarat
   const defaultCenter: [number, number] = [22.75, 71.95];
@@ -249,17 +257,37 @@ export const GISMap: React.FC<GISMapProps> = ({
         className="w-full h-full"
         zoomControl={false}
       >
-        {/* Esri World Dark Gray Canvas: High-tech dark tactical basemap (Zero Watermarks, No API Key) */}
-        <TileLayer
-          attribution='&copy; <a href="https://www.esri.com/">Esri</a> &bull; Gujarat Police'
-          url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}"
-          maxZoom={16}
-        />
-        {/* Esri World Dark Gray Reference: Clean city and highway labels */}
-        <TileLayer
-          url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}"
-          maxZoom={16}
-        />
+        {/* Zero-Watermark Basemap Engine: High-Res Satellite Recon vs Tactical Dark Canvas */}
+        {mapTheme === 'satellite' ? (
+          <>
+            {/* Esri World Imagery (High-Res Satellite Recon) — Zero Watermarks, No API Key */}
+            <TileLayer
+              attribution='&copy; <a href="https://www.esri.com/">Esri</a> &bull; Gujarat Police'
+              url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+              maxZoom={18}
+            />
+            {/* High-Contrast City & Highway Reference Overlay */}
+            <TileLayer
+              url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"
+              maxZoom={16}
+              opacity={0.85}
+            />
+          </>
+        ) : (
+          <>
+            {/* Esri Dark Gray Canvas Base — Zero Watermarks, No API Key */}
+            <TileLayer
+              attribution='&copy; <a href="https://www.esri.com/">Esri</a> &bull; Gujarat Police'
+              url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}"
+              maxZoom={16}
+            />
+            {/* Dark City & Highway Reference */}
+            <TileLayer
+              url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}"
+              maxZoom={16}
+            />
+          </>
+        )}
 
         {/* Map Controller for programmatic flyTo & statewide trajectory auto-fitting */}
         <MapController flyToLocation={flyToLocation} trajectoryCoordinates={trajectoryCoordinates} />
@@ -316,31 +344,56 @@ export const GISMap: React.FC<GISMapProps> = ({
           </Marker>
         ))}
 
-        {/* Suspect Corridor Route Polyline: Glowing Underlay + Razor Edge */}
+        {/* Suspect Corridor: Multi-Layer High-Visibility Laser Beam & Tactical Signal Pulses */}
         {trajectoryCoordinates.length > 1 && (
           <>
+            {/* Layer 1: Wide Laser Bloom / Ambient Glow */}
             <Polyline
               positions={trajectoryCoordinates}
               pathOptions={{
                 color: '#ef4444',
-                weight: 6,
-                opacity: 0.35,
+                weight: 12,
+                opacity: 0.18,
                 lineCap: 'round',
                 lineJoin: 'round',
               }}
             />
+            {/* Layer 2: Glowing Crimson Conduit */}
             <Polyline
               positions={trajectoryCoordinates}
               pathOptions={{
-                color: '#ff4d4f',
-                weight: 3,
+                color: '#ff2d55',
+                weight: 5,
+                opacity: 0.85,
+                lineCap: 'round',
+                lineJoin: 'round',
+              }}
+            />
+            {/* Layer 3: High-Intensity White Laser Filament Core */}
+            <Polyline
+              positions={trajectoryCoordinates}
+              pathOptions={{
+                color: '#ffffff',
+                weight: 1.8,
                 opacity: 0.95,
                 lineCap: 'round',
                 lineJoin: 'round',
               }}
             />
+            {/* Layer 4: Tactical Energy Pulse Line */}
+            <Polyline
+              positions={trajectoryCoordinates}
+              pathOptions={{
+                color: '#fecaca',
+                weight: 2.2,
+                opacity: 0.9,
+                dashArray: '6, 16',
+                lineCap: 'round',
+              }}
+            />
           </>
         )}
+
 
         {/* Numbered Sighting Checkpoints along Suspect Route */}
         {sortedSightings.map((sighting, idx) => {
@@ -408,88 +461,139 @@ export const GISMap: React.FC<GISMapProps> = ({
         })}
       </MapContainer>
 
-      {/* Top-Left Mode Switch: Suspect Corridor vs All Cams */}
-      <div className="absolute top-3 left-3 z-[1000] flex items-center gap-1.5 pointer-events-auto">
-        <button
-          type="button"
-          onClick={() => setShowAllCameras(false)}
-          className={`px-2.5 py-1 rounded-md text-xs font-mono font-bold flex items-center gap-1.5 transition-all shadow-md cursor-pointer ${
-            !showAllCameras
-              ? 'bg-red-950/90 text-red-300 border border-red-500/80 shadow-red-950/50'
-              : 'bg-[#0b1222]/90 text-slate-400 border border-slate-700/60 hover:text-white'
-          }`}
-          title="Focus on suspect escape corridor only"
-        >
-          <Crosshair className="w-3.5 h-3.5" />
-          <span>CORRIDOR FOCUS</span>
-          {sortedSightings.length > 0 && (
-            <span className="px-1.5 py-0.2 rounded bg-red-500/20 text-red-400 text-[10px]">
-              {sortedSightings.length}
-            </span>
-          )}
-        </button>
-        <button
-          type="button"
-          onClick={() => setShowAllCameras(true)}
-          className={`px-2.5 py-1 rounded-md text-xs font-mono font-bold flex items-center gap-1.5 transition-all shadow-md cursor-pointer ${
-            showAllCameras
-              ? 'bg-cyan-950/90 text-cyan-300 border border-cyan-500/80 shadow-cyan-950/50'
-              : 'bg-[#0b1222]/90 text-slate-400 border border-slate-700/60 hover:text-white'
-          }`}
-          title="Show all statewide camera nodes"
-        >
-          <Eye className="w-3.5 h-3.5" />
-          <span>ALL CAMS</span>
-          <span className="px-1.5 py-0.2 rounded bg-slate-800 text-slate-300 text-[10px]">
-            {visibleCameras.length}
-          </span>
-        </button>
+      {/* Military Tactical Corner Graticules */}
+      <div className="absolute top-2 left-2 z-[999] pointer-events-none text-[9px] font-mono text-slate-500/60 select-none">
+        + LAT 23°13'N / 72°38'E
+      </div>
+      <div className="absolute top-2 right-2 z-[999] pointer-events-none text-[9px] font-mono text-slate-500/60 select-none">
+        + STATEWIDE GIS // SECTOR-04
+      </div>
+      <div className="absolute bottom-2 left-2 z-[999] pointer-events-none text-[9px] font-mono text-slate-500/60 select-none">
+        + 22°18'N / 70°47'E
+      </div>
+      <div className="absolute bottom-2 right-2 z-[999] pointer-events-none text-[9px] font-mono text-slate-500/60 select-none">
+        + SENTINEL-GIS // BSA §63
       </div>
 
-      {/* Top-Right Tactical Toolbar */}
-      <div className="absolute top-3 right-3 z-[1000] flex items-center gap-1.5 bg-[#0b1222]/90 backdrop-blur-md border border-slate-700/60 rounded-lg p-1 text-slate-400 pointer-events-auto">
-        <button
-          type="button"
-          onClick={() => {
-            window.dispatchEvent(new CustomEvent('map:fit'));
-          }}
-          className="p-1 hover:text-white rounded hover:bg-slate-800 transition-colors cursor-pointer"
-          title="Fit Suspect Corridor / Statewide Bounds"
-        >
-          <LocateFixed className="w-3.5 h-3.5" />
-        </button>
-        <button
-          type="button"
-          onClick={() => setShowAllCameras((prev) => !prev)}
-          className="p-1 hover:text-white rounded hover:bg-slate-800 transition-colors cursor-pointer"
-          title="Toggle All Camera Grid"
-        >
-          <Layers className="w-3.5 h-3.5" />
-        </button>
+      {/* Top-Left Mode Switch & Corridor Intelligence */}
+      <div className="absolute top-3.5 left-3.5 z-[1000] flex flex-col gap-1.5 pointer-events-auto">
+        <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => setShowAllCameras(false)}
+            className={`px-3 py-1 rounded-md text-xs font-mono font-bold flex items-center gap-1.5 transition-all shadow-md cursor-pointer ${
+              !showAllCameras
+                ? 'bg-red-950/90 text-red-300 border border-red-500/80 shadow-[0_0_12px_rgba(239,68,68,0.35)]'
+                : 'bg-[#0b1222]/90 text-slate-400 border border-slate-700/60 hover:text-white'
+            }`}
+            title="Focus on suspect escape corridor only"
+          >
+            <Crosshair className="w-3.5 h-3.5 text-red-400" />
+            <span>CORRIDOR FOCUS</span>
+            {sortedSightings.length > 0 && (
+              <span className="px-1.5 py-0.2 rounded bg-red-500/20 text-red-400 text-[10px]">
+                {sortedSightings.length}
+              </span>
+            )}
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowAllCameras(true)}
+            className={`px-3 py-1 rounded-md text-xs font-mono font-bold flex items-center gap-1.5 transition-all shadow-md cursor-pointer ${
+              showAllCameras
+                ? 'bg-cyan-950/90 text-cyan-300 border border-cyan-500/80 shadow-[0_0_12px_rgba(6,182,212,0.35)]'
+                : 'bg-[#0b1222]/90 text-slate-400 border border-slate-700/60 hover:text-white'
+            }`}
+            title="Show all statewide camera nodes"
+          >
+            <Eye className="w-3.5 h-3.5 text-cyan-400" />
+            <span>ALL CAMS</span>
+            <span className="px-1.5 py-0.2 rounded bg-slate-800 text-slate-300 text-[10px]">
+              {visibleCameras.length}
+            </span>
+          </button>
+        </div>
+
+        {/* Route Corridor Telemetry Banner */}
+        {sortedSightings.length > 0 && (
+          <div className="bg-[#070b14]/90 backdrop-blur-md border border-slate-800 rounded-md px-2.5 py-1 text-[10px] font-mono text-slate-300 flex items-center gap-2 shadow-lg">
+            <span className="text-red-400 font-bold">SUSPECT CORRIDOR</span>
+            <span className="text-slate-600">•</span>
+            <span className="text-slate-300">Ahmedabad → Rajkot</span>
+            <span className="text-slate-600">•</span>
+            <span className="text-emerald-400 font-semibold">221 km</span>
+            <span className="text-slate-600">•</span>
+            <span className="text-cyan-300">Avg 71 km/h</span>
+          </div>
+        )}
+      </div>
+
+      {/* Top-Right Tactical Toolbar with Basemap Switcher */}
+      <div className="absolute top-3.5 right-3.5 z-[1000] flex items-center gap-2 pointer-events-auto">
+        {/* Basemap Engine Toggle */}
+        <div className="flex items-center bg-[#070b14]/90 backdrop-blur-md border border-slate-700/80 rounded-lg p-0.5 shadow-lg">
+          <button
+            type="button"
+            onClick={() => setMapTheme('dark')}
+            className={`px-2 py-1 rounded text-[10px] font-mono font-bold flex items-center gap-1 transition-all cursor-pointer ${
+              mapTheme === 'dark'
+                ? 'bg-cyan-950 text-cyan-300 border border-cyan-500/60 shadow-sm'
+                : 'text-slate-400 hover:text-white'
+            }`}
+            title="Tactical Obsidian Dark Vector Map"
+          >
+            <span>⚡ DARK</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setMapTheme('satellite')}
+            className={`px-2 py-1 rounded text-[10px] font-mono font-bold flex items-center gap-1 transition-all cursor-pointer ${
+              mapTheme === 'satellite'
+                ? 'bg-cyan-950 text-cyan-300 border border-cyan-500/60 shadow-sm'
+                : 'text-slate-400 hover:text-white'
+            }`}
+            title="High-Res Satellite Reconnaissance"
+          >
+            <span>🛰️ SATELLITE</span>
+          </button>
+        </div>
+
+        <div className="flex items-center gap-1 bg-[#070b14]/90 backdrop-blur-md border border-slate-700/80 rounded-lg p-1 text-slate-400 shadow-lg">
+          <button
+            type="button"
+            onClick={() => {
+              window.dispatchEvent(new CustomEvent('map:fit'));
+            }}
+            className="p-1 hover:text-white rounded hover:bg-slate-800 transition-colors cursor-pointer"
+            title="Fit Route Corridor"
+          >
+            <LocateFixed className="w-3.5 h-3.5 text-cyan-400" />
+          </button>
+        </div>
       </div>
 
       {/* Bottom-Center Checkpoint Stepper Bar */}
       {sortedSightings.length > 0 && (
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-[1000] flex items-center gap-3 bg-[#0b1222]/95 backdrop-blur-md border border-slate-700/80 rounded-full px-3.5 py-1.5 shadow-2xl pointer-events-auto">
+        <div className="absolute bottom-3.5 left-1/2 -translate-x-1/2 z-[1000] flex items-center gap-2.5 bg-[#070b14]/95 backdrop-blur-md border border-slate-700/80 rounded-full px-3 py-1.5 shadow-[0_4px_24px_rgba(0,0,0,0.8)] pointer-events-auto">
           <button
             type="button"
             onClick={handlePrevStep}
             disabled={activeStepIndex <= 0}
-            className="p-1 rounded-full text-slate-300 hover:text-white hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
+            className="w-6 h-6 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center text-slate-300 hover:text-white hover:border-slate-500 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
             title="Previous Sighting Checkpoint"
           >
-            <ChevronLeft className="w-4 h-4" />
+            <ChevronLeft className="w-3.5 h-3.5" />
           </button>
 
-          <div className="flex items-center gap-2.5 text-xs font-mono">
-            <span className="px-2 py-0.5 rounded bg-red-950/80 border border-red-500/60 text-red-400 font-bold text-[11px]">
+          <div className="flex items-center gap-2 text-xs font-mono px-1">
+            <span className="px-2 py-0.5 rounded bg-red-950/90 border border-red-500/70 text-red-400 font-extrabold text-[10px] tracking-wide">
               CHECKPOINT {activeStepIndex + 1}/{sortedSightings.length}
             </span>
-            <span className="text-white font-semibold max-w-[200px] truncate">
+            <span className="text-white font-bold text-[11px] max-w-[210px] truncate">
               {currentSighting?.camera_name || 'Suspect Trail'}
             </span>
             {currentSighting && (
-              <span className="text-slate-400 text-[11px]">
+              <span className="text-cyan-400 text-[10px] font-semibold bg-cyan-950/60 px-1.5 py-0.5 rounded border border-cyan-500/30">
                 {new Date(currentSighting.timestamp_iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
               </span>
             )}
@@ -499,39 +603,41 @@ export const GISMap: React.FC<GISMapProps> = ({
             type="button"
             onClick={handleNextStep}
             disabled={activeStepIndex >= sortedSightings.length - 1}
-            className="p-1 rounded-full text-slate-300 hover:text-white hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
+            className="w-6 h-6 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center text-slate-300 hover:text-white hover:border-slate-500 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
             title="Next Sighting Checkpoint"
           >
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="w-3.5 h-3.5" />
           </button>
         </div>
       )}
 
-      {/* Bottom-Left Clean Horizontal Legend */}
-      <div className="absolute bottom-4 left-3 z-[1000] bg-[#0b1222]/90 backdrop-blur-md border border-slate-700/60 rounded-lg px-2.5 py-1.5 text-xs font-mono text-slate-300 shadow-xl pointer-events-auto flex items-center gap-3">
-        <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_6px_#ef4444]"></span>
-          <span className="text-slate-200 text-[11px] font-medium">Suspect Trail</span>
+      {/* Bottom-Left Clean Minimal Legend */}
+      <div className="absolute bottom-3.5 left-3.5 z-[1000] bg-[#070b14]/90 backdrop-blur-md border border-slate-700/60 rounded-md px-2.5 py-1 text-[10px] font-mono text-slate-300 shadow-xl pointer-events-auto flex items-center gap-2.5">
+        <div className="flex items-center gap-1">
+          <span className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_6px_#ef4444]"></span>
+          <span className="text-slate-200 font-semibold">Escape Trail</span>
         </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-blue-500"></span>
-          <span className="text-slate-400 text-[11px]">Police</span>
+        <span className="text-slate-700">•</span>
+        <div className="flex items-center gap-1">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#3b82f6]"></span>
+          <span className="text-slate-400">Police</span>
         </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-orange-500"></span>
-          <span className="text-slate-400 text-[11px]">RTO</span>
+        <div className="flex items-center gap-1">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#f97316]"></span>
+          <span className="text-slate-400">RTO</span>
         </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-          <span className="text-slate-400 text-[11px]">GSRTC</span>
+        <div className="flex items-center gap-1">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#10b981]"></span>
+          <span className="text-slate-400">GSRTC</span>
         </div>
       </div>
 
       {/* Bottom-Right Attribution */}
-      <div className="absolute bottom-2 right-3 z-[1000] pointer-events-none text-[10px] font-mono text-slate-500">
-        Esri Dark Canvas &bull; Gujarat Police GIS
+      <div className="absolute bottom-2 right-3.5 z-[1000] pointer-events-none text-[9px] font-mono text-slate-500/80">
+        {mapTheme === 'dark' ? 'CARTO Dark Vector' : 'Esri Satellite Recon'} &bull; Gujarat Police GIS
       </div>
     </div>
   );
 };
+
 
