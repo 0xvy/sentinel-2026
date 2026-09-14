@@ -181,7 +181,7 @@ export const GISMap: React.FC<GISMapProps> = ({
   // Focus Mode: When tracking a suspect vehicle, default to "Route Focus" to eliminate clutter!
   const [showAllCameras, setShowAllCameras] = useState<boolean>(false);
   const [activeStepIndex, setActiveStepIndex] = useState<number>(0);
-  const [mapTheme, setMapTheme] = useState<'satellite' | 'dark'>('satellite');
+  const [mapTheme, setMapTheme] = useState<'satellite' | 'dark'>('dark');
 
   // Center of Gujarat
   const defaultCenter: [number, number] = [22.75, 71.95];
@@ -344,51 +344,29 @@ export const GISMap: React.FC<GISMapProps> = ({
           </Marker>
         ))}
 
-        {/* Suspect Corridor: Multi-Layer High-Visibility Laser Beam & Tactical Signal Pulses */}
+        {/* Suspect Corridor: Clean 2-Layer Red Glow Route */}
         {trajectoryCoordinates.length > 1 && (
           <>
-            {/* Layer 1: Wide Laser Bloom / Ambient Glow */}
+            {/* Layer 1: Soft Ambient Red Glow */}
             <Polyline
               positions={trajectoryCoordinates}
               pathOptions={{
                 color: '#ef4444',
-                weight: 12,
-                opacity: 0.18,
+                weight: 8,
+                opacity: 0.25,
                 lineCap: 'round',
                 lineJoin: 'round',
               }}
             />
-            {/* Layer 2: Glowing Crimson Conduit */}
+            {/* Layer 2: Solid Crisp Red Line */}
             <Polyline
               positions={trajectoryCoordinates}
               pathOptions={{
-                color: '#ff2d55',
-                weight: 5,
-                opacity: 0.85,
-                lineCap: 'round',
-                lineJoin: 'round',
-              }}
-            />
-            {/* Layer 3: High-Intensity White Laser Filament Core */}
-            <Polyline
-              positions={trajectoryCoordinates}
-              pathOptions={{
-                color: '#ffffff',
-                weight: 1.8,
-                opacity: 0.95,
-                lineCap: 'round',
-                lineJoin: 'round',
-              }}
-            />
-            {/* Layer 4: Tactical Energy Pulse Line */}
-            <Polyline
-              positions={trajectoryCoordinates}
-              pathOptions={{
-                color: '#fecaca',
-                weight: 2.2,
+                color: '#ef4444',
+                weight: 3,
                 opacity: 0.9,
-                dashArray: '6, 16',
                 lineCap: 'round',
+                lineJoin: 'round',
               }}
             />
           </>
