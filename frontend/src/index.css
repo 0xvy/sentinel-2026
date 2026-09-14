@@ -457,21 +457,18 @@ pre {
 /* ==========================================================================
    Dark Tactical Map: Invert standard OSM tiles to deep obsidian navy
    ========================================================================== */
+/* Dark tactical map via CSS inversion of standard OSM tiles */
 .leaflet-tile-pane {
-  filter: invert(1) hue-rotate(180deg) brightness(0.65) contrast(1.3) saturate(0.3);
+  filter: invert(1) hue-rotate(180deg) brightness(0.6) contrast(1.3) saturate(0.3);
 }
 
-/* Prevent the inversion from affecting markers, popups, and overlays */
+/* Prevent inversion from affecting markers, popups, overlays */
 .leaflet-marker-pane,
 .leaflet-shadow-pane,
 .leaflet-popup-pane,
 .leaflet-overlay-pane,
 .leaflet-tooltip-pane,
-.leaflet-control-container {
-  filter: none !important;
-}
-
-/* Make sure our custom DivIcon markers are NOT inverted */
+.leaflet-control-container,
 .custom-camera-marker,
 .custom-waypoint-marker {
   filter: none !important;

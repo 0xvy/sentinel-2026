@@ -21,12 +21,12 @@ const MapController: React.FC<{
   const map = useMap();
 
   useEffect(() => {
-    // If trajectory coordinates exist (2 or more waypoints), fit the full statewide route!
+    // If trajectory coordinates exist (2 or more waypoints), fit the full statewide corridor
     if (trajectoryCoordinates && trajectoryCoordinates.length > 1) {
       const bounds = L.latLngBounds(trajectoryCoordinates);
       map.fitBounds(bounds, {
         padding: [60, 60],
-        maxZoom: 10, // Show full Gujarat state view
+        maxZoom: 10,
         animate: true,
         duration: 1.5,
       });
@@ -36,7 +36,7 @@ const MapController: React.FC<{
     if (!flyToLocation) {
       map.setView([22.8, 71.8], 8);
     }
-  }, [trajectoryCoordinates, map, flyToLocation]);
+  }, [trajectoryCoordinates, map]);
 
   useEffect(() => {
     if (flyToLocation && flyToLocation.lat && flyToLocation.lng) {
