@@ -13,28 +13,35 @@ interface GISMapProps {
   onSelectSighting?: (sighting: Sighting) => void;
 }
 
-// Map controller to execute programmatic flyTo operations & orbital dives
+// Map controller to execute programmatic flyTo operations & auto-fit statewide trajectory
 const MapController: React.FC<{
   flyToLocation: { lat: number; lng: number; zoom?: number } | null;
-  orbitalDiveTrigger: number;
-}> = ({ flyToLocation, orbitalDiveTrigger }) => {
+  trajectoryCoordinates: [number, number][];
+}> = ({ flyToLocation, trajectoryCoordinates }) => {
   const map = useMap();
 
-  // Feature 2: van Wijk-Nuij Hyperbolic Camera Flight into Street Level
   useEffect(() => {
-    if (orbitalDiveTrigger > 0) {
-      map.flyTo([23.0125, 72.5620], 16, {
-        duration: 1.2,
-        easeLinearity: 0.25,
+    // If trajectory coordinates exist (2 or more waypoints), fit the full statewide route!
+    if (trajectoryCoordinates && trajectoryCoordinates.length > 1) {
+      const bounds = L.latLngBounds(trajectoryCoordinates);
+      map.fitBounds(bounds, {
+        padding: [50, 50],
+        maxZoom: 11, // Prevents over-zooming into a single street!
+        animate: true,
+        duration: 1.5,
       });
+      return;
     }
-  }, [orbitalDiveTrigger, map]);
+    // Default view: Center on Gujarat
+    if (!flyToLocation) {
+      map.setView([22.8, 71.8], 8);
+    }
+  }, [trajectoryCoordinates, map, flyToLocation]);
 
   useEffect(() => {
     if (flyToLocation && flyToLocation.lat && flyToLocation.lng) {
-      map.flyTo([flyToLocation.lat, flyToLocation.lng], flyToLocation.zoom || 14, {
-        duration: 1.5,
-        easeLinearity: 0.25,
+      map.flyTo([flyToLocation.lat, flyToLocation.lng], Math.min(flyToLocation.zoom || 12, 13), {
+        duration: 1.2,
       });
     }
   }, [flyToLocation, map]);
@@ -218,60 +225,24 @@ export const GISMap: React.FC<GISMapProps> = ({
   const defaultCenter: [number, number] = [22.65, 71.85];
   const defaultZoom = 7;
 
-  // Motion States: Radar Dragnet Sweep & Macro-to-Micro Orbital Dive
+  // Motion States: Radar Dragnet Sweep
   const [isRadarSweeping, setIsRadarSweeping] = useState<boolean>(false);
-  const [showStreetStream, setShowStreetStream] = useState<boolean>(false);
-  const [orbitalDiveTrigger, setOrbitalDiveTrigger] = useState<number>(0);
   const lastHandledPlateRef = useRef<string>('');
 
-  // Automatically trigger radar sweep and orbital dive when target is selected
+  // Automatically trigger radar sweep when target is selected
   useEffect(() => {
     if (!activeTrajectory || !activeTrajectory.plate_number) return;
     const plate = activeTrajectory.plate_number;
 
     if (lastHandledPlateRef.current !== plate) {
       lastHandledPlateRef.current = plate;
-
-      // Feature 1: Trigger Google Maps Geospatial Dragnet Radar Sweep
       setIsRadarSweeping(true);
       const sweepTimer = setTimeout(() => {
         setIsRadarSweeping(false);
       }, 950);
-
-      // Feature 2: If suspect is Vikram Solanki's vehicle (GJ01ER8842), initiate Macro-to-Micro Orbital Dive
-      if (plate === 'GJ01ER8842') {
-        const diveTimer = setTimeout(() => {
-          setOrbitalDiveTrigger(Date.now());
-        }, 700);
-
-        const streamTimer = setTimeout(() => {
-          setShowStreetStream(true);
-        }, 1900); // 700ms radar + 1200ms camera flight = 1900ms street level
-
-        return () => {
-          clearTimeout(sweepTimer);
-          clearTimeout(diveTimer);
-          clearTimeout(streamTimer);
-        };
-      }
-
-      return () => {
-        clearTimeout(sweepTimer);
-      };
+      return () => clearTimeout(sweepTimer);
     }
   }, [activeTrajectory]);
-
-  // Manual re-trigger for keynote demonstrations
-  const triggerManualDive = () => {
-    setIsRadarSweeping(true);
-    setTimeout(() => setIsRadarSweeping(false), 950);
-    setTimeout(() => {
-      setOrbitalDiveTrigger(Date.now());
-    }, 700);
-    setTimeout(() => {
-      setShowStreetStream(true);
-    }, 1900);
-  };
 
   // Filter cameras based on selected departments
   const visibleCameras = useMemo(() => {
@@ -325,15 +296,16 @@ export const GISMap: React.FC<GISMapProps> = ({
         className="w-full h-full"
         zoomControl={false}
       >
-        {/* Dark tactical tiles — Esri Dark Gray Canvas (no API key needed) */}
+        {/* CartoDB Dark Matter: High-contrast, deep obsidian tactical canvas with sleek glowing roads */}
         <TileLayer
-          attribution='&copy; <a href="https://www.esri.com/">Esri</a> &bull; Gujarat Police GIS'
-          url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}"
-          maxZoom={16}
+          attribution='&copy; <a href="https://carto.com/">CARTO</a> &bull; Gujarat Police GIS'
+          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+          subdomains={['a', 'b', 'c', 'd']}
+          maxZoom={19}
         />
 
-        {/* Map Controller for programmatic flyTo & hyperbolic orbital dive */}
-        <MapController flyToLocation={flyToLocation} orbitalDiveTrigger={orbitalDiveTrigger} />
+        {/* Map Controller for programmatic flyTo & statewide trajectory auto-fitting */}
+        <MapController flyToLocation={flyToLocation} trajectoryCoordinates={trajectoryCoordinates} />
 
         {/* Feature 1: Camera-Anchored Geospatial Dragnet Wavefront Overlay */}
         <RadarSweepWavefront active={isRadarSweeping} originCoords={sweepOriginCoords} />
@@ -348,9 +320,6 @@ export const GISMap: React.FC<GISMapProps> = ({
               icon={createCameraIcon(camera, isRadarSweeping, isTargetNode)}
               eventHandlers={{
                 click: () => {
-                  if (camera.camera_id === 'cam04' && isCam04Locked) {
-                    triggerManualDive();
-                  }
                   onSelectCamera && onSelectCamera(camera);
                 },
               }}
@@ -393,16 +362,6 @@ export const GISMap: React.FC<GISMapProps> = ({
                     </div>
                   </div>
 
-                  {camera.camera_id === 'cam04' && (
-                    <button
-                      type="button"
-                      onClick={() => triggerManualDive()}
-                      className="w-full mb-2 px-2 py-1 bg-rose-600 hover:bg-rose-500 text-white font-mono text-[10px] font-bold rounded border border-rose-400 cursor-pointer active:scale-95 transition-transform"
-                    >
-                      ⚡ DIVE TO LIVE 1080p STREAM
-                    </button>
-                  )}
-
                   {camera.stream_url && (
                     <div className="p-1.5 bg-black/60 rounded text-[9px] font-mono text-cyan-300 truncate">
                       RTSP: {camera.stream_url}
@@ -414,22 +373,37 @@ export const GISMap: React.FC<GISMapProps> = ({
           );
         })}
 
-        {/* Trajectory Polyline overlay with dashArray animation */}
+        {/* Trajectory Polyline: Layer 1 (Outer Glow) */}
         {trajectoryCoordinates.length > 1 && (
           <Polyline
             positions={trajectoryCoordinates}
             pathOptions={{
               color: trajectoryColor,
-              weight: 4,
-              opacity: 0.95,
-              dashArray: '10, 10',
-              className: 'leaflet-animated-polyline',
+              weight: 8,
+              opacity: 0.35,
+              lineCap: 'round',
               lineJoin: 'round',
             }}
           />
         )}
 
-        {/* Timestamped Waypoints for active vehicle trajectory */}
+        {/* Trajectory Polyline: Layer 2 (Core Sharp Artery with dash animation) */}
+        {trajectoryCoordinates.length > 1 && (
+          <Polyline
+            positions={trajectoryCoordinates}
+            pathOptions={{
+              color: trajectoryColor === '#ef4444' ? '#f87171' : trajectoryColor === '#f59e0b' ? '#fbbf24' : '#4ade80',
+              weight: 3,
+              opacity: 0.95,
+              dashArray: '8, 6',
+              className: 'leaflet-animated-polyline',
+              lineCap: 'round',
+              lineJoin: 'round',
+            }}
+          />
+        )}
+
+        {/* Timestamped Waypoints for active vehicle trajectory (Waypoints 1 to 7) */}
         {activeTrajectory &&
           activeTrajectory.sightings.map((sighting, idx) => {
             const isLatest = idx === activeTrajectory.sightings.length - 1;
@@ -443,34 +417,32 @@ export const GISMap: React.FC<GISMapProps> = ({
                   sighting,
                   idx,
                   isLatest || isSelected,
-                  activeTrajectory.watchlist_status.threat_level
+                  activeTrajectory.watchlist_status?.threat_level || 'CRITICAL'
                 )}
                 eventHandlers={{
                   click: () => onSelectSighting && onSelectSighting(sighting),
                 }}
               >
                 <Popup>
-                  <div className="text-xs min-w-[240px]">
-                    <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-gray-700">
-                      <span className="font-plate text-cyan-400 font-extrabold text-sm">
-                        {activeTrajectory.plate_number}
+                  <div className="bg-[#0c1322] text-white p-2.5 font-mono text-xs rounded-lg border border-red-500/50 shadow-xl min-w-[220px]">
+                    <div className="flex items-center justify-between pb-1 mb-1.5 border-b border-gray-700">
+                      <span className="text-red-400 font-bold">
+                        WAYPOINT #{idx + 1}: {sighting.camera_id}
                       </span>
-                      <span className="font-mono text-xs font-bold text-gray-300">
-                        Waypoint #{idx + 1}
-                      </span>
+                      {isLatest && (
+                        <span className="bg-red-500 text-white text-[9px] px-1.5 py-0.2 rounded font-bold uppercase">
+                          LATEST
+                        </span>
+                      )}
                     </div>
-
-                    <div className="text-gray-100 font-semibold mb-1 text-[11px]">
+                    <div className="text-slate-200 font-semibold text-[11px] mb-1">
                       {sighting.camera_name}
                     </div>
-
-                    <div className="text-[10px] text-gray-400 space-y-0.5 mb-2 font-mono tabular-nums">
-                      <div>Time: {new Date(sighting.timestamp_iso).toLocaleTimeString()}</div>
-                      <div>Heading: {sighting.direction_of_travel} &bull; Conf: {(sighting.confidence * 100).toFixed(1)}%</div>
-                      <div>Dept: {sighting.department}</div>
+                    <div className="text-[10px] text-slate-400 space-y-0.5 mb-1.5">
+                      <div>Time: <span className="text-white font-bold">{new Date(sighting.timestamp_iso).toLocaleTimeString()}</span></div>
+                      <div>Heading: <span className="text-cyan-300">{sighting.direction_of_travel}</span> • Conf: <span className="text-emerald-400 font-bold">{Math.round(sighting.confidence * 100)}%</span></div>
                     </div>
-
-                    <div className="pt-1.5 border-t border-gray-700/80 text-[9px] font-mono text-cyan-400 truncate tabular-nums">
+                    <div className="pt-1 border-t border-gray-700 text-[9px] text-cyan-400 truncate">
                       SHA: {sighting.snapshot_hash_sha256}
                     </div>
                   </div>
@@ -479,62 +451,6 @@ export const GISMap: React.FC<GISMapProps> = ({
             );
           })}
       </MapContainer>
-
-      {/* Feature 2: Macro-to-Micro Street Stream Viewport Blossom (Paldi Circle Cam04) */}
-      {showStreetStream && (
-        <div className="absolute bottom-4 right-4 z-[1000] w-80 md:w-96 bg-[#070b14]/95 border-2 border-cyan-500/80 rounded-xl overflow-hidden shadow-2xl street-stream-blossom backdrop-blur-md">
-          {/* Tactical Stream Header */}
-          <div className="flex items-center justify-between px-3 py-1.5 bg-[#0d1424] border-b border-slate-800 text-xs font-mono">
-            <div className="flex items-center gap-2">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
-              </span>
-              <span className="text-cyan-400 font-bold text-[11px] tracking-wider uppercase">
-                LIVE CCTV &bull; CAM04 (PALDI CIRCLE)
-              </span>
-            </div>
-            <button
-              type="button"
-              onClick={() => setShowStreetStream(false)}
-              className="text-slate-400 hover:text-white p-0.5 rounded hover:bg-slate-800 transition-colors cursor-pointer"
-              title="Close Live Stream Viewport"
-            >
-              ✕
-            </button>
-          </div>
-
-          {/* Live Stream Viewport with Animated Reticle */}
-          <div className="relative aspect-video w-full bg-black overflow-hidden flex items-center justify-center">
-            <img
-              src="/api/streams/cam04/feed"
-              alt="Cam04 Live Street Stream"
-              className="w-full h-full object-cover"
-            />
-
-            {/* Animated Tactical Reticle Snapping Over Target Vehicle */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className="relative w-44 h-24 border-2 border-emerald-400 tactical-reticle-box shadow-lg shadow-emerald-500/40">
-                {/* Reticle Corner Brackets */}
-                <div className="absolute -top-1 -left-1 w-3 h-3 border-t-2 border-l-2 border-emerald-300"></div>
-                <div className="absolute -top-1 -right-1 w-3 h-3 border-t-2 border-r-2 border-emerald-300"></div>
-                <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b-2 border-l-2 border-emerald-300"></div>
-                <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b-2 border-r-2 border-emerald-300"></div>
-
-                {/* Telemetry Tag */}
-                <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 whitespace-nowrap bg-[#070b14]/90 border border-emerald-500/80 px-2 py-0.2 rounded text-[9px] font-mono text-emerald-300 font-bold tracking-wider tabular-nums shadow-md">
-                  TARGET LOCKED: GJ01ER8842 [CONF: 98.4%]
-                </div>
-              </div>
-            </div>
-
-            {/* Overlay Latency Info */}
-            <div className="absolute top-2 left-2 bg-[#070b14]/85 px-1.5 py-0.5 rounded text-[9px] font-mono text-cyan-300 border border-slate-700">
-              1080p &bull; TCP/RTSP &bull; PTS-SYNC
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Tactical Map Overlay HUD */}
       <div className="absolute top-3 left-3 pointer-events-none z-[1000] flex flex-col gap-2">
@@ -561,18 +477,6 @@ export const GISMap: React.FC<GISMapProps> = ({
                 {activeTrajectory.sightings.length} waypoints
               </span>
             </div>
-            {isCam04Locked && (
-              <div className="mt-2 pt-1.5 border-t border-slate-800 pointer-events-auto">
-                <button
-                  type="button"
-                  onClick={triggerManualDive}
-                  className="w-full px-2 py-1 bg-rose-600 hover:bg-rose-500 active:scale-[0.96] text-white font-mono text-[10px] font-extrabold rounded border border-rose-400/80 shadow-md shadow-rose-950/60 transition-all duration-75 cursor-pointer flex items-center justify-center gap-1 uppercase"
-                  title="Execute Keynote van Wijk-Nuij Orbital Dive into Cam04"
-                >
-                  <span>⚡ ORBITAL DIVE TO CAM04</span>
-                </button>
-              </div>
-            )}
           </div>
         )}
       </div>

@@ -8,12 +8,14 @@ interface PlateSearchProps {
   activePlate: string;
   onSelectPlate: (plate: string) => void;
   isLoadingTrajectory?: boolean;
+  showPresets?: boolean;
 }
 
 export const PlateSearch: React.FC<PlateSearchProps> = ({
   activePlate,
   onSelectPlate,
   isLoadingTrajectory = false,
+  showPresets = true,
 }) => {
   const [query, setQuery] = useState(activePlate || '');
   const [suggestions, setSuggestions] = useState<VehicleSearchItem[]>([]);
@@ -139,53 +141,55 @@ export const PlateSearch: React.FC<PlateSearchProps> = ({
       </div>
 
       {/* Preset Quick Tags for Quick Evaluation / Jury Demonstration */}
-      <div className="flex flex-wrap items-center gap-1.5 mt-2 text-xs">
-        <span className="text-slate-400 text-[10px] uppercase font-mono font-bold tracking-wider mr-1 shrink-0">
-          Target Presets:
-        </span>
-        <button
-          type="button"
-          onClick={() => handleSelect('GJ01ER8842')}
-          className={`px-2.5 py-1 rounded font-mono text-xs font-bold border cursor-pointer shrink-0 transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/70 flex items-center gap-1.5 ${
-            activePlate === 'GJ01ER8842'
-              ? 'bg-rose-600 text-white border-rose-400 shadow-md shadow-rose-950/60'
-              : 'bg-rose-950/40 text-rose-300 border-rose-800/60 hover:bg-rose-900/60'
-          }`}
-          title="Core Jury Test Case: Armed Suspect Vikram Solanki (Stolen Creta)"
-        >
-          <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
-          <span>GJ01ER8842</span>
-          <span className="text-[10px] opacity-80 font-normal hidden sm:inline">— Stolen Creta (Sec 302)</span>
-        </button>
-        <button
-          type="button"
-          onClick={() => handleSelect('GJ05CD5678')}
-          className={`px-2.5 py-1 rounded font-mono text-xs font-bold border cursor-pointer shrink-0 transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/70 flex items-center gap-1.5 ${
-            activePlate === 'GJ05CD5678'
-              ? 'bg-amber-600 text-white border-amber-400 shadow-md shadow-amber-950/60'
-              : 'bg-amber-950/40 text-amber-300 border-amber-800/60 hover:bg-amber-900/60'
-          }`}
-          title="Suspended DL & Open FIR (Maruti Swift)"
-        >
-          <span className="w-2 h-2 rounded-full bg-amber-400" />
-          <span>GJ05CD5678</span>
-          <span className="text-[10px] opacity-80 font-normal hidden sm:inline">— Suspended DL</span>
-        </button>
-        <button
-          type="button"
-          onClick={() => handleSelect('GJ27K9012')}
-          className={`px-2.5 py-1 rounded font-mono text-xs font-bold border cursor-pointer shrink-0 transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/70 flex items-center gap-1.5 ${
-            activePlate === 'GJ27K9012'
-              ? 'bg-emerald-600 text-white border-emerald-400 shadow-md shadow-emerald-950/60'
-              : 'bg-emerald-950/40 text-emerald-300 border-emerald-800/60 hover:bg-emerald-900/60'
-          }`}
-          title="Clean Vehicle Verified Registration (Tata Nexon)"
-        >
-          <span className="w-2 h-2 rounded-full bg-emerald-400" />
-          <span>GJ27K9012</span>
-          <span className="text-[10px] opacity-80 font-normal hidden sm:inline">— Clean Vehicle</span>
-        </button>
-      </div>
+      {showPresets && (
+        <div className="flex flex-wrap items-center gap-1.5 mt-1.5 text-xs">
+          <span className="text-slate-400 text-[10px] uppercase font-mono font-bold tracking-wider mr-1 shrink-0">
+            Presets:
+          </span>
+          <button
+            type="button"
+            onClick={() => handleSelect('GJ01ER8842')}
+            className={`px-2 py-0.5 rounded font-mono text-[11px] font-bold border cursor-pointer shrink-0 transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/70 flex items-center gap-1.5 ${
+              activePlate === 'GJ01ER8842'
+                ? 'bg-rose-600 text-white border-rose-400 shadow-md shadow-rose-950/60'
+                : 'bg-rose-950/40 text-rose-300 border-rose-800/60 hover:bg-rose-900/60'
+            }`}
+            title="Core Jury Test Case: Armed Suspect Vikram Solanki (Stolen Creta)"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
+            <span>GJ01ER8842</span>
+            <span className="text-[9px] opacity-80 font-normal hidden sm:inline">— Stolen Creta (Sec 302)</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => handleSelect('GJ05CD5678')}
+            className={`px-2 py-0.5 rounded font-mono text-[11px] font-bold border cursor-pointer shrink-0 transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/70 flex items-center gap-1.5 ${
+              activePlate === 'GJ05CD5678'
+                ? 'bg-amber-600 text-white border-amber-400 shadow-md shadow-amber-950/60'
+                : 'bg-amber-950/40 text-amber-300 border-amber-800/60 hover:bg-amber-900/60'
+            }`}
+            title="Suspended DL & Open FIR (Maruti Swift)"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+            <span>GJ05CD5678</span>
+            <span className="text-[9px] opacity-80 font-normal hidden sm:inline">— Suspended DL</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => handleSelect('GJ27K9012')}
+            className={`px-2 py-0.5 rounded font-mono text-[11px] font-bold border cursor-pointer shrink-0 transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/70 flex items-center gap-1.5 ${
+              activePlate === 'GJ27K9012'
+                ? 'bg-emerald-600 text-white border-emerald-400 shadow-md shadow-emerald-950/60'
+                : 'bg-emerald-950/40 text-emerald-300 border-emerald-800/60 hover:bg-emerald-900/60'
+            }`}
+            title="Clean Vehicle Verified Registration (Tata Nexon)"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+            <span>GJ27K9012</span>
+            <span className="text-[9px] opacity-80 font-normal hidden sm:inline">— Clean Vehicle</span>
+          </button>
+        </div>
+      )}
 
       {/* Autocomplete Dropdown */}
       {isOpen && suggestions.length > 0 && (
