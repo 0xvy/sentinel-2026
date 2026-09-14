@@ -116,10 +116,10 @@ export const PlateSearch: React.FC<PlateSearchProps> = ({
           }}
           onKeyDown={handleKeyDown}
           placeholder="SEARCH VEHICLE PLATE (e.g. GJ01ER8842)"
-          className="w-full pl-10 pr-24 py-2 bg-[#070b14] border-2 border-cyan-500/60 focus:border-cyan-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/70 rounded-lg text-white font-plate text-sm md:text-base tracking-widest placeholder:text-slate-400 placeholder:font-sans placeholder:tracking-normal shadow-lg shadow-cyan-950/40 transition-all"
+          className="w-full pl-9 pr-20 py-1.5 bg-[#040711] border border-[#1e293b] focus:border-slate-500 focus:outline-none rounded-lg text-white font-mono text-xs tracking-wider placeholder:text-slate-500 transition-colors"
         />
 
-        <div className="absolute right-2 flex items-center gap-1.5">
+        <div className="absolute right-1.5 flex items-center gap-1.5">
           {query && (
             <button
               type="button"
@@ -127,7 +127,7 @@ export const PlateSearch: React.FC<PlateSearchProps> = ({
                 setQuery('');
                 setSuggestions([]);
               }}
-              className="text-slate-400 hover:text-white p-1 text-xs transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/70"
+              className="text-slate-400 hover:text-white p-1 text-xs transition-colors rounded cursor-pointer"
               title="Clear search"
             >
               ✕
@@ -137,7 +137,7 @@ export const PlateSearch: React.FC<PlateSearchProps> = ({
             type="button"
             onClick={() => handleSelect(query)}
             disabled={!query.trim() || isLoadingTrajectory}
-            className="tactile-active-press px-3 py-1 bg-cyan-500 hover:bg-cyan-400 disabled:opacity-50 text-slate-950 font-extrabold text-xs rounded tracking-wider cursor-pointer font-mono shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/70"
+            className="px-2.5 py-1 bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 text-slate-950 font-bold text-xs rounded font-mono transition-colors cursor-pointer"
           >
             LOCATE
           </button>
@@ -146,59 +146,53 @@ export const PlateSearch: React.FC<PlateSearchProps> = ({
 
       {/* Preset Quick Tags for Quick Evaluation / Jury Demonstration */}
       {showPresets && (
-        <div className="flex flex-wrap items-center gap-1.5 mt-1.5 text-xs">
+        <div className="flex flex-wrap items-center gap-1.5 mt-1.5 text-xs font-mono">
           <span className="text-slate-400 text-[10px] uppercase font-mono font-bold tracking-wider mr-1 shrink-0">
             Presets:
           </span>
           <button
             type="button"
             onClick={() => handleSelect('GJ01ER8842')}
-            className={`px-2 py-0.5 rounded font-mono text-[11px] font-bold border cursor-pointer shrink-0 transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/70 flex items-center gap-1.5 ${
+            className={`px-2 py-0.5 rounded font-mono text-xs font-bold border cursor-pointer shrink-0 transition-colors ${
               activePlate === 'GJ01ER8842'
-                ? 'bg-rose-600 text-white border-rose-400 shadow-md shadow-rose-950/60'
-                : 'bg-rose-950/40 text-rose-300 border-rose-800/60 hover:bg-rose-900/60'
+                ? 'bg-[#1e293b] text-red-400 border-red-500/50'
+                : 'bg-transparent text-slate-400 border-[#1e293b] hover:text-white'
             }`}
             title="Core Jury Test Case: Armed Suspect Vikram Solanki (Stolen Creta)"
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
-            <span>GJ01ER8842</span>
-            <span className="text-[9px] opacity-80 font-normal hidden sm:inline">— Stolen Creta (Sec 302)</span>
+            GJ01ER8842 (Stolen)
           </button>
           <button
             type="button"
             onClick={() => handleSelect('GJ05CX9988')}
-            className={`px-2 py-0.5 rounded font-mono text-[11px] font-bold border cursor-pointer shrink-0 transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/70 flex items-center gap-1.5 ${
+            className={`px-2 py-0.5 rounded font-mono text-xs font-bold border cursor-pointer shrink-0 transition-colors ${
               activePlate === 'GJ05CX9988'
-                ? 'bg-amber-600 text-white border-amber-400 shadow-md shadow-amber-950/60'
-                : 'bg-amber-950/40 text-amber-300 border-amber-800/60 hover:bg-amber-900/60'
+                ? 'bg-[#1e293b] text-amber-400 border-amber-500/50'
+                : 'bg-transparent text-slate-400 border-[#1e293b] hover:text-white'
             }`}
             title="Stolen Vehicle Surat & Suspended DL"
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-            <span>GJ05CX9988</span>
-            <span className="text-[9px] opacity-80 font-normal hidden sm:inline">— Suspended DL</span>
+            GJ05CX9988 (Suspended)
           </button>
           <button
             type="button"
             onClick={() => handleSelect('GJ01AB1234')}
-            className={`px-2 py-0.5 rounded font-mono text-[11px] font-bold border cursor-pointer shrink-0 transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/70 flex items-center gap-1.5 ${
+            className={`px-2 py-0.5 rounded font-mono text-xs font-bold border cursor-pointer shrink-0 transition-colors ${
               activePlate === 'GJ01AB1234'
-                ? 'bg-emerald-600 text-white border-emerald-400 shadow-md shadow-emerald-950/60'
-                : 'bg-emerald-950/40 text-emerald-300 border-emerald-800/60 hover:bg-emerald-900/60'
+                ? 'bg-[#1e293b] text-emerald-400 border-emerald-500/50'
+                : 'bg-transparent text-slate-400 border-[#1e293b] hover:text-white'
             }`}
             title="Clean Vehicle Verified Registration"
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-            <span>GJ01AB1234</span>
-            <span className="text-[9px] opacity-80 font-normal hidden sm:inline">— Clean Vehicle</span>
+            GJ01AB1234 (Clean)
           </button>
         </div>
       )}
 
       {/* Autocomplete Dropdown */}
       {isOpen && suggestions.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-[#0d1424] border border-cyan-500/60 rounded-xl shadow-2xl z-50 max-h-72 overflow-y-auto tactical-scrollbar">
-          <div className="px-3 py-2 border-b border-slate-800 text-[10px] text-slate-400 font-mono uppercase tracking-wider flex justify-between bg-[#070b14]/80">
+        <div className="absolute top-full left-0 right-0 mt-1.5 bg-[#0a101f] border border-[#1e293b] rounded-lg shadow-2xl z-50 max-h-72 overflow-y-auto tactical-scrollbar">
+          <div className="px-3 py-1.5 border-b border-[#1e293b] text-[10px] text-slate-400 font-mono uppercase tracking-wider flex justify-between bg-[#040711] font-bold">
             <span>Surveillance Registries Matches ({suggestions.length})</span>
             <span>Press Enter to select</span>
           </div>

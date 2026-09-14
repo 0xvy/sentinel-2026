@@ -49,7 +49,7 @@ export const PCRDispatchModal: React.FC<PCRDispatchModalProps> = ({
         {/* Top Emergency Header */}
         <div className="bg-gradient-to-r from-red-950 via-[#14070a] to-[#0d1424] border-b border-red-500/50 p-4 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-red-600/30 border border-red-500 flex items-center justify-center text-red-400 animate-pulse">
+            <div className="w-10 h-10 rounded-xl bg-red-600/30 border border-red-500 flex items-center justify-center text-red-400">
               <ShieldAlert className="w-6 h-6" />
             </div>
             <div>
@@ -269,7 +269,7 @@ export const PCRDispatchModal: React.FC<PCRDispatchModalProps> = ({
                   onClick={handleDispatch}
                   className="w-full py-4 px-4 bg-gradient-to-r from-red-600 via-red-500 to-red-600 hover:from-red-500 hover:to-red-400 text-white font-extrabold font-mono text-sm tracking-wider uppercase rounded-xl border border-red-400/60 shadow-xl shadow-red-950/80 flex items-center justify-center gap-2.5 transition-all duration-75 active:scale-[0.98] cursor-pointer"
                 >
-                  <Radio className="w-5 h-5 animate-pulse" />
+                  <Radio className="w-5 h-5" />
                   <span>DISPATCH UNIT PCR-09 NOW</span>
                 </button>
               )}

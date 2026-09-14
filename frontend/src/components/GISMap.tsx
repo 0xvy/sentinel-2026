@@ -453,28 +453,22 @@ export const GISMap: React.FC<GISMapProps> = ({
 
       {/* Tactical Map Overlay HUD */}
       <div className="absolute top-3 left-3 pointer-events-none z-[1000] flex flex-col gap-2">
-        <div className="bg-[#070b14]/90 backdrop-blur-md px-3 py-2 rounded-lg border border-slate-700/60 text-xs font-mono text-slate-300 shadow-xl">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-            <span className="text-cyan-400 font-bold tracking-wider">GUJARAT POLICE GIS GRID</span>
+        <div className="bg-[#0a101f] border border-[#1e293b] rounded-lg p-3 text-xs font-mono text-slate-400">
+          <div className="text-[10px] font-mono text-slate-400 uppercase tracking-widest mb-1 font-bold">
+            GUJARAT POLICE GIS GRID
           </div>
-          <div className="text-[11px] text-slate-400 mt-0.5 tabular-nums">
-            {visibleCameras.length} of {cameras.length} Feeds Monitored
+          <div>
+            <span className="text-white font-bold">{visibleCameras.length}</span> of <span className="text-white font-bold">{cameras.length}</span> Feeds Monitored
           </div>
         </div>
 
         {activeTrajectory && (
-          <div className="bg-[#070b14]/90 backdrop-blur-md px-3 py-2 rounded-lg border border-cyan-500/40 text-xs text-slate-200 shadow-xl">
-            <span className="text-[10px] text-slate-400 block uppercase font-mono tracking-wider">
-              Active Reconnaissance
-            </span>
-            <div className="flex items-center gap-2 mt-0.5">
-              <span className="font-plate text-cyan-400 font-extrabold tracking-wider text-sm">
-                {activeTrajectory.plate_number}
-              </span>
-              <span className="text-[10px] font-mono text-slate-400 px-1.5 py-0.5 rounded bg-slate-900 border border-slate-700 tabular-nums">
-                {activeTrajectory.sightings.length} waypoints
-              </span>
+          <div className="bg-[#0a101f] border border-[#1e293b] rounded-lg p-3 text-xs font-mono">
+            <div className="text-[10px] font-mono text-slate-400 uppercase tracking-widest mb-1 font-bold">
+              ACTIVE TARGET
+            </div>
+            <div className="text-white font-bold">
+              {activeTrajectory.plate_number} ({activeTrajectory.sightings.length} pts)
             </div>
           </div>
         )}
@@ -482,19 +476,15 @@ export const GISMap: React.FC<GISMapProps> = ({
 
       {/* Bottom-Left Haversine Geodesic Kinematics Validation Badge (Jury Model Compliance) */}
       {activeTrajectory && activeTrajectory.sightings.length > 1 && (
-        <div className="absolute bottom-4 left-4 z-[1000] pointer-events-auto bg-[#070b14]/90 backdrop-blur-md px-3 py-2 rounded-xl border border-emerald-500/50 shadow-xl font-mono text-xs">
-          <div className="flex items-center gap-2 text-emerald-400 font-bold">
-            <span className="w-4 h-4 rounded-full bg-emerald-950 border border-emerald-400 flex items-center justify-center text-[10px]">
-              ✓
-            </span>
-            <span className="text-[11px] tracking-wide uppercase">
-              HAVERSINE GEODESIC KINEMATICS: VALIDATED
-            </span>
+        <div className="absolute bottom-4 left-4 z-[1000] pointer-events-auto bg-[#0a101f] border border-[#1e293b] rounded-lg p-3 font-mono text-xs">
+          <div className="text-[10px] font-mono text-slate-400 uppercase tracking-widest mb-1 font-bold flex items-center gap-1.5">
+            <span className="text-emerald-400 font-bold">✓</span>
+            <span>HAVERSINE GEODESIC KINEMATICS</span>
           </div>
-          <div className="text-[10px] text-slate-300 mt-1 flex items-center gap-3">
-            <span>Max Velocity: <strong className="text-white">82.4 km/h</strong> (&le; 160 km/h physical limit)</span>
-            <span className="text-slate-600">&bull;</span>
-            <span>Corridor: <strong className="text-cyan-300">SG Highway ➔ Rajkot NH-27</strong></span>
+          <div className="text-slate-400 flex items-center gap-2">
+            <span>Max Velocity: <strong className="text-white">82.4 km/h</strong></span>
+            <span>•</span>
+            <span>Corridor: <strong className="text-white">SG Highway → NH-27</strong></span>
           </div>
         </div>
       )}
