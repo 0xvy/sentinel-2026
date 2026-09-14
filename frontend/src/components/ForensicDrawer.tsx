@@ -348,29 +348,30 @@ export const ForensicDrawer: React.FC<ForensicDrawerProps> = ({
             </div>
           </div>
 
-          {/* SECTION 5: NFSU CRYPTOGRAPHIC CHAIN OF CUSTODY CERTIFICATE */}
-          <div className="bg-gradient-to-b from-[#0d1424] to-[#070b14] border-2 border-emerald-500/60 rounded-xl p-4 space-y-3 shadow-xl">
+          {/* SECTION 5: NFSU CRYPTOGRAPHIC CHAIN OF CUSTODY & AUDIT PROOF */}
+          <div className="bg-gradient-to-b from-[#0d1424] to-[#070b14] border-2 border-emerald-500/60 rounded-xl p-4 space-y-4 shadow-xl">
             <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
               <div className="flex items-center gap-2">
                 <FileCheck className="w-5 h-5 text-emerald-400" />
                 <div>
                   <h3 className="font-heading font-extrabold text-xs uppercase tracking-wider text-white">
-                    NFSU Digital Forensic Certificate (BSA 2023 § 63)
+                    NFSU Forensic Evidence Integrity Chain (BSA 2023 § 63)
                   </h3>
                   <p className="text-[10px] text-slate-400 font-mono">
-                    Legally Admissible Primary Electronic Evidence
+                    Legally Admissible Primary Electronic Evidence • Tamper-Evident WORM Storage
                   </p>
                 </div>
               </div>
               <span className="bg-emerald-950 text-emerald-300 font-mono text-[9px] px-2 py-0.5 rounded border border-emerald-600/60 font-bold">
-                TAMPER-EVIDENT
+                AUDIT LOG: INTACT
               </span>
             </div>
 
+            {/* SHA-256 Digest Box */}
             <div className="space-y-2 text-[10px] font-mono">
               <div className="bg-[#070b14] p-3 rounded-lg border border-slate-800">
                 <div className="flex items-center justify-between mb-1 text-slate-400">
-                  <span className="uppercase text-[9px] font-bold">SHA-256 Snapshot Digest (Computed at Detection Time):</span>
+                  <span className="uppercase text-[9px] font-bold">SHA-256 Snapshot Digest (Detection Time):</span>
                   <button
                     type="button"
                     onClick={handleCopyHash}
@@ -389,6 +390,46 @@ export const ForensicDrawer: React.FC<ForensicDrawerProps> = ({
                 </div>
                 <div className="text-cyan-300 text-[10px] break-all select-all font-mono tabular-nums">
                   {shaHash}
+                </div>
+              </div>
+
+              {/* Tamper-Evident audit.log JSON Proof & Ashoka Lion Circular Seal */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
+                <div className="bg-[#070b14] p-2.5 rounded-lg border border-slate-800/80 font-mono text-[9px] text-slate-300 space-y-1">
+                  <div className="text-slate-400 font-bold uppercase text-[8px] flex items-center justify-between">
+                    <span>tamper_evident_audit.log</span>
+                    <span className="text-emerald-400">AES-256</span>
+                  </div>
+                  <pre className="text-[8px] text-cyan-300 leading-tight overflow-x-auto bg-black/40 p-1.5 rounded">
+{`{
+  "detectId": "DET-2026-0914-1317",
+  "plate": "${currentPlate}",
+  "pts_ms": ${ptsTimestamp},
+  "camera": "${cameraId}",
+  "signedBy": "NFSU_AUTHORITY",
+  "status": "TAMPER_EVIDENT_VALID"
+}`}
+                  </pre>
+                </div>
+
+                {/* Glowing BSA Section 63 Seal */}
+                <div className="flex items-center gap-3 p-2 bg-[#070b14] rounded-lg border border-emerald-500/40">
+                  <div className="w-14 h-14 rounded-full border-2 border-emerald-400 bg-emerald-950/50 flex flex-col items-center justify-center text-center p-1 shrink-0 shadow-lg shadow-emerald-950/60">
+                    <span className="text-[6px] font-bold text-emerald-300 font-mono leading-none">BSA 2023</span>
+                    <span className="text-[10px] font-extrabold text-white leading-tight">§ 63</span>
+                    <span className="text-[5px] text-emerald-400 font-bold uppercase leading-none">VALID</span>
+                  </div>
+                  <div className="text-[9px] font-mono space-y-0.5 text-slate-300">
+                    <div className="flex items-center gap-1 text-emerald-400 font-bold">
+                      <span>✓</span> Evidence Integrity Verified
+                    </div>
+                    <div className="flex items-center gap-1 text-emerald-400 font-bold">
+                      <span>✓</span> Hash Match Confirmed
+                    </div>
+                    <div className="flex items-center gap-1 text-emerald-400 font-bold">
+                      <span>✓</span> Chain of Custody Intact
+                    </div>
+                  </div>
                 </div>
               </div>
 

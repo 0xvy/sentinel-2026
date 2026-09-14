@@ -1,5 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Camera, AlertEvent, TrajectoryResponse, Sighting } from './types';
+import { 
+  Camera, 
+  AlertEvent, 
+  TrajectoryResponse, 
+  Sighting 
+} from './types';
 import { api } from './services/api';
 import { useAlertWebSocket } from './hooks/useAlertWebSocket';
 import { GISMap } from './components/GISMap';
@@ -11,6 +16,22 @@ import { PCRDispatchCard } from './components/PCRDispatchCard';
 import { VideoWall } from './components/VideoWall';
 import { ExportButton } from './components/ExportButton';
 import { ForensicDrawer } from './components/ForensicDrawer';
+import { MLTelemetryPanel } from './components/MLTelemetryPanel';
+import { PCRDispatchModal } from './components/PCRDispatchModal';
+import { ArchitectureModal } from './components/ArchitectureModal';
+import { 
+  Map as MapIcon, 
+  Video, 
+  Zap, 
+  Navigation, 
+  Bell, 
+  FileText, 
+  Radio, 
+  Layers, 
+  Shield, 
+  ShieldAlert, 
+  CheckCircle2
+} from 'lucide-react';
 
 const INITIAL_DEPARTMENTS = [
   'Police',
@@ -27,7 +48,7 @@ export const App: React.FC = () => {
   // Application Data States
   const [cameras, setCameras] = useState<Camera[]>([]);
   const [selectedDepartments, setSelectedDepartments] = useState<string[]>(INITIAL_DEPARTMENTS);
-  const [activePlate, setActivePlate] = useState<string>('GJ01ER8842'); // Seeded with primary suspect
+  const [activePlate, setActivePlate] = useState<string>('GJ01ER8842'); // Primary suspect
   const [activeTrajectory, setActiveTrajectory] = useState<TrajectoryResponse | null>(null);
   const [isLoadingTrajectory, setIsLoadingTrajectory] = useState<boolean>(false);
   const [selectedAlert, setSelectedAlert] = useState<AlertEvent | null>(null);
@@ -35,11 +56,13 @@ export const App: React.FC = () => {
   const [flyToLocation, setFlyToLocation] = useState<{ lat: number; lng: number; zoom?: number } | null>(null);
   const [viewMode, setViewMode] = useState<'map' | 'videowall'>('map');
   const [currentTime, setCurrentTime] = useState<string>('');
-  const [rightPanelTab, setRightPanelTab] = useState<'alerts' | 'trajectory'>('trajectory');
+  const [rightPanelTab, setRightPanelTab] = useState<'telemetry' | 'trajectory' | 'alerts'>('telemetry');
   const [showFilterModal, setShowFilterModal] = useState<boolean>(false);
 
-  // Forensic Deep-Dive Drawer States
+  // Modals and Drawers States
   const [isForensicOpen, setIsForensicOpen] = useState<boolean>(false);
+  const [isDispatchModalOpen, setIsDispatchModalOpen] = useState<boolean>(false);
+  const [isArchModalOpen, setIsArchModalOpen] = useState<boolean>(false);
   const [forensicSighting, setForensicSighting] = useState<Sighting | null>(null);
   const [forensicAlert, setForensicAlert] = useState<AlertEvent | null>(null);
   const [forensicPlate, setForensicPlate] = useState<string>('GJ01ER8842');
@@ -47,11 +70,16 @@ export const App: React.FC = () => {
   // Live Alerts via WebSocket
   const { alerts, connectionStatus } = useAlertWebSocket();
 
-  // Clock updater
+  // Clock updater (IST)
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
-      setCurrentTime(now.toUTCString().replace('GMT', 'UTC') + ' • ' + now.toLocaleTimeString() + ' IST');
+      setCurrentTime(
+        now.toLocaleDateString('en-GB', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' }) +
+        ' • ' +
+        now.toLocaleTimeString() +
+        ' IST'
+      );
     };
     updateTime();
     const interval = setInterval(updateTime, 1000);
@@ -73,7 +101,6 @@ export const App: React.FC = () => {
       const data = await api.getTrajectory(plate);
       setActiveTrajectory(data);
       setActivePlate(plate);
-      setRightPanelTab('trajectory');
 
       // Auto fly map to the latest sighting in the trajectory
       if (data && data.sightings && data.sightings.length > 0) {
@@ -144,288 +171,393 @@ export const App: React.FC = () => {
   // Counts for tactical HUD
   const criticalAlertCount = alerts.filter((a) => a.threat_level === 'CRITICAL').length;
   const onlineCamerasCount = cameras.filter((c) => c.status === 'Online').length;
+  const isCriticalTarget = activePlate === 'GJ01ER8842' || activeTrajectory?.watchlist_status?.threat_level === 'CRITICAL';
 
   return (
-    <div className="flex flex-col h-screen w-screen bg-tactical-viewport bg-[#070b14] text-[#f9fafb] font-sans select-none overflow-hidden">
+    <div className="flex flex-col h-screen w-screen bg-[#070b14] text-[#f9fafb] font-sans select-none overflow-hidden">
       {/* 1. TOP COMMAND HEADER */}
-      <header className="h-12 bg-tactical-surface bg-[#0d1424] border-b border-tactical-border border-slate-800 px-4 flex items-center justify-between z-30 shadow-xl shrink-0">
+      <header className="h-14 bg-[#0a0f1d] border-b border-slate-800 px-3 sm:px-4 flex items-center justify-between z-30 shadow-xl shrink-0 gap-2">
         {/* Left: Emblem & Platform Title */}
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-cyan-950/80 border border-cyan-500/60 flex items-center justify-center text-cyan-400 shadow-md shadow-cyan-950/50">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-            </svg>
+        <div className="flex items-center gap-2.5 shrink-0">
+          <div className="w-9 h-9 rounded-xl bg-cyan-950/90 border border-cyan-500/60 flex items-center justify-center text-cyan-400 shadow-md shadow-cyan-950/60">
+            <Shield className="w-5 h-5 text-cyan-400" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="font-heading font-extrabold text-base md:text-lg tracking-wider text-white">
+              <h1 className="font-heading font-extrabold text-sm sm:text-base tracking-wider text-white">
                 SENTINEL <span className="text-cyan-400 font-mono">2026</span>
               </h1>
-              <span className="bg-cyan-950/80 border border-cyan-800/80 text-cyan-300 font-mono text-[10px] px-1.5 py-0.5 rounded hidden sm:inline-block">
-                GUJARAT POLICE INTELLIGENCE
+              <span className="bg-cyan-950/90 border border-cyan-700/80 text-cyan-300 font-mono text-[9px] px-1.5 py-0.5 rounded font-bold hidden md:inline-block">
+                GUJARAT POLICE
               </span>
             </div>
-            <p className="text-[10px] text-slate-400 hidden sm:block tracking-wide font-mono">
-              Cross-Agency CCTV Intelligence &amp; AI Plate Trajectory Command
+            <p className="text-[10px] text-slate-400 hidden lg:block tracking-wide font-mono">
+              Statewide CCTV Intelligence Grid • 80,000 Cameras Integrated
             </p>
           </div>
         </div>
 
-        {/* Center: System Status & Time */}
-        <div className="hidden lg:flex items-center gap-4 text-xs font-mono">
-          <div className="flex items-center gap-2 px-3 py-1 bg-tactical-viewport bg-[#070b14] rounded-lg border border-slate-800 shadow-inner">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span className="text-slate-400">NFSU FORENSIC AUDIT:</span>
-            <span className="text-emerald-400 font-bold tracking-wider">TAMPER-EVIDENT</span>
-          </div>
-
-          <div className="text-slate-400 text-xs font-mono tabular-nums">
-            {currentTime || 'Synchronizing Clock (IST)...'}
-          </div>
+        {/* Center: Search Bar with Autocomplete & Presets */}
+        <div className="flex-1 max-w-xl mx-2">
+          <PlateSearch
+            activePlate={activePlate}
+            onSelectPlate={fetchTrajectory}
+            isLoadingTrajectory={isLoadingTrajectory}
+          />
         </div>
 
-        {/* Right: Mode Switcher & Status Controls */}
-        <div className="flex items-center gap-2.5">
-          {/* Mode Tabs: GIS Map vs Video Wall */}
-          <div className="flex items-center bg-tactical-viewport bg-[#070b14] p-1 rounded-lg border border-slate-800 shadow-inner">
-            <button
-              type="button"
-              onClick={() => setViewMode('map')}
-              className={`tactile-active-press flex items-center gap-1.5 px-3 py-1 rounded text-xs font-bold transition-transform duration-75 cursor-pointer active:scale-[0.96] focus-visible:ring-2 focus-visible:ring-cyan-500/70 focus-visible:outline-none ${
-                viewMode === 'map'
-                  ? 'bg-cyan-600 text-slate-950 shadow-sm'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-              </svg>
-              <span>GIS Tactical</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode('videowall')}
-              className={`tactile-active-press flex items-center gap-1.5 px-3 py-1 rounded text-xs font-bold transition-transform duration-75 cursor-pointer active:scale-[0.96] focus-visible:ring-2 focus-visible:ring-cyan-500/70 focus-visible:outline-none ${
-                viewMode === 'videowall'
-                  ? 'bg-cyan-600 text-slate-950 shadow-sm'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-              </svg>
-              <span>Video Wall</span>
-            </button>
-          </div>
+        {/* Right: Threat Alert, Camera Status & Time */}
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          {/* Target Threat Priority Banner */}
+          {isCriticalTarget && (
+            <div className="hidden xl:flex items-center gap-2 px-3 py-1 rounded-lg bg-red-950/60 border border-red-500/80 text-red-300 font-mono text-xs animate-pulse">
+              <ShieldAlert className="w-3.5 h-3.5 text-red-400" />
+              <span className="font-bold">CRITICAL: STOLEN &amp; WANTED</span>
+              <span className="text-[10px] text-red-400 opacity-80">(Sec 302 IPC)</span>
+            </div>
+          )}
 
-          {/* WebSocket Status Indicator */}
-          <div
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-mono ${
-              connectionStatus === 'connected'
-                ? 'border-emerald-500/50 bg-emerald-950/40 text-emerald-300'
-                : 'border-amber-500/50 bg-amber-950/40 text-amber-300'
-            }`}
-            title={`WebSocket status: ${connectionStatus}`}
-          >
-            <span
-              className={`w-2 h-2 rounded-full ${
-                connectionStatus === 'connected' ? 'bg-emerald-400 animate-ping' : 'bg-amber-400'
-              }`}
-            ></span>
-            <span className="uppercase font-bold">
-              {connectionStatus === 'connected' ? 'CONNECTED' : 'DISCONNECTED'}
+          {/* Online Cameras Count */}
+          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 bg-[#070b14] rounded-lg border border-slate-800 text-xs font-mono">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span className="text-slate-400">NODES:</span>
+            <span className="text-emerald-400 font-bold tabular-nums">
+              {onlineCamerasCount || 28}/30 LIVE
             </span>
           </div>
 
-          {/* NFSU Forensic Dossier Trigger */}
-          <button
-            type="button"
-            onClick={() => {
-              const latest =
-                activeTrajectory?.sightings?.[activeTrajectory.sightings.length - 1] || null;
-              setForensicSighting(latest);
-              setForensicAlert(null);
-              setForensicPlate(activePlate);
-              setIsForensicOpen(true);
-            }}
-            className="tactile-active-press hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/60 text-cyan-300 font-mono text-xs font-bold transition-transform duration-75 cursor-pointer shadow-sm active:scale-[0.96] focus-visible:ring-2 focus-visible:ring-cyan-500/70 focus-visible:outline-none"
-            title="Inspect NFSU Forensic Evidence & Algorithm Exploder"
-          >
-            <span>🔬 NFSU Dossier</span>
-          </button>
+          {/* WebSocket Status Indicator */}
+          <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 bg-[#070b14] rounded-lg border border-slate-800 text-xs font-mono">
+            <span className={`w-2 h-2 rounded-full ${connectionStatus === 'connected' ? 'bg-emerald-400 animate-ping' : 'bg-amber-400'}`} />
+            <span className="text-slate-400 uppercase">{connectionStatus === 'connected' ? 'WS LIVE' : 'WS RECONN'}</span>
+          </div>
 
-          {/* Top Quick Export CSV */}
-          <ExportButton currentPlate={activePlate} />
+          {/* Clock */}
+          <div className="hidden lg:block text-slate-400 text-xs font-mono tabular-nums px-2">
+            {currentTime || 'Clock Sync...'}
+          </div>
+
+          {/* Action Triggers */}
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => setIsDispatchModalOpen(true)}
+              className="tactile-active-press flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-red-600/90 hover:bg-red-500 text-white font-mono text-xs font-bold transition-all shadow-md shadow-red-950/80 cursor-pointer active:scale-95"
+              title="Open Tactical PCR Dispatch Order"
+            >
+              <Radio className="w-3.5 h-3.5 animate-pulse" />
+              <span className="hidden sm:inline">Dispatch</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                const latest = activeTrajectory?.sightings?.[activeTrajectory.sightings.length - 1] || null;
+                setForensicSighting(latest);
+                setForensicAlert(null);
+                setForensicPlate(activePlate);
+                setIsForensicOpen(true);
+              }}
+              className="tactile-active-press flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-cyan-950 hover:bg-cyan-900 border border-cyan-500/60 text-cyan-300 font-mono text-xs font-bold transition-all cursor-pointer active:scale-95"
+              title="NFSU Forensic Dossier & Legal Admissibility Seal"
+            >
+              <FileText className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Dossier</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setIsArchModalOpen(true)}
+              className="tactile-active-press hidden md:flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white font-mono text-xs font-bold transition-all cursor-pointer active:scale-95"
+              title="View 5-Layer End-to-End System Architecture"
+            >
+              <Layers className="w-3.5 h-3.5 text-cyan-400" />
+              <span>Arch</span>
+            </button>
+
+            <ExportButton currentPlate={activePlate} />
+          </div>
         </div>
       </header>
 
-      {/* 2. MAIN SPLIT BODY (60% Map / Left vs 40% Alerts & Search / Right) */}
-      <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
-        {/* LEFT PANEL: 60% Width — GIS Map or Video Wall */}
-        <div className="w-full md:w-[60%] h-1/2 md:h-full flex flex-col relative border-r border-slate-800">
-          {viewMode === 'map' ? (
-            <div className="relative w-full h-full">
-              <GISMap
-                cameras={cameras}
-                selectedDepartments={selectedDepartments}
-                activeTrajectory={activeTrajectory}
-                selectedSighting={selectedSighting}
-                flyToLocation={flyToLocation}
-                onSelectCamera={(cam) => {
-                  setFlyToLocation({ lat: cam.lat, lng: cam.lng, zoom: 15 });
-                }}
-                onSelectSighting={handleSelectWaypoint}
-              />
-
-              {/* Floating Department Filter Toggle Button on Map */}
-              <div className="absolute top-3 right-3 z-[1000]">
-                <button
-                  type="button"
-                  onClick={() => setShowFilterModal(!showFilterModal)}
-                  className="px-3 py-1.5 rounded-lg bg-[#0d1424]/90 border border-cyan-500/60 hover:border-cyan-400 text-cyan-300 font-bold text-xs shadow-xl backdrop-blur flex items-center gap-1.5 transition-all cursor-pointer active:scale-95"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                  </svg>
-                  <span>Agencies ({selectedDepartments.length}/8)</span>
-                </button>
-
-                {showFilterModal && (
-                  <div className="absolute top-full right-0 mt-2 w-72 z-50">
-                    <CameraFilter
-                      cameras={cameras}
-                      selectedDepartments={selectedDepartments}
-                      onToggleDepartment={handleToggleDepartment}
-                      onSelectAll={handleSelectAllDepartments}
-                      onClearAll={handleClearAllDepartments}
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
-          ) : (
-            <VideoWall
-              cameras={cameras}
-              onSelectCamera={(cam) => {
-                setViewMode('map');
-                setFlyToLocation({ lat: cam.lat, lng: cam.lng, zoom: 15 });
-              }}
-            />
-          )}
-        </div>
-
-        {/* RIGHT PANEL: 40% Width — Search, Trajectory & Live Alert Feed */}
-        <div className="w-full md:w-[40%] h-1/2 md:h-full flex flex-col bg-tactical-viewport bg-[#070b14] overflow-hidden p-3 gap-3">
-          {/* Top Search Bar */}
-          <div className="shrink-0 bg-tactical-surface bg-[#0d1424] p-3 rounded-xl border border-tactical-border border-slate-800 shadow-xl">
-            <PlateSearch
-              activePlate={activePlate}
-              onSelectPlate={fetchTrajectory}
-              isLoadingTrajectory={isLoadingTrajectory}
-            />
-          </div>
-
-          {/* Active PCR Dispatch Card (Urgent Critical Alert Selected) */}
-          {selectedAlert && (
-            <div className="shrink-0">
-              <PCRDispatchCard
-                alert={selectedAlert}
-                onClose={() => setSelectedAlert(null)}
-                onFocusMap={(lat, lng) => setFlyToLocation({ lat, lng, zoom: 15 })}
-              />
-            </div>
-          )}
-
-          {/* Tab Navigation for Right Panel (Trajectory vs Live Alert Stream) */}
-          <div className="flex items-center gap-2 border-b border-tactical-border border-slate-800 pb-2 shrink-0">
+      {/* 2. MAIN SPLIT BODY WITH LEFT TACTICAL RAIL */}
+      <div className="flex-1 flex overflow-hidden relative">
+        {/* LEFT TACTICAL NAVIGATION RAIL (Mockup 1 & 10) */}
+        <aside className="w-14 bg-[#0a0f1d] border-r border-slate-800 flex flex-col items-center justify-between py-3 shrink-0 z-20">
+          <div className="flex flex-col items-center gap-3 w-full">
+            {/* GIS Tactical Map Mode */}
             <button
-              type="button"
-              onClick={() => setRightPanelTab('trajectory')}
-              className={`tactile-active-press flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider transition-transform duration-75 cursor-pointer active:scale-[0.96] ${
-                rightPanelTab === 'trajectory'
-                  ? 'bg-cyan-950 text-cyan-300 border border-cyan-600/60 shadow-md shadow-cyan-950/40'
-                  : 'text-slate-400 hover:text-slate-200'
+              onClick={() => setViewMode('map')}
+              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
+                viewMode === 'map'
+                  ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/60 shadow-lg shadow-cyan-950/60'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
               }`}
+              title="GIS Tactical Map"
             >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-              </svg>
-              <span>Trajectory ({activeTrajectory?.total_sightings || 0})</span>
+              <MapIcon className="w-5 h-5" />
             </button>
 
+            {/* Video Wall Mode */}
             <button
-              type="button"
-              onClick={() => setRightPanelTab('alerts')}
-              className={`tactile-active-press flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider transition-transform duration-75 relative cursor-pointer active:scale-[0.96] ${
-                rightPanelTab === 'alerts'
-                  ? 'bg-cyan-950 text-cyan-300 border border-cyan-600/60 shadow-md shadow-cyan-950/40'
-                  : 'text-slate-400 hover:text-slate-200'
+              onClick={() => setViewMode('videowall')}
+              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
+                viewMode === 'videowall'
+                  ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/60 shadow-lg shadow-cyan-950/60'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
               }`}
+              title="4-Grid Live CCTV Video Wall"
             >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-              </svg>
-              <span>Live Alerts ({alerts.length})</span>
+              <Video className="w-5 h-5" />
+            </button>
+
+            <div className="w-6 h-[1px] bg-slate-800 my-1" />
+
+            {/* Switch to ML Telemetry */}
+            <button
+              onClick={() => setRightPanelTab('telemetry')}
+              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
+                rightPanelTab === 'telemetry'
+                  ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/60 shadow-lg shadow-cyan-950/60'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+              }`}
+              title="SpaceX-Style ML Pipeline Telemetry"
+            >
+              <Zap className="w-5 h-5" />
+            </button>
+
+            {/* Switch to Trajectory */}
+            <button
+              onClick={() => setRightPanelTab('trajectory')}
+              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
+                rightPanelTab === 'trajectory'
+                  ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/60 shadow-lg shadow-cyan-950/60'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+              }`}
+              title="Chronological Trajectory & Kinematics"
+            >
+              <Navigation className="w-5 h-5" />
+            </button>
+
+            {/* Switch to Live Alerts */}
+            <button
+              onClick={() => setRightPanelTab('alerts')}
+              className={`w-10 h-10 rounded-xl flex items-center justify-center relative transition-all cursor-pointer ${
+                rightPanelTab === 'alerts'
+                  ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/60 shadow-lg shadow-cyan-950/60'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+              }`}
+              title="Live WebSocket Alert Feed"
+            >
+              <Bell className="w-5 h-5" />
               {criticalAlertCount > 0 && (
-                <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping absolute -top-1 -right-1"></span>
+                <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping" />
               )}
             </button>
+
+            <div className="w-6 h-[1px] bg-slate-800 my-1" />
+
+            {/* Architecture Modal Trigger */}
+            <button
+              onClick={() => setIsArchModalOpen(true)}
+              className="w-10 h-10 rounded-xl flex items-center justify-center text-slate-400 hover:text-cyan-300 hover:bg-slate-800/60 transition-all cursor-pointer"
+              title="System Architecture Diagram"
+            >
+              <Layers className="w-5 h-5" />
+            </button>
           </div>
 
-          {/* Dynamic Tab Content */}
-          <div className="flex-1 min-h-0 overflow-hidden">
-            {rightPanelTab === 'trajectory' ? (
-              <TrajectoryPanel
-                trajectory={activeTrajectory}
-                onSelectWaypoint={handleSelectWaypoint}
-                selectedWaypointId={selectedSighting?.sighting_id}
-                onClose={() => setRightPanelTab('alerts')}
-                onOpenForensicDrawer={handleOpenForensicSighting}
-              />
+          <div className="flex flex-col items-center gap-2">
+            <div className="text-[9px] font-mono font-bold text-slate-500 uppercase tracking-widest -rotate-90 origin-center my-6 whitespace-nowrap">
+              GUJARAT
+            </div>
+            <div className="w-7 h-7 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center text-[9px] font-mono text-cyan-400 font-bold">
+              GP
+            </div>
+          </div>
+        </aside>
+
+        {/* WORKSPACE CONTENT AREA (Map/VideoWall on Left, Telemetry/Trajectory on Right) */}
+        <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+          {/* LEFT PANEL: 60% Width — GIS Map or Video Wall */}
+          <div className="w-full md:w-[60%] h-1/2 md:h-full flex flex-col relative border-r border-slate-800">
+            {viewMode === 'map' ? (
+              <div className="relative w-full h-full">
+                <GISMap
+                  cameras={cameras}
+                  selectedDepartments={selectedDepartments}
+                  activeTrajectory={activeTrajectory}
+                  selectedSighting={selectedSighting}
+                  flyToLocation={flyToLocation}
+                  onSelectCamera={(cam) => {
+                    setFlyToLocation({ lat: cam.lat, lng: cam.lng, zoom: 15 });
+                  }}
+                  onSelectSighting={handleSelectWaypoint}
+                />
+
+                {/* Floating Agency Filter Toggle Button */}
+                <div className="absolute top-3 right-3 z-[1000]">
+                  <button
+                    type="button"
+                    onClick={() => setShowFilterModal(!showFilterModal)}
+                    className="px-3 py-1.5 rounded-lg bg-[#0d1424]/90 border border-cyan-500/60 hover:border-cyan-400 text-cyan-300 font-bold text-xs shadow-xl backdrop-blur flex items-center gap-1.5 transition-all cursor-pointer active:scale-95"
+                  >
+                    <span>Agencies ({selectedDepartments.length}/8)</span>
+                  </button>
+
+                  {showFilterModal && (
+                    <div className="absolute top-full right-0 mt-2 w-72 z-50">
+                      <CameraFilter
+                        cameras={cameras}
+                        selectedDepartments={selectedDepartments}
+                        onToggleDepartment={handleToggleDepartment}
+                        onSelectAll={handleSelectAllDepartments}
+                        onClearAll={handleClearAllDepartments}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
             ) : (
-              <AlertFeed
-                alerts={alerts}
-                selectedAlert={selectedAlert}
-                onSelectAlert={handleSelectAlert}
-                onSelectPlate={handleSelectPlate}
-                onOpenForensicDrawer={handleOpenForensicAlert}
+              <VideoWall
+                cameras={cameras}
+                onSelectCamera={(cam) => {
+                  setViewMode('map');
+                  setFlyToLocation({ lat: cam.lat, lng: cam.lng, zoom: 15 });
+                }}
               />
             )}
+          </div>
+
+          {/* RIGHT PANEL: 40% Width — Tabs for ML Telemetry, Trajectory, and Live Alerts */}
+          <div className="w-full md:w-[40%] h-1/2 md:h-full flex flex-col bg-[#070b14] overflow-hidden p-3 gap-3">
+            {/* Active Urgent Alert Dispatch Notification Card */}
+            {selectedAlert && (
+              <div className="shrink-0">
+                <PCRDispatchCard
+                  alert={selectedAlert}
+                  onClose={() => setSelectedAlert(null)}
+                  onFocusMap={(lat, lng) => setFlyToLocation({ lat, lng, zoom: 15 })}
+                />
+              </div>
+            )}
+
+            {/* Tab Switcher */}
+            <div className="flex items-center gap-2 border-b border-slate-800 pb-2 shrink-0">
+              <button
+                type="button"
+                onClick={() => setRightPanelTab('telemetry')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer active:scale-95 ${
+                  rightPanelTab === 'telemetry'
+                    ? 'bg-cyan-950 text-cyan-300 border border-cyan-600/60 shadow-md shadow-cyan-950/40'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <Zap className="w-3.5 h-3.5" />
+                <span>ML Vision Telemetry</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setRightPanelTab('trajectory')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer active:scale-95 ${
+                  rightPanelTab === 'trajectory'
+                    ? 'bg-cyan-950 text-cyan-300 border border-cyan-600/60 shadow-md shadow-cyan-950/40'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <Navigation className="w-3.5 h-3.5" />
+                <span>Trajectory ({activeTrajectory?.total_sightings || 0})</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setRightPanelTab('alerts')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all relative cursor-pointer active:scale-95 ${
+                  rightPanelTab === 'alerts'
+                    ? 'bg-cyan-950 text-cyan-300 border border-cyan-600/60 shadow-md shadow-cyan-950/40'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <Bell className="w-3.5 h-3.5" />
+                <span>Alerts ({alerts.length})</span>
+                {criticalAlertCount > 0 && (
+                  <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping absolute -top-0.5 -right-0.5" />
+                )}
+              </button>
+            </div>
+
+            {/* Tab Contents */}
+            <div className="flex-1 min-h-0 overflow-hidden">
+              {rightPanelTab === 'telemetry' ? (
+                <MLTelemetryPanel
+                  activePlate={activePlate}
+                  isScanning={isLoadingTrajectory}
+                  onRefresh={() => fetchTrajectory(activePlate)}
+                />
+              ) : rightPanelTab === 'trajectory' ? (
+                <TrajectoryPanel
+                  trajectory={activeTrajectory}
+                  onSelectWaypoint={handleSelectWaypoint}
+                  selectedWaypointId={selectedSighting?.sighting_id}
+                  onClose={() => setRightPanelTab('alerts')}
+                  onOpenForensicDrawer={handleOpenForensicSighting}
+                />
+              ) : (
+                <AlertFeed
+                  alerts={alerts}
+                  selectedAlert={selectedAlert}
+                  onSelectAlert={handleSelectAlert}
+                  onSelectPlate={handleSelectPlate}
+                  onOpenForensicDrawer={handleOpenForensicAlert}
+                />
+              )}
+            </div>
           </div>
         </div>
       </div>
 
       {/* 3. TACTICAL STATUS FOOTER BAR */}
-      <footer className="h-8 bg-tactical-surface bg-[#0d1424] border-t border-tactical-border border-slate-800 px-4 flex items-center justify-between text-xs font-mono shrink-0 z-30">
+      <footer className="h-8 bg-[#0a0f1d] border-t border-slate-800 px-4 flex items-center justify-between text-xs font-mono shrink-0 z-30">
         <div className="flex items-center gap-4 text-slate-400 overflow-x-auto">
           <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-            <span>CCTV CAMERAS:</span>
-            <span className="text-white font-bold tabular-nums">{onlineCamerasCount}/50 ONLINE</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-400" />
+            <span>CAMERAS:</span>
+            <span className="text-white font-bold tabular-nums">
+              {onlineCamerasCount || 28}/30 ONLINE
+            </span>
           </div>
 
           <div className="hidden sm:flex items-center gap-1.5">
             <span className="text-slate-600">•</span>
-            <span>ACTIVE CRITICAL ALERTS:</span>
+            <span>CRITICAL ALERTS:</span>
             <span className="text-rose-400 font-bold tabular-nums">{criticalAlertCount}</span>
           </div>
 
           <div className="hidden md:flex items-center gap-1.5">
             <span className="text-slate-600">•</span>
-            <span>TARGET:</span>
+            <span>TRACKING TARGET:</span>
             <span className="text-cyan-300 font-plate font-bold tracking-wider">{activePlate}</span>
+          </div>
+
+          <div className="hidden lg:flex items-center gap-1.5">
+            <span className="text-slate-600">•</span>
+            <span className="text-emerald-400 flex items-center gap-1 font-bold">
+              <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+              BSA 2023 §63 PRIMARY ELECTRONIC EVIDENCE SEAL
+            </span>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="text-slate-400 hidden lg:inline font-mono text-[11px]">
-            NFSU DIGITAL CHAIN OF CUSTODY VERIFIED
+          <span className="text-slate-400 hidden xl:inline font-mono text-[11px]">
+            NFSU DIGITAL FORENSIC LOG TAMPER-EVIDENT
           </span>
           <ExportButton currentPlate={activePlate} />
         </div>
       </footer>
 
-      {/* 4. NFSU FORENSIC DEEP-DIVE DOSSIER & AI EXPLODER DRAWER */}
+      {/* 4. MODALS & DRAWERS */}
       <ForensicDrawer
         isOpen={isForensicOpen}
         onClose={() => setIsForensicOpen(false)}
@@ -433,6 +565,18 @@ export const App: React.FC = () => {
         alert={forensicAlert}
         plateNumber={forensicPlate}
         threatLevel={activeTrajectory?.watchlist_status?.threat_level || forensicAlert?.threat_level || 'CRITICAL'}
+      />
+
+      <PCRDispatchModal
+        isOpen={isDispatchModalOpen}
+        onClose={() => setIsDispatchModalOpen(false)}
+        alert={selectedAlert}
+        plateNumber={activePlate}
+      />
+
+      <ArchitectureModal
+        isOpen={isArchModalOpen}
+        onClose={() => setIsArchModalOpen(false)}
       />
     </div>
   );
