@@ -325,7 +325,7 @@ def _stream_worker(camera_id: str, stop_event: threading.Event):
                                 _detection_queue.put_nowait({
                                     "camera_id": camera_id,
                                     "plate_number": plate_text,
-                                    "pts_timestamp_ms": int(pts_ms),
+                                    "pts_timestamp_ms": max(0, int(pts_ms)),
                                     "confidence": conf,
                                     "snapshot_bytes": snap_bytes,
                                     "snapshot_hash": snap_hash,
@@ -479,7 +479,7 @@ async def drain_detection_queue():
                         "camera_name": cam_name,
                         "department": cam_dept,
                         "plate_number": clean_plate,
-                        "pts_timestamp_ms": pts_ms,
+                        "pts_timestamp_ms": max(0, pts_ms),
                         "timestamp_iso": now_iso,
                         "lat": cam_lat,
                         "lng": cam_lng,
@@ -498,7 +498,7 @@ async def drain_detection_queue():
                         alert_id = f"ALT-{datetime.now(timezone.utc).strftime('%Y-%m%d')}-{int(time.time()*1000)%10000:04d}"
                         alert_dict = {
                             "alert_id": alert_id,
-                            "timestamp_pts_ms": pts_ms,
+                            "timestamp_pts_ms": max(0, pts_ms),
                             "timestamp_iso": now_iso,
                             "camera_id": camera_id,
                             "camera_dept": cam_dept,

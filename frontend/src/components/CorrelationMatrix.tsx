@@ -22,7 +22,7 @@ export const CorrelationMatrix: React.FC<CorrelationMatrixProps> = ({
 }) => {
   const cleanPlate = activePlate.replace(/\s+/g, '').toUpperCase();
   const isTargetPlate = cleanPlate === 'GJ01ER8842';
-  const isSwift = cleanPlate === 'GJ05CD5678';
+  const isFlagged = cleanPlate === 'GJ05CX9988';
 
   return (
     <div className="bg-[#0a0f1d] border border-slate-800 rounded-xl overflow-hidden shadow-2xl flex flex-col font-sans">
@@ -65,9 +65,9 @@ export const CorrelationMatrix: React.FC<CorrelationMatrixProps> = ({
                 <span className="w-full py-0.5 text-center font-mono font-extrabold text-[11px] bg-red-950/80 border border-red-500 text-red-300 rounded shadow-xs shadow-red-950/50">
                   STOLEN
                 </span>
-              ) : isSwift ? (
-                <span className="w-full py-0.5 text-center font-mono font-bold text-[11px] bg-amber-950/70 border border-amber-500/60 text-amber-300 rounded">
-                  FLAGGED
+              ) : isFlagged ? (
+                <span className="w-full py-0.5 text-center font-mono font-bold text-[11px] bg-red-950/70 border border-red-500/60 text-red-300 rounded">
+                  STOLEN
                 </span>
               ) : (
                 <span className="w-full py-0.5 text-center font-mono font-bold text-[11px] bg-emerald-950/70 border border-emerald-500/60 text-emerald-300 rounded">
@@ -77,9 +77,9 @@ export const CorrelationMatrix: React.FC<CorrelationMatrixProps> = ({
             </div>
 
             <div className="space-y-0.5 font-mono text-[9px] text-slate-400">
-              <div><span className="text-slate-500">Owner:</span> <span className="text-slate-200 font-semibold">{isTargetPlate ? 'Vikramaditya S.' : isSwift ? 'Pooja Sharma' : 'Ramesh Patel'}</span></div>
-              <div><span className="text-slate-500">Model:</span> <span className="text-slate-300">{isTargetPlate ? 'Hyundai Creta' : isSwift ? 'Maruti Swift' : 'Tata Nexon'}</span></div>
-              <div><span className="text-slate-500">Reg:</span> <span className="text-slate-400">{isTargetPlate ? '12-08-2023' : '05-11-2021'}</span></div>
+              <div><span className="text-slate-500">Owner:</span> <span className="text-slate-200 font-semibold">{isTargetPlate ? 'Vikram Solanki' : isFlagged ? 'Amit Shah' : 'Rajesh Mehta'}</span></div>
+              <div><span className="text-slate-500">Model:</span> <span className="text-slate-300">{isTargetPlate ? 'Hyundai Creta' : 'Motor Car (LMV)'}</span></div>
+              <div><span className="text-slate-500">Reg:</span> <span className="text-slate-400">{isTargetPlate ? '15-03-2022' : isFlagged ? '20-08-2021' : '10-04-2023'}</span></div>
             </div>
           </div>
 
@@ -101,7 +101,7 @@ export const CorrelationMatrix: React.FC<CorrelationMatrixProps> = ({
             <p className="text-[9px] text-slate-500 font-mono mt-0.5">Driver License Registry</p>
 
             <div className="my-1.5 flex justify-center">
-              {isTargetPlate || isSwift ? (
+              {isTargetPlate || isFlagged ? (
                 <span className="w-full py-0.5 text-center font-mono font-extrabold text-[11px] bg-amber-950/80 border border-amber-500 text-amber-300 rounded shadow-xs shadow-amber-950/50">
                   SUSPENDED
                 </span>
@@ -113,9 +113,9 @@ export const CorrelationMatrix: React.FC<CorrelationMatrixProps> = ({
             </div>
 
             <div className="space-y-0.5 font-mono text-[9px] text-slate-400">
-              <div><span className="text-slate-500">Driver:</span> <span className="text-slate-200 font-semibold">{isTargetPlate ? 'Vikram Solanki' : isSwift ? 'Pooja Sharma' : 'Ramesh Patel'}</span></div>
-              <div><span className="text-slate-500">DL No:</span> <span className="text-slate-300">{isTargetPlate ? 'GJ01-2018-045' : 'GJ05-2019-892'}</span></div>
-              <div><span className="text-slate-500">Status:</span> <span className={isTargetPlate || isSwift ? 'text-amber-400 font-bold' : 'text-emerald-400'}>{isTargetPlate || isSwift ? 'DISQUALIFIED' : 'ACTIVE'}</span></div>
+              <div><span className="text-slate-500">Driver:</span> <span className="text-slate-200 font-semibold">{isTargetPlate ? 'Vikram Solanki' : isFlagged ? 'Naresh Bharwad' : 'Rajesh Mehta'}</span></div>
+              <div><span className="text-slate-500">DL No:</span> <span className="text-slate-300">{isTargetPlate ? 'GJ01-2018-0098421' : isFlagged ? 'GJ05-2019-0011223' : 'GJ01-2015-0001234'}</span></div>
+              <div><span className="text-slate-500">Status:</span> <span className={isTargetPlate || isFlagged ? 'text-amber-400 font-bold' : 'text-emerald-400'}>{isTargetPlate || isFlagged ? 'SUSPENDED' : 'ACTIVE'}</span></div>
             </div>
           </div>
 
@@ -141,7 +141,7 @@ export const CorrelationMatrix: React.FC<CorrelationMatrixProps> = ({
                 <span className="w-full py-0.5 text-center font-mono font-extrabold text-[11px] bg-red-950/80 border border-red-500 text-red-300 rounded shadow-xs shadow-red-950/50 animate-pulse">
                   WANTED
                 </span>
-              ) : isSwift ? (
+              ) : isFlagged ? (
                 <span className="w-full py-0.5 text-center font-mono font-bold text-[11px] bg-amber-950/70 border border-amber-500/60 text-amber-300 rounded">
                   OPEN FIR
                 </span>
@@ -153,9 +153,9 @@ export const CorrelationMatrix: React.FC<CorrelationMatrixProps> = ({
             </div>
 
             <div className="space-y-0.5 font-mono text-[9px] text-slate-400">
-              <div><span className="text-slate-500">Charge:</span> <span className={isTargetPlate ? 'text-red-300 font-bold' : 'text-slate-300'}>{isTargetPlate ? 'Sec 302 IPC (Murder)' : isSwift ? 'Sec 279 (Rash)' : 'All Clear'}</span></div>
-              <div><span className="text-slate-500">FIR:</span> <span className="text-slate-300">{isTargetPlate ? '2026/0412 Crime Br.' : isSwift ? '2025/1109' : 'None'}</span></div>
-              <div><span className="text-slate-500">Warrant:</span> <span className={isTargetPlate ? 'text-red-400 font-bold' : 'text-slate-400'}>{isTargetPlate ? 'NON-BAILABLE' : 'NONE'}</span></div>
+              <div><span className="text-slate-500">Charge:</span> <span className={isTargetPlate ? 'text-red-300 font-bold' : isFlagged ? 'text-amber-300 font-bold' : 'text-slate-300'}>{isTargetPlate ? 'Sec 302 IPC (Murder)' : isFlagged ? 'Vehicle Theft & Extortion' : 'All Clear'}</span></div>
+              <div><span className="text-slate-500">FIR:</span> <span className="text-slate-300">{isTargetPlate ? 'FIR-892/2026/CRIME-BR' : isFlagged ? 'FIR-402/2026/SURAT-CR' : 'None'}</span></div>
+              <div><span className="text-slate-500">Warrant:</span> <span className={isTargetPlate ? 'text-red-400 font-bold' : isFlagged ? 'text-amber-400 font-bold' : 'text-slate-400'}>{isTargetPlate ? 'NON-BAILABLE' : isFlagged ? 'ABSCONDING' : 'NONE'}</span></div>
             </div>
           </div>
 
@@ -179,7 +179,11 @@ export const CorrelationMatrix: React.FC<CorrelationMatrixProps> = ({
             <div className="my-1.5 flex justify-center">
               {isTargetPlate ? (
                 <span className="w-full py-0.5 text-center font-mono font-extrabold text-[11px] bg-red-950/80 border border-red-500 text-red-300 rounded shadow-xs shadow-red-950/50">
-                  MATCH #AF-8942
+                  MATCH #AF-4512
+                </span>
+              ) : isFlagged ? (
+                <span className="w-full py-0.5 text-center font-mono font-bold text-[11px] bg-amber-950/70 border border-amber-500/60 text-amber-300 rounded">
+                  MATCH #AF-3891
                 </span>
               ) : (
                 <span className="w-full py-0.5 text-center font-mono font-bold text-[11px] bg-emerald-950/70 border border-emerald-500/60 text-emerald-300 rounded">
@@ -189,9 +193,9 @@ export const CorrelationMatrix: React.FC<CorrelationMatrixProps> = ({
             </div>
 
             <div className="space-y-0.5 font-mono text-[9px] text-slate-400">
-              <div><span className="text-slate-500">Match:</span> <span className={isTargetPlate ? 'text-cyan-300 font-bold' : 'text-slate-400'}>{isTargetPlate ? '99.4% Biometric' : 'No Record'}</span></div>
-              <div><span className="text-slate-500">Docket:</span> <span className="text-slate-300">{isTargetPlate ? '#CR-2022-7714' : 'N/A'}</span></div>
-              <div><span className="text-slate-500">Priors:</span> <span className="text-slate-300">{isTargetPlate ? '2 Armed Robbery' : 'None'}</span></div>
+              <div><span className="text-slate-500">Match:</span> <span className={isTargetPlate ? 'text-red-300 font-bold' : isFlagged ? 'text-amber-300 font-bold' : 'text-slate-400'}>{isTargetPlate ? '98.0% Biometric' : isFlagged ? '95.0% Biometric' : 'No Record'}</span></div>
+              <div><span className="text-slate-500">Docket:</span> <span className="text-slate-300">{isTargetPlate ? '#AF-GJ-2026-004512' : isFlagged ? '#AF-GJ-2026-003891' : 'N/A'}</span></div>
+              <div><span className="text-slate-500">Priors:</span> <span className="text-slate-300">{isTargetPlate ? '2 Armed Robbery' : isFlagged ? 'Auto Theft Racket' : 'None'}</span></div>
             </div>
           </div>
 
@@ -217,6 +221,10 @@ export const CorrelationMatrix: React.FC<CorrelationMatrixProps> = ({
                 <span className="w-full py-0.5 text-center font-mono font-extrabold text-[11px] bg-red-950/80 border border-red-500 text-red-300 rounded shadow-xs shadow-red-950/50">
                   FUGITIVE LINK
                 </span>
+              ) : isFlagged ? (
+                <span className="w-full py-0.5 text-center font-mono font-bold text-[11px] bg-amber-950/70 border border-amber-500/60 text-amber-300 rounded">
+                  INTERSTATE SYNC
+                </span>
               ) : (
                 <span className="w-full py-0.5 text-center font-mono font-bold text-[11px] bg-emerald-950/70 border border-emerald-500/60 text-emerald-300 rounded">
                   CLEAN STATUS
@@ -225,9 +233,9 @@ export const CorrelationMatrix: React.FC<CorrelationMatrixProps> = ({
             </div>
 
             <div className="space-y-0.5 font-mono text-[9px] text-slate-400">
-              <div><span className="text-slate-500">Interstate:</span> <span className={isTargetPlate ? 'text-red-300 font-bold' : 'text-slate-400'}>{isTargetPlate ? 'RJ • MP • GJ' : 'Clean'}</span></div>
-              <div><span className="text-slate-500">Linked:</span> <span className="text-slate-300">{isTargetPlate ? '4 Inter-State Cases' : '0'}</span></div>
-              <div><span className="text-slate-500">Alert:</span> <span className={isTargetPlate ? 'text-red-400 font-bold' : 'text-slate-400'}>{isTargetPlate ? 'ALL UNITS ACTIVE' : 'NONE'}</span></div>
+              <div><span className="text-slate-500">Interstate:</span> <span className={isTargetPlate ? 'text-red-300 font-bold' : isFlagged ? 'text-amber-300 font-bold' : 'text-slate-400'}>{isTargetPlate ? 'RJ • MP • GJ' : isFlagged ? 'GJ • MP • MH' : 'Clean'}</span></div>
+              <div><span className="text-slate-500">Linked:</span> <span className="text-slate-300">{isTargetPlate ? 'NCRB Red Notice' : isFlagged ? 'NCRB Disposal Ring' : '0'}</span></div>
+              <div><span className="text-slate-500">Alert:</span> <span className={isTargetPlate ? 'text-red-400 font-bold' : isFlagged ? 'text-amber-400 font-bold' : 'text-slate-400'}>{isTargetPlate ? 'ALL UNITS ACTIVE' : isFlagged ? 'SURVEILLANCE' : 'NONE'}</span></div>
             </div>
           </div>
 

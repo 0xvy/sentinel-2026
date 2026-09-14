@@ -109,7 +109,11 @@ export const PlateSearch: React.FC<PlateSearchProps> = ({
           type="text"
           value={query}
           onChange={handleInputChange}
-          onFocus={() => executeSearch(query)}
+          onFocus={() => {
+            if (query && query !== activePlate && query.length >= 2) {
+              executeSearch(query);
+            }
+          }}
           onKeyDown={handleKeyDown}
           placeholder="SEARCH VEHICLE PLATE (e.g. GJ01ER8842)"
           className="w-full pl-10 pr-24 py-2 bg-[#070b14] border-2 border-cyan-500/60 focus:border-cyan-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/70 rounded-lg text-white font-plate text-sm md:text-base tracking-widest placeholder:text-slate-400 placeholder:font-sans placeholder:tracking-normal shadow-lg shadow-cyan-950/40 transition-all"
@@ -162,30 +166,30 @@ export const PlateSearch: React.FC<PlateSearchProps> = ({
           </button>
           <button
             type="button"
-            onClick={() => handleSelect('GJ05CD5678')}
+            onClick={() => handleSelect('GJ05CX9988')}
             className={`px-2 py-0.5 rounded font-mono text-[11px] font-bold border cursor-pointer shrink-0 transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/70 flex items-center gap-1.5 ${
-              activePlate === 'GJ05CD5678'
+              activePlate === 'GJ05CX9988'
                 ? 'bg-amber-600 text-white border-amber-400 shadow-md shadow-amber-950/60'
                 : 'bg-amber-950/40 text-amber-300 border-amber-800/60 hover:bg-amber-900/60'
             }`}
-            title="Suspended DL & Open FIR (Maruti Swift)"
+            title="Stolen Vehicle Surat & Suspended DL"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-            <span>GJ05CD5678</span>
+            <span>GJ05CX9988</span>
             <span className="text-[9px] opacity-80 font-normal hidden sm:inline">— Suspended DL</span>
           </button>
           <button
             type="button"
-            onClick={() => handleSelect('GJ27K9012')}
+            onClick={() => handleSelect('GJ01AB1234')}
             className={`px-2 py-0.5 rounded font-mono text-[11px] font-bold border cursor-pointer shrink-0 transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/70 flex items-center gap-1.5 ${
-              activePlate === 'GJ27K9012'
+              activePlate === 'GJ01AB1234'
                 ? 'bg-emerald-600 text-white border-emerald-400 shadow-md shadow-emerald-950/60'
                 : 'bg-emerald-950/40 text-emerald-300 border-emerald-800/60 hover:bg-emerald-900/60'
             }`}
-            title="Clean Vehicle Verified Registration (Tata Nexon)"
+            title="Clean Vehicle Verified Registration"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-            <span>GJ27K9012</span>
+            <span>GJ01AB1234</span>
             <span className="text-[9px] opacity-80 font-normal hidden sm:inline">— Clean Vehicle</span>
           </button>
         </div>

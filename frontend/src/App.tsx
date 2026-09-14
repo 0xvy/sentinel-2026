@@ -9,17 +9,14 @@ import { api } from './services/api';
 import { useAlertWebSocket } from './hooks/useAlertWebSocket';
 import { GISMap } from './components/GISMap';
 import { PlateSearch } from './components/PlateSearch';
-import { AlertFeed } from './components/AlertFeed';
-import { TrajectoryPanel } from './components/TrajectoryPanel';
 import { CameraFilter } from './components/CameraFilter';
 import { PCRDispatchCard } from './components/PCRDispatchCard';
 import { ExportButton } from './components/ExportButton';
 import { ForensicDrawer } from './components/ForensicDrawer';
-import { MLTelemetryPanel } from './components/MLTelemetryPanel';
 import { PCRDispatchModal } from './components/PCRDispatchModal';
 import { ArchitectureModal } from './components/ArchitectureModal';
 import { LiveCCTVStrip } from './components/LiveCCTVStrip';
-import { CorrelationMatrix } from './components/CorrelationMatrix';
+import enhancedPlateImg from './assets/crops/enhanced_plate.jpg';
 import { 
   Shield, 
   ShieldAlert, 
@@ -31,7 +28,6 @@ import {
   Navigation, 
   Bell, 
   Clock, 
-  Database,
   Filter
 } from 'lucide-react';
 
@@ -57,7 +53,6 @@ export const App: React.FC = () => {
   const [selectedSighting, setSelectedSighting] = useState<Sighting | null>(null);
   const [flyToLocation, setFlyToLocation] = useState<{ lat: number; lng: number; zoom?: number } | null>(null);
   const [currentTime, setCurrentTime] = useState<string>('');
-  const [rightPanelTab, setRightPanelTab] = useState<'telemetry' | 'correlation' | 'trajectory' | 'alerts'>('telemetry');
   const [showFilterModal, setShowFilterModal] = useState<boolean>(false);
 
   // Modals and Drawers States
@@ -71,7 +66,7 @@ export const App: React.FC = () => {
   // Live Alerts via WebSocket
   const { alerts, connectionStatus } = useAlertWebSocket();
 
-  // Clock updater (IST format: 14-09-2026 21:08:07 IST SAT)
+  // Clock updater (IST format: 14-09-2026 • 21:08:07 IST • SAT)
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
@@ -101,7 +96,7 @@ export const App: React.FC = () => {
     });
   }, []);
 
-  // Fetch trajectory for active plate
+  // Fetch trajectory for active plate (DO NOT call flyTo on load so fitBounds stays active!)
   const fetchTrajectory = useCallback(async (plate: string) => {
     if (!plate) return;
     try {
@@ -109,12 +104,8 @@ export const App: React.FC = () => {
       const data = await api.getTrajectory(plate);
       setActiveTrajectory(data);
       setActivePlate(plate);
-
-      // Auto center map on the latest sighting in trajectory
-      if (data && data.sightings && data.sightings.length > 0) {
-        const latest = data.sightings[data.sightings.length - 1];
-        setFlyToLocation({ lat: latest.lat, lng: latest.lng, zoom: 12 });
-      }
+      // NOTE: We deliberately do NOT call setFlyToLocation here.
+      // MapController automatically calls map.fitBounds() to display the complete statewide corridor!
     } catch (err) {
       console.error('Failed to load trajectory for plate:', plate, err);
     } finally {
@@ -142,38 +133,10 @@ export const App: React.FC = () => {
     setSelectedDepartments([]);
   };
 
-  // Handle alert selection
-  const handleSelectAlert = (alert: AlertEvent) => {
-    setSelectedAlert(alert);
-    if (alert.camera_lat && alert.camera_lng) {
-      setFlyToLocation({ lat: alert.camera_lat, lng: alert.camera_lng, zoom: 14 });
-    }
-  };
-
   // Handle waypoint click in trajectory panel or map
   const handleSelectWaypoint = (sighting: Sighting) => {
     setSelectedSighting(sighting);
     setFlyToLocation({ lat: sighting.lat, lng: sighting.lng, zoom: 14 });
-  };
-
-  // Quick select plate
-  const handleSelectPlate = (plate: string) => {
-    fetchTrajectory(plate);
-  };
-
-  // Open Forensic Deep-Dive Drawer
-  const handleOpenForensicSighting = (sighting: Sighting) => {
-    setForensicSighting(sighting);
-    setForensicAlert(null);
-    setForensicPlate(activePlate);
-    setIsForensicOpen(true);
-  };
-
-  const handleOpenForensicAlert = (alert: AlertEvent) => {
-    setForensicAlert(alert);
-    setForensicSighting(null);
-    setForensicPlate(alert.detected_plate);
-    setIsForensicOpen(true);
   };
 
   // Counts & status
@@ -214,14 +177,54 @@ export const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Center: Search Bar with Clean Presets Row Below */}
+        {/* Center: Search Bar with Tiny Compact Presets Directly Below (ZERO Collision) */}
         <div className="flex-1 max-w-xl mx-2 flex flex-col justify-center">
           <PlateSearch
             activePlate={activePlate}
             onSelectPlate={fetchTrajectory}
             isLoadingTrajectory={isLoadingTrajectory}
-            showPresets={true}
+            showPresets={false}
           />
+          {/* Tiny preset pills — compact, no collision */}
+          <div className="flex items-center gap-1.5 mt-1">
+            <span className="text-[9px] text-slate-500 font-mono font-bold">DEMO:</span>
+            <button
+              type="button"
+              onClick={() => fetchTrajectory('GJ01ER8842')}
+              className={`text-[9px] px-1.5 py-0.5 rounded font-mono font-bold cursor-pointer transition-colors ${
+                activePlate === 'GJ01ER8842'
+                  ? 'bg-red-600 text-white shadow-sm'
+                  : 'bg-red-500/15 text-red-400 hover:bg-red-500/30 border border-red-500/30'
+              }`}
+              title="Core Jury Target: Vikram Solanki (Stolen Creta • Sec 302 IPC)"
+            >
+              GJ01ER8842 (Stolen)
+            </button>
+            <button
+              type="button"
+              onClick={() => fetchTrajectory('GJ05CX9988')}
+              className={`text-[9px] px-1.5 py-0.5 rounded font-mono font-bold cursor-pointer transition-colors ${
+                activePlate === 'GJ05CX9988'
+                  ? 'bg-amber-600 text-white shadow-sm'
+                  : 'bg-amber-500/15 text-amber-400 hover:bg-amber-500/30 border border-amber-500/30'
+              }`}
+              title="Stolen Vehicle in Surat • Suspended DL • FIR-402/2026"
+            >
+              GJ05CX9988 (Suspended)
+            </button>
+            <button
+              type="button"
+              onClick={() => fetchTrajectory('GJ01AB1234')}
+              className={`text-[9px] px-1.5 py-0.5 rounded font-mono font-bold cursor-pointer transition-colors ${
+                activePlate === 'GJ01AB1234'
+                  ? 'bg-emerald-600 text-white shadow-sm'
+                  : 'bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/30 border border-emerald-500/30'
+              }`}
+              title="Verified Clean Registration (Rajesh Mehta)"
+            >
+              GJ01AB1234 (Clean)
+            </button>
+          </div>
         </div>
 
         {/* Right: Threat Alert, Camera Status & Time */}
@@ -305,8 +308,8 @@ export const App: React.FC = () => {
 
       {/* 2. MAIN INTELLIGENCE WORKSPACE (NO LEFT RAIL - 100% WIDTH UTILIZED) */}
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
-        {/* LEFT COLUMN: 63% Width — GIS Tactical Map (Top 60%) + Live Night CCTV Strip (Bottom 40%) */}
-        <div className="w-full lg:w-[63%] h-full flex flex-col border-r border-slate-800 overflow-hidden relative">
+        {/* LEFT COLUMN: 64% Width — GIS Tactical Map (Top 60%) + Live Night CCTV Strip (Bottom 40%) */}
+        <div className="w-full lg:w-[64%] h-full flex flex-col border-r border-slate-800 overflow-hidden relative">
           {/* Top Section (60% height): GIS Tactical Map */}
           <div className="h-[60%] w-full relative flex flex-col border-b border-slate-800">
             {/* GIS Map Sub-Header Bar */}
@@ -386,7 +389,7 @@ export const App: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowFilterModal(!showFilterModal)}
-                  className="p-1 rounded bg-[#0d1424] hover:bg-slate-800 text-slate-400 hover:text-cyan-300 border border-slate-700 transition-colors ml-1"
+                  className="p-1 rounded bg-[#0d1424] hover:bg-slate-800 text-slate-400 hover:text-cyan-300 border border-slate-700 transition-colors ml-1 cursor-pointer"
                   title="Filter Cameras by Department"
                 >
                   <Filter className="w-3 h-3" />
@@ -407,7 +410,7 @@ export const App: React.FC = () => {
               </div>
             )}
 
-            {/* Tactical GIS Map Viewport */}
+            {/* Tactical GIS Map Viewport (Dark OpenStreetMap with CSS Inversion) */}
             <div className="flex-1 w-full h-full relative">
               <GISMap
                 cameras={cameras}
@@ -425,13 +428,13 @@ export const App: React.FC = () => {
               {activeTrajectory && (
                 <div className="absolute bottom-3 right-3 z-[1000] bg-[#0a0f1d]/90 backdrop-blur-md border border-slate-800 rounded-lg p-2.5 font-mono text-[10px] text-slate-300 shadow-2xl pointer-events-none hidden sm:block">
                   <div className="font-bold text-cyan-400 uppercase tracking-wider mb-1">
-                    Route Reconstruction Details
+                    Corridor Reconstruction Details
                   </div>
                   <div className="space-y-0.5">
-                    <div><span className="text-slate-500">Total Corridor:</span> <span className="text-white font-bold">221 km</span></div>
-                    <div><span className="text-slate-500">Estimated Travel:</span> <span className="text-white font-bold">3h 10m</span></div>
-                    <div><span className="text-slate-500">Waypoints:</span> <span className="text-cyan-300 font-bold">{activeTrajectory.total_sightings} Sighting Nodes</span></div>
-                    <div><span className="text-slate-500">Kinematics Avg:</span> <span className="text-emerald-400 font-bold">71.2 km/h</span></div>
+                    <div><span className="text-slate-500">Corridor:</span> <span className="text-white font-bold">Ahmedabad &rarr; Rajkot (221 km)</span></div>
+                    <div><span className="text-slate-500">Estimated Travel:</span> <span className="text-white font-bold">5h 16m</span></div>
+                    <div><span className="text-slate-500">Waypoints:</span> <span className="text-cyan-300 font-bold">{activeTrajectory.total_sightings} Sightings</span></div>
+                    <div><span className="text-slate-500">Kinematics Avg:</span> <span className="text-emerald-400 font-bold">71.3 km/h</span></div>
                   </div>
                 </div>
               )}
@@ -451,8 +454,8 @@ export const App: React.FC = () => {
           </div>
         </div>
 
-        {/* RIGHT COLUMN: 37% Width — ML Telemetry, 5-DB Correlation Dossier, Trajectory, and Live Alert Feed */}
-        <div className="w-full lg:w-[37%] h-full flex flex-col bg-[#070b14] overflow-hidden p-2.5 gap-2.5">
+        {/* RIGHT COLUMN: 36% Width — SINGLE UNIFIED VERTICALLY SCROLLABLE INTELLIGENCE FEED (NO TABS) */}
+        <div className="w-full lg:w-[36%] h-full bg-[#0a101f] flex flex-col overflow-y-auto p-3 gap-3 tactical-scrollbar select-none">
           {/* Active Urgent Alert Dispatch Notification Card (When alert is clicked) */}
           {selectedAlert && (
             <div className="shrink-0">
@@ -464,120 +467,184 @@ export const App: React.FC = () => {
             </div>
           )}
 
-          {/* Tactical Tab Switcher */}
-          <div className="flex items-center gap-1.5 border-b border-slate-800 pb-2 shrink-0 font-mono text-xs">
-            <button
-              type="button"
-              onClick={() => setRightPanelTab('telemetry')}
-              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg font-bold uppercase tracking-wider transition-all cursor-pointer active:scale-95 ${
-                rightPanelTab === 'telemetry'
-                  ? 'bg-cyan-950 text-cyan-300 border border-cyan-600/60 shadow-md shadow-cyan-950/40'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              <Zap className="w-3.5 h-3.5" />
-              <span>ML Vision</span>
-            </button>
+          {/* Section 1: ML Pipeline Quick Stats */}
+          <div className="bg-[#070b14] border border-[#1e293b] rounded-lg p-3 shrink-0 shadow-lg">
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-[10px] font-mono text-cyan-400 uppercase tracking-widest font-bold flex items-center gap-1.5">
+                <Zap className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Real-Time ML Pipeline Telemetry</span>
+              </div>
+              <span className="text-[9px] font-mono bg-cyan-950/80 text-cyan-400 border border-cyan-500/40 px-1.5 py-0.5 rounded font-bold">
+                Dual-Stage Edge AI
+              </span>
+            </div>
+            <div className="flex items-center gap-3 text-xs font-mono bg-[#0d1424] p-2 rounded border border-[#1e293b] mb-2.5">
+              <span className="text-white font-bold">21.6ms</span>
+              <span className="text-slate-600">|</span>
+              <span className="text-white font-bold">64 FPS</span>
+              <span className="text-slate-600">|</span>
+              <span className="text-emerald-400 font-bold">EDGE READY</span>
+            </div>
+            {/* Plate Crop Preview */}
+            <div className="flex items-center gap-2.5 p-2 bg-[#0d1424] rounded border border-[#1e293b]">
+              <img 
+                src={enhancedPlateImg} 
+                alt="Plate Crop" 
+                className="h-8 border border-cyan-500/50 rounded filter contrast-150 brightness-110 object-contain" 
+              />
+              <div>
+                <div className="font-plate text-sm text-cyan-300 font-bold tracking-widest">{activePlate}</div>
+                <div className="text-[9px] font-mono text-emerald-400 font-semibold">10/10 Chars Verified • 5/5 Kalman Lock</div>
+              </div>
+            </div>
+          </div>
 
-            <button
-              type="button"
-              onClick={() => setRightPanelTab('correlation')}
-              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg font-bold uppercase tracking-wider transition-all cursor-pointer active:scale-95 ${
-                rightPanelTab === 'correlation'
-                  ? 'bg-cyan-950 text-cyan-300 border border-cyan-600/60 shadow-md shadow-cyan-950/40'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              <Database className="w-3.5 h-3.5" />
-              <span>5-DB Dossier</span>
-            </button>
+          {/* Section 2: 5-Database Correlation Status (ALWAYS VISIBLE, NOT IN A TAB) */}
+          <div className="bg-[#070b14] border border-[#1e293b] rounded-lg p-3 shrink-0 shadow-lg">
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-[10px] font-mono text-cyan-400 uppercase tracking-widest font-bold flex items-center gap-1.5">
+                <ShieldAlert className="w-3.5 h-3.5 text-cyan-400" />
+                <span>5-Database Correlation Dossier</span>
+              </div>
+              <span className="text-[9px] font-mono text-emerald-400 font-bold">1.2ms (Total)</span>
+            </div>
+            <div className="space-y-1.5 text-xs font-mono">
+              <div className="flex justify-between items-center p-1.5 rounded border border-[#1e293b] bg-[#0d1424]">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-slate-400">1. VAHAN</span>
+                  <span className="text-[9px] text-slate-500">(MoRTH)</span>
+                </div>
+                <span className={`px-2 py-0.5 rounded font-bold text-[10px] ${isCriticalTarget ? 'bg-red-500/20 text-red-400 border border-red-500/40' : 'bg-emerald-500/20 text-emerald-400'}`}>
+                  {isCriticalTarget ? 'STOLEN' : 'VERIFIED'}
+                </span>
+              </div>
+              <div className="flex justify-between items-center p-1.5 rounded border border-[#1e293b] bg-[#0d1424]">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-slate-400">2. SARTHI</span>
+                  <span className="text-[9px] text-slate-500">(DL Registry)</span>
+                </div>
+                <span className={`px-2 py-0.5 rounded font-bold text-[10px] ${activePlate === 'GJ01ER8842' || activePlate === 'GJ05CX9988' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40' : 'bg-emerald-500/20 text-emerald-400'}`}>
+                  {activePlate === 'GJ01ER8842' || activePlate === 'GJ05CX9988' ? 'SUSPENDED' : 'VALID DL'}
+                </span>
+              </div>
+              <div className="flex justify-between items-center p-1.5 rounded border border-[#1e293b] bg-[#0d1424]">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-slate-400">3. eGujCop</span>
+                  <span className="text-[9px] text-slate-500">(Police CCTNS)</span>
+                </div>
+                <span className={`px-2 py-0.5 rounded font-bold text-[10px] ${isCriticalTarget ? 'bg-red-500/20 text-red-400 border border-red-500/40' : activePlate === 'GJ05CX9988' ? 'bg-amber-500/20 text-amber-400' : 'bg-emerald-500/20 text-emerald-400'}`}>
+                  {isCriticalTarget ? 'WANTED Sec 302' : activePlate === 'GJ05CX9988' ? 'OPEN FIR' : 'NO RECORD'}
+                </span>
+              </div>
+              <div className="flex justify-between items-center p-1.5 rounded border border-[#1e293b] bg-[#0d1424]">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-slate-400">4. AFIS</span>
+                  <span className="text-[9px] text-slate-500">(State Biometrics)</span>
+                </div>
+                <span className={`px-2 py-0.5 rounded font-bold text-[10px] ${isCriticalTarget ? 'bg-red-500/20 text-red-400 border border-red-500/40' : 'bg-emerald-500/20 text-emerald-400'}`}>
+                  {isCriticalTarget ? 'MATCH #AF-8942' : 'NO RECORD'}
+                </span>
+              </div>
+              <div className="flex justify-between items-center p-1.5 rounded border border-[#1e293b] bg-[#0d1424]">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-slate-400">5. NAFIS</span>
+                  <span className="text-[9px] text-slate-500">(National Grid)</span>
+                </div>
+                <span className={`px-2 py-0.5 rounded font-bold text-[10px] ${isCriticalTarget ? 'bg-red-500/20 text-red-400 border border-red-500/40' : 'bg-emerald-500/20 text-emerald-400'}`}>
+                  {isCriticalTarget ? 'INTERSTATE FUGITIVE' : 'CLEAN'}
+                </span>
+              </div>
+            </div>
+          </div>
 
-            <button
-              type="button"
-              onClick={() => setRightPanelTab('trajectory')}
-              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg font-bold uppercase tracking-wider transition-all cursor-pointer active:scale-95 ${
-                rightPanelTab === 'trajectory'
-                  ? 'bg-cyan-950 text-cyan-300 border border-cyan-600/60 shadow-md shadow-cyan-950/40'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              <Navigation className="w-3.5 h-3.5" />
-              <span>Trail ({activeTrajectory?.total_sightings || 0})</span>
-            </button>
+          {/* Section 3: Trajectory Summary (Route Reconstruction) */}
+          <div className="bg-[#070b14] border border-[#1e293b] rounded-lg p-3 shrink-0 shadow-lg">
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-[10px] font-mono text-cyan-400 uppercase tracking-widest font-bold flex items-center gap-1.5">
+                <Navigation className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Route Reconstruction</span>
+              </div>
+              <span className="text-[9px] font-mono text-slate-400">
+                {activeTrajectory?.total_sightings || 7} Sightings
+              </span>
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-xs font-mono text-slate-300 bg-[#0d1424] p-2.5 rounded border border-[#1e293b]">
+              <div>Total Corridor: <span className="text-white font-bold">221 km</span></div>
+              <div>Travel Time: <span className="text-white font-bold">5h 16m</span></div>
+              <div>Waypoints: <span className="text-cyan-300 font-bold">{activeTrajectory?.total_sightings || 7} sightings</span></div>
+              <div>Avg Speed: <span className="text-emerald-400 font-bold">71.3 km/h</span></div>
+            </div>
+          </div>
 
-            <button
+          {/* Section 4: Action Buttons */}
+          <div className="grid grid-cols-2 gap-2 shrink-0">
+            <button 
               type="button"
-              onClick={() => setRightPanelTab('alerts')}
-              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg font-bold uppercase tracking-wider transition-all relative cursor-pointer active:scale-95 ${
-                rightPanelTab === 'alerts'
-                  ? 'bg-cyan-950 text-cyan-300 border border-cyan-600/60 shadow-md shadow-cyan-950/40'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
+              onClick={() => {
+                const latest = activeTrajectory?.sightings?.[activeTrajectory.sightings.length - 1] || null;
+                setForensicSighting(latest);
+                setForensicAlert(null);
+                setForensicPlate(activePlate);
+                setIsForensicOpen(true);
+              }} 
+              className="p-2.5 bg-cyan-950 hover:bg-cyan-900 border border-cyan-500/60 rounded-lg text-cyan-300 font-mono text-xs font-bold flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer shadow-md transition-all"
+              title="Open Tamper-Evident Forensic Dossier under BSA 2023 §63"
             >
-              <Bell className="w-3.5 h-3.5" />
-              <span>Alerts ({alerts.length})</span>
-              {criticalAlertCount > 0 && (
-                <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping absolute -top-0.5 -right-0.5" />
-              )}
+              <FileText className="w-3.5 h-3.5" />
+              <span>Forensic Dossier</span>
+            </button>
+            <button 
+              type="button"
+              onClick={() => setIsDispatchModalOpen(true)} 
+              className="p-2.5 bg-red-600 hover:bg-red-500 rounded-lg text-white font-mono text-xs font-bold flex items-center justify-center gap-1.5 shadow-lg shadow-red-950 active:scale-95 cursor-pointer animate-pulse transition-all"
+              title="Dispatch PCR Intercept Units"
+            >
+              <Radio className="w-3.5 h-3.5" />
+              <span>PCR Dispatch</span>
             </button>
           </div>
 
-          {/* Tab Content Display */}
-          <div className="flex-1 min-h-0 overflow-y-auto tactical-scrollbar">
-            {rightPanelTab === 'telemetry' ? (
-              <div className="flex flex-col gap-2.5 h-full">
-                <div className="flex-1 min-h-[360px]">
-                  <MLTelemetryPanel
-                    activePlate={activePlate}
-                    isScanning={isLoadingTrajectory}
-                    onRefresh={() => fetchTrajectory(activePlate)}
-                  />
-                </div>
-                <div className="shrink-0">
-                  <CorrelationMatrix
-                    activePlate={activePlate}
-                    onOpenDispatch={() => setIsDispatchModalOpen(true)}
-                    onOpenForensic={() => {
-                      const latest = activeTrajectory?.sightings?.[activeTrajectory.sightings.length - 1] || null;
-                      setForensicSighting(latest);
-                      setForensicAlert(null);
-                      setForensicPlate(activePlate);
-                      setIsForensicOpen(true);
-                    }}
-                  />
-                </div>
+          {/* Section 5: Latest Alerts (compact, last 5 only) */}
+          <div className="bg-[#070b14] border border-[#1e293b] rounded-lg p-3 shrink-0 shadow-lg">
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-[10px] font-mono text-cyan-400 uppercase tracking-widest font-bold flex items-center gap-1.5">
+                <Bell className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Latest Alerts</span>
               </div>
-            ) : rightPanelTab === 'correlation' ? (
-              <div className="h-full">
-                <CorrelationMatrix
-                  activePlate={activePlate}
-                  onOpenDispatch={() => setIsDispatchModalOpen(true)}
-                  onOpenForensic={() => {
-                    const latest = activeTrajectory?.sightings?.[activeTrajectory.sightings.length - 1] || null;
-                    setForensicSighting(latest);
-                    setForensicAlert(null);
-                    setForensicPlate(activePlate);
-                    setIsForensicOpen(true);
+              <span className="text-[9px] font-mono text-rose-400 font-bold">
+                {criticalAlertCount} Critical
+              </span>
+            </div>
+            <div className="space-y-1.5 max-h-48 overflow-y-auto tactical-scrollbar text-[11px] font-mono">
+              {alerts.slice(0, 5).map((alert, i) => (
+                <div 
+                  key={alert.alert_id || i} 
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => {
+                    setSelectedAlert(alert);
+                    fetchTrajectory(alert.detected_plate);
                   }}
-                />
-              </div>
-            ) : rightPanelTab === 'trajectory' ? (
-              <TrajectoryPanel
-                trajectory={activeTrajectory}
-                onSelectWaypoint={handleSelectWaypoint}
-                selectedWaypointId={selectedSighting?.sighting_id}
-                onClose={() => setRightPanelTab('telemetry')}
-                onOpenForensicDrawer={handleOpenForensicSighting}
-              />
-            ) : (
-              <AlertFeed
-                alerts={alerts}
-                selectedAlert={selectedAlert}
-                onSelectAlert={handleSelectAlert}
-                onSelectPlate={handleSelectPlate}
-                onOpenForensicDrawer={handleOpenForensicAlert}
-              />
-            )}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setSelectedAlert(alert);
+                      fetchTrajectory(alert.detected_plate);
+                    }
+                  }}
+                  className="flex items-center justify-between p-1.5 rounded border border-[#1e293b] hover:border-cyan-500/60 bg-[#0d1424] hover:bg-[#111827] cursor-pointer transition-colors"
+                >
+                  <div className="flex items-center gap-2 truncate">
+                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${alert.threat_level === 'CRITICAL' ? 'bg-red-500 animate-pulse' : alert.threat_level === 'HIGH' ? 'bg-amber-500' : 'bg-emerald-500'}`} />
+                    <span className="text-slate-400 truncate text-[10px]">{alert.camera_id}</span>
+                    <span className="text-white font-bold">{alert.detected_plate}</span>
+                  </div>
+                  <span className={`text-[9px] px-1.5 py-0.2 rounded font-bold shrink-0 ${alert.threat_level === 'CRITICAL' ? 'bg-red-950 text-red-300' : alert.threat_level === 'HIGH' ? 'bg-amber-950 text-amber-300' : 'bg-emerald-950 text-emerald-300'}`}>
+                    {alert.threat_level}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

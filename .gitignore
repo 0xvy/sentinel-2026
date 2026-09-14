@@ -51,3 +51,4 @@ Thumbs.db
 # Test artifacts & Models
 frontend/test-results/
 *.pt
+scan_crops/

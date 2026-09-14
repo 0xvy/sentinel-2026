@@ -25,8 +25,8 @@ const MapController: React.FC<{
     if (trajectoryCoordinates && trajectoryCoordinates.length > 1) {
       const bounds = L.latLngBounds(trajectoryCoordinates);
       map.fitBounds(bounds, {
-        padding: [50, 50],
-        maxZoom: 11, // Prevents over-zooming into a single street!
+        padding: [60, 60],
+        maxZoom: 10, // Show full Gujarat state view
         animate: true,
         duration: 1.5,
       });
@@ -296,11 +296,10 @@ export const GISMap: React.FC<GISMapProps> = ({
         className="w-full h-full"
         zoomControl={false}
       >
-        {/* CartoDB Dark Matter: High-contrast, deep obsidian tactical canvas with sleek glowing roads */}
+        {/* OpenStreetMap with Dark CSS Inversion Filter (Free forever, no API key watermark) */}
         <TileLayer
-          attribution='&copy; <a href="https://carto.com/">CARTO</a> &bull; Gujarat Police GIS'
-          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-          subdomains={['a', 'b', 'c', 'd']}
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           maxZoom={19}
         />
 
