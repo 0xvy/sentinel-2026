@@ -455,23 +455,49 @@ pre {
 }
 
 /* ==========================================================================
-   Dark Tactical Map: Invert standard OSM tiles to deep obsidian navy
+   Clean Tactical GIS Map Styling (CartoDB Dark Matter)
    ========================================================================== */
-/* Dark tactical map via CSS inversion of standard OSM tiles */
-.leaflet-tile-pane {
-  filter: invert(1) hue-rotate(180deg) brightness(0.6) contrast(1.3) saturate(0.3);
+.leaflet-container {
+  background-color: #070b14 !important;
+  font-family: var(--font-body);
 }
 
-/* Prevent inversion from affecting markers, popups, overlays */
-.leaflet-marker-pane,
-.leaflet-shadow-pane,
-.leaflet-popup-pane,
-.leaflet-overlay-pane,
-.leaflet-tooltip-pane,
-.leaflet-control-container,
-.custom-camera-marker,
-.custom-waypoint-marker {
-  filter: none !important;
+/* Crisp Dark Tooltips on Marker Hover */
+.leaflet-tooltip {
+  background-color: rgba(11, 18, 34, 0.95) !important;
+  border: 1px solid rgba(51, 65, 85, 0.8) !important;
+  color: #f8fafc !important;
+  font-family: var(--font-mono);
+  font-size: 11px !important;
+  border-radius: 6px !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.7) !important;
+  padding: 4px 8px !important;
+}
+
+.leaflet-tooltip-top:before {
+  border-top-color: rgba(11, 18, 34, 0.95) !important;
+}
+
+.leaflet-tooltip-bottom:before {
+  border-bottom-color: rgba(11, 18, 34, 0.95) !important;
+}
+
+/* Crisp Dark Popup */
+.leaflet-popup-content-wrapper {
+  background-color: #0b1222 !important;
+  border: 1px solid #1e293b !important;
+  border-radius: 8px !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.85) !important;
+  color: #f8fafc !important;
+  padding: 0 !important;
+}
+
+.leaflet-popup-tip {
+  background-color: #0b1222 !important;
+}
+
+.leaflet-popup-content {
+  margin: 0 !important;
 }
 
 

@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
+import React, { useEffect, useMemo } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, Tooltip, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import { Layers, Activity, Maximize2 } from 'lucide-react';
+import { Layers, Maximize2, LocateFixed } from 'lucide-react';
 import { Camera, Sighting, TrajectoryResponse, ThreatLevel } from '../types';
 
 interface GISMapProps {
@@ -26,10 +26,10 @@ const MapController: React.FC<{
     if (trajectoryCoordinates && trajectoryCoordinates.length > 1) {
       const bounds = L.latLngBounds(trajectoryCoordinates);
       map.fitBounds(bounds, {
-        padding: [60, 60],
-        maxZoom: 10,
+        padding: [50, 50],
+        maxZoom: 11,
         animate: true,
-        duration: 1.5,
+        duration: 1.2,
       });
       return;
     }
@@ -50,95 +50,53 @@ const MapController: React.FC<{
   return null;
 };
 
-// Feature 1: Camera-Anchored Geospatial Dragnet Wavefront Component
-const RadarSweepWavefront: React.FC<{
-  active: boolean;
-  originCoords: [number, number];
-}> = ({ active, originCoords }) => {
-  const map = useMap();
-  const [pixelPos, setPixelPos] = useState<{ x: number; y: number } | null>(null);
-
-  useEffect(() => {
-    if (!active) {
-      setPixelPos(null);
-      return;
-    }
-
-    const updatePosition = () => {
-      try {
-        if (originCoords && originCoords[0] && originCoords[1]) {
-          const pt = map.latLngToContainerPoint(originCoords);
-          setPixelPos({ x: pt.x, y: pt.y });
-        } else {
-          const size = map.getSize();
-          setPixelPos({ x: size.x / 2, y: size.y / 2 });
-        }
-      } catch {
-        const size = map.getSize();
-        setPixelPos({ x: size.x / 2, y: size.y / 2 });
-      }
-    };
-
-    updatePosition();
-    map.on('move', updatePosition);
-    return () => {
-      map.off('move', updatePosition);
-    };
-  }, [active, originCoords, map]);
-
-  if (!active || !pixelPos) return null;
-
-  return (
-    <div
-      className="pointer-events-none z-[999]"
-      style={{
-        position: 'absolute',
-        left: `${pixelPos.x}px`,
-        top: `${pixelPos.y}px`,
-        width: 0,
-        height: 0,
-      }}
-    >
-      <div className="geospatial-sweep-wave"></div>
-      <div className="geospatial-sweep-wave geospatial-sweep-wave-echo"></div>
-    </div>
-  );
-};
-
-// Create circular tactical camera DivIcon matching mockup (Blue=Police, Orange=RTO, Green=GSRTC, Cyan=Municipal)
-function createCameraIcon(camera: Camera, _isRadarSweeping: boolean, isTargetLocked: boolean) {
+// Sleek, minimal circular camera node: 14px clean disc with colored jewel dot
+function createCameraIcon(camera: Camera, isTargetLocked: boolean) {
   const deptColors: Record<string, string> = {
-    Police: '#2563eb',
-    'Transport (RTO)': '#ea580c',
-    GSRTC: '#16a34a',
-    'Municipal Corp': '#0891b2',
-    Health: '#10b981',
-    Panchayat: '#f97316',
-    'Food & Civil Supplies': '#ec4899',
+    Police: '#3b82f6',
+    'Transport (RTO)': '#f97316',
+    GSRTC: '#10b981',
+    'Municipal Corp': '#06b6d4',
+    Health: '#ec4899',
+    Panchayat: '#8b5cf6',
+    'Food & Civil Supplies': '#eab308',
     Private: '#64748b',
   };
-  const baseColor = deptColors[camera.department] || '#2563eb';
-  const ringColor = isTargetLocked ? '#ef4444' : baseColor;
+  const color = deptColors[camera.department] || '#3b82f6';
+
+  if (isTargetLocked) {
+    return L.divIcon({
+      className: 'custom-camera-marker-locked',
+      html: `
+        <div style="position: relative; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+          <div style="position: absolute; width: 24px; height: 24px; border-radius: 50%; background: rgba(239, 68, 68, 0.3); border: 1.5px solid #ef4444; animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>
+          <div style="position: relative; width: 16px; height: 16px; border-radius: 50%; background: #0f172a; border: 2px solid #ef4444; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 10px rgba(239, 68, 68, 0.8);">
+            <div style="width: 6px; height: 6px; border-radius: 50%; background: #ef4444;"></div>
+          </div>
+        </div>
+      `,
+      iconSize: [24, 24],
+      iconAnchor: [12, 12],
+      popupAnchor: [0, -14],
+    });
+  }
 
   return L.divIcon({
     className: 'custom-camera-marker',
     html: `
-      <div style="position: relative; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center;">
-        <div style="width: 24px; height: 24px; border-radius: 50%; background-color: ${ringColor}; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 10px ${ringColor}90, 0 2px 5px rgba(0,0,0,0.8); border: 1.5px solid rgba(255,255,255,0.7); cursor: pointer;">
-          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M23 7l-7 5 7 5V7z"/>
-            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
-          </svg>
+      <div style="position: relative; width: 14px; height: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+        <div style="width: 14px; height: 14px; border-radius: 50%; background: #0f172a; border: 1.5px solid ${color}; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 5px ${color}80, 0 1px 3px rgba(0,0,0,0.8);">
+          <div style="width: 4px; height: 4px; border-radius: 50%; background: ${color};"></div>
         </div>
       </div>
     `,
-    iconSize: [26, 26],
-    iconAnchor: [13, 13],
-    popupAnchor: [0, -14],
+    iconSize: [14, 14],
+    iconAnchor: [7, 7],
+    popupAnchor: [0, -10],
   });
 }
 
-// Create vehicle waypoint DivIcon with red car badge and timestamp matching mockup
+// Clean vehicle waypoint icon: 18px numbered disc along the route, with distinct target disc at the end
 function createWaypointIcon(
   sighting: Sighting,
   index: number,
@@ -152,48 +110,47 @@ function createWaypointIcon(
 
   if (isLatest) {
     return L.divIcon({
-      className: 'custom-waypoint-marker',
+      className: 'custom-waypoint-marker-latest',
       html: `
-        <div style="display: flex; flex-direction: column; align-items: center; cursor: pointer;">
-          <div style="display: flex; align-items: center; gap: 4px; background-color: ${badgeColor}; border: 2px solid #ffffff; padding: 2px 6px; border-radius: 6px; box-shadow: 0 0 14px ${badgeColor}e6;">
-            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <div style="position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer;">
+          <div style="position: absolute; top: -3px; width: 30px; height: 30px; border-radius: 50%; background: rgba(239, 68, 68, 0.25); border: 1.5px solid ${badgeColor}; animation: ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>
+          <div style="position: relative; width: 24px; height: 24px; border-radius: 50%; background: #070b14; border: 2px solid ${badgeColor}; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 14px ${badgeColor}cc;">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="${badgeColor}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9C2.1 11.1 2 11.5 2 12v4c0 .6.4 1 1 1h2"/>
               <circle cx="7" cy="17" r="2"/>
               <path d="M9 17h6"/>
               <circle cx="17" cy="17" r="2"/>
             </svg>
-            <span style="font-size: 10px; font-family: monospace; font-weight: 800; color: #ffffff;">LATEST</span>
           </div>
-          <span style="font-size: 9px; font-family: monospace; font-weight: bold; color: #fca5a5; background-color: rgba(7,11,20,0.85); padding: 1px 4px; border-radius: 3px; border: 1px solid ${badgeColor}80; margin-top: 2px;">
-            ${timeStr}
-          </span>
+          <div style="margin-top: 2px; background: rgba(7, 11, 20, 0.95); border: 1px solid ${badgeColor}; border-radius: 3px; padding: 0.5px 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.8); display: flex; align-items: center; gap: 3px; white-space: nowrap;">
+            <span style="font-size: 9px; font-family: monospace; font-weight: 800; color: #ffffff;">LATEST</span>
+            <span style="font-size: 8px; font-family: monospace; color: #cbd5e1;">${timeStr}</span>
+          </div>
         </div>
       `,
-      iconSize: [60, 36],
-      iconAnchor: [30, 18],
-      popupAnchor: [0, -18],
+      iconSize: [50, 42],
+      iconAnchor: [25, 12],
+      popupAnchor: [0, -14],
     });
   }
+
+  // Intermediate Waypoint: A clean numbered circle along the route
+  const isStart = index === 0;
+  const bg = isStart ? '#10b981' : '#ef4444';
 
   return L.divIcon({
     className: 'custom-waypoint-marker',
     html: `
-      <div style="display: flex; align-items: center; gap: 3px; cursor: pointer;">
-        <div style="width: 24px; height: 18px; border-radius: 4px; background-color: ${badgeColor}; border: 1.5px solid #ffffff; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 10px ${badgeColor}cc;">
-          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9C2.1 11.1 2 11.5 2 12v4c0 .6.4 1 1 1h2"/>
-            <circle cx="7" cy="17" r="2"/>
-            <path d="M9 17h6"/>
-            <circle cx="17" cy="17" r="2"/>
-          </svg>
+      <div style="position: relative; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+        <div style="width: 18px; height: 18px; border-radius: 50%; background: ${bg}; border: 1.5px solid #ffffff; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 8px ${bg}99, 0 1px 3px rgba(0,0,0,0.8);">
+          <span style="font-size: 9px; font-family: monospace; font-weight: 800; color: #ffffff; line-height: 1;">
+            ${isStart ? 'A' : index + 1}
+          </span>
         </div>
-        <span style="font-size: 9px; font-family: monospace; font-weight: bold; color: #fca5a5; background-color: rgba(7,11,20,0.85); padding: 1px 3px; border-radius: 3px; border: 1px solid ${badgeColor}66; white-space: nowrap;">
-          ${timeStr}
-        </span>
       </div>
     `,
-    iconSize: [54, 20],
-    iconAnchor: [12, 10],
+    iconSize: [18, 18],
+    iconAnchor: [9, 9],
     popupAnchor: [0, -12],
   });
 }
@@ -207,28 +164,9 @@ export const GISMap: React.FC<GISMapProps> = ({
   onSelectCamera,
   onSelectSighting,
 }) => {
-  // Center of Gujarat (near Gandhinagar/Ahmedabad)
+  // Center of Gujarat
   const defaultCenter: [number, number] = [22.65, 71.85];
-  const defaultZoom = 7;
-
-  // Motion States: Radar Dragnet Sweep
-  const [isRadarSweeping, setIsRadarSweeping] = useState<boolean>(false);
-  const lastHandledPlateRef = useRef<string>('');
-
-  // Automatically trigger radar sweep when target is selected
-  useEffect(() => {
-    if (!activeTrajectory || !activeTrajectory.plate_number) return;
-    const plate = activeTrajectory.plate_number;
-
-    if (lastHandledPlateRef.current !== plate) {
-      lastHandledPlateRef.current = plate;
-      setIsRadarSweeping(true);
-      const sweepTimer = setTimeout(() => {
-        setIsRadarSweeping(false);
-      }, 950);
-      return () => clearTimeout(sweepTimer);
-    }
-  }, [activeTrajectory]);
+  const defaultZoom = 8;
 
   // Filter cameras based on selected departments
   const visibleCameras = useMemo(() => {
@@ -238,11 +176,9 @@ export const GISMap: React.FC<GISMapProps> = ({
   // Trajectory polyline coordinates (chronologically sorted and deduplicated)
   const trajectoryCoordinates = useMemo(() => {
     if (!activeTrajectory || !activeTrajectory.sightings) return [];
-    // Sort by timestamp chronologically
     const sorted = [...activeTrajectory.sightings].sort(
       (a, b) => new Date(a.timestamp_iso || 0).getTime() - new Date(b.timestamp_iso || 0).getTime()
     );
-    // Deduplicate consecutive identical coordinates (same camera)
     const deduped: [number, number][] = [];
     for (const s of sorted) {
       const coord: [number, number] = [s.lat, s.lng];
@@ -254,102 +190,81 @@ export const GISMap: React.FC<GISMapProps> = ({
     return deduped;
   }, [activeTrajectory]);
 
-  // Color for the trajectory line
-  const trajectoryColor = useMemo(() => {
-    if (!activeTrajectory) return '#06b6d4';
-    const threat = activeTrajectory.watchlist_status.threat_level;
-    if (threat === 'CRITICAL') return '#ef4444';
-    if (threat === 'HIGH') return '#f59e0b';
-    return '#22c55e';
-  }, [activeTrajectory]);
-
   const isCam04Locked = activeTrajectory?.plate_number === 'GJ01ER8842';
 
-  // Origin coordinates for the Google Maps Dragnet Radar Wavefront (anchored to camera / sighting)
-  const sweepOriginCoords = useMemo<[number, number]>(() => {
-    if (activeTrajectory?.sightings && activeTrajectory.sightings.length > 0) {
-      const s = activeTrajectory.sightings[0];
-      return [s.lat, s.lng];
-    }
-    return [23.0125, 72.5620]; // Default to Paldi Circle Cam04
-  }, [activeTrajectory]);
-
   return (
-    <div className="relative w-full h-full bg-[#0a0f1d] rounded-lg overflow-hidden border border-[#1f2937] shadow-2xl">
+    <div className="relative w-full h-full bg-[#070b14] rounded-lg overflow-hidden border border-slate-800 shadow-2xl">
       <MapContainer
         center={defaultCenter}
         zoom={defaultZoom}
         className="w-full h-full"
         zoomControl={false}
       >
-        {/* OpenStreetMap with Dark CSS Inversion Filter (Free forever, no API key watermark) */}
+        {/* CartoDB Dark Matter: Crisp vector-rendered dark tiles */}
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+          subdomains="abcd"
           maxZoom={19}
         />
 
         {/* Map Controller for programmatic flyTo & statewide trajectory auto-fitting */}
         <MapController flyToLocation={flyToLocation} trajectoryCoordinates={trajectoryCoordinates} />
 
-        {/* Feature 1: Camera-Anchored Geospatial Dragnet Wavefront Overlay */}
-        <RadarSweepWavefront active={isRadarSweeping} originCoords={sweepOriginCoords} />
-
-        {/* 50 Camera Markers across Gujarat with scan excitation & cam04 lock */}
+        {/* 50 Camera Markers across Gujarat: Clean 14px nodes with tooltips on hover */}
         {visibleCameras.map((camera) => {
-          const isTargetNode = isCam04Locked && camera.camera_id === 'cam04';
+          const isTargetNode = isCam04Locked && (camera.camera_id === 'CAM-POL-AHM-04' || camera.camera_id === 'cam04');
           return (
             <Marker
               key={camera.camera_id}
               position={[camera.lat, camera.lng]}
-              icon={createCameraIcon(camera, isRadarSweeping, isTargetNode)}
+              icon={createCameraIcon(camera, isTargetNode)}
               eventHandlers={{
                 click: () => {
                   onSelectCamera && onSelectCamera(camera);
                 },
               }}
             >
+              <Tooltip direction="top" offset={[0, -10]} opacity={1}>
+                <div className="font-mono text-xs">
+                  <span className="font-bold text-white">{camera.camera_name}</span>
+                  <div className="text-slate-400 text-[10px]">
+                    {camera.department} • {camera.camera_id} • <span className="text-emerald-400">{camera.status}</span>
+                  </div>
+                </div>
+              </Tooltip>
+
               <Popup>
-                <div className="text-xs min-w-[220px]">
-                  <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-gray-700">
-                    <span className="font-mono text-cyan-400 font-bold text-[11px]">
+                <div className="text-xs min-w-[220px] p-2.5 font-mono">
+                  <div className="flex items-center justify-between pb-1 mb-1.5 border-b border-slate-700">
+                    <span className="text-cyan-400 font-bold">
                       {camera.camera_id}
                     </span>
                     <span
                       className={`px-1.5 py-0.2 rounded text-[10px] font-bold ${
                         camera.status === 'Online'
                           ? 'bg-emerald-950 text-emerald-400'
-                          : camera.status === 'Offline'
-                          ? 'bg-rose-950 text-rose-400'
-                          : 'bg-amber-950 text-amber-400'
+                          : 'bg-rose-950 text-rose-400'
                       }`}
                     >
                       {camera.status}
                     </span>
                   </div>
 
-                  <div className="text-gray-100 font-semibold mb-1 text-[11px]">
+                  <div className="text-white font-semibold mb-1 text-[11px]">
                     {camera.camera_name}
                   </div>
 
-                  <div className="grid grid-cols-2 gap-1 text-[10px] text-gray-400 mb-2">
-                    <div>
-                      <span className="text-gray-500">Dept:</span> {camera.department}
-                    </div>
-                    <div>
-                      <span className="text-gray-500">District:</span> {camera.district}
-                    </div>
-                    <div>
-                      <span className="text-gray-500">VMS:</span> {camera.vms_vendor || 'Milestone'}
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Res:</span> {camera.resolution || '1080p'}
-                    </div>
+                  <div className="grid grid-cols-2 gap-1 text-[10px] text-slate-400 mb-2">
+                    <div><span className="text-slate-500">Dept:</span> {camera.department}</div>
+                    <div><span className="text-slate-500">District:</span> {camera.district}</div>
+                    <div><span className="text-slate-500">VMS:</span> {camera.vms_vendor || 'Milestone'}</div>
+                    <div><span className="text-slate-500">Res:</span> {camera.resolution || '1080p'}</div>
                   </div>
 
                   {camera.stream_url && (
-                    <div className="p-1.5 bg-black/60 rounded text-[9px] font-mono text-cyan-300 truncate">
-                      RTSP: {camera.stream_url}
+                    <div className="p-1 bg-black/60 rounded text-[9px] text-cyan-300 truncate">
+                      {camera.stream_url}
                     </div>
                   )}
                 </div>
@@ -358,13 +273,13 @@ export const GISMap: React.FC<GISMapProps> = ({
           );
         })}
 
-        {/* Trajectory Polyline: Layer 1 (Outer Glow) */}
+        {/* Trajectory Polyline: Soft Outer Ambient Glow */}
         {trajectoryCoordinates.length > 1 && (
           <Polyline
             positions={trajectoryCoordinates}
             pathOptions={{
-              color: trajectoryColor,
-              weight: 8,
+              color: '#ef4444',
+              weight: 6,
               opacity: 0.35,
               lineCap: 'round',
               lineJoin: 'round',
@@ -372,23 +287,21 @@ export const GISMap: React.FC<GISMapProps> = ({
           />
         )}
 
-        {/* Trajectory Polyline: Layer 2 (Core Sharp Artery with dash animation) */}
+        {/* Trajectory Polyline: Core Crisp Route Line */}
         {trajectoryCoordinates.length > 1 && (
           <Polyline
             positions={trajectoryCoordinates}
             pathOptions={{
-              color: trajectoryColor === '#ef4444' ? '#f87171' : trajectoryColor === '#f59e0b' ? '#fbbf24' : '#4ade80',
+              color: '#ff4d4f',
               weight: 3,
               opacity: 0.95,
-              dashArray: '8, 6',
-              className: 'leaflet-animated-polyline',
               lineCap: 'round',
               lineJoin: 'round',
             }}
           />
         )}
 
-        {/* Timestamped Waypoints for active vehicle trajectory (Waypoints 1 to 7) */}
+        {/* Timestamped Waypoints for active vehicle trajectory */}
         {activeTrajectory &&
           activeTrajectory.sightings.map((sighting, idx) => {
             const isLatest = idx === activeTrajectory.sightings.length - 1;
@@ -408,6 +321,15 @@ export const GISMap: React.FC<GISMapProps> = ({
                   click: () => onSelectSighting && onSelectSighting(sighting),
                 }}
               >
+                <Tooltip direction="top" offset={[0, -12]} opacity={1}>
+                  <div className="font-mono text-xs">
+                    <span className="text-cyan-400 font-bold">Waypoint #{idx + 1}</span>: <span className="text-white font-semibold">{sighting.camera_name}</span>
+                    <div className="text-slate-400 text-[10px] mt-0.5">
+                      {new Date(sighting.timestamp_iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • Heading: {sighting.direction_of_travel}
+                    </div>
+                  </div>
+                </Tooltip>
+
                 <Popup>
                   <div className="bg-[#0c1322] text-white p-2.5 font-mono text-xs rounded-lg border border-red-500/50 shadow-xl min-w-[220px]">
                     <div className="flex items-center justify-between pb-1 mb-1.5 border-b border-gray-700">
@@ -437,51 +359,68 @@ export const GISMap: React.FC<GISMapProps> = ({
           })}
       </MapContainer>
 
-      {/* Top-Left Floating Tag: High-tech Tactical Dark GIS Map */}
+      {/* Top-Left Floating Badge: Clean Status Tag */}
       <div className="absolute top-3 left-3 z-[1000] pointer-events-none">
-        <div className="bg-[#0b1222]/85 backdrop-blur-sm border border-slate-700/60 rounded-lg px-3 py-1.5 text-xs font-mono text-slate-200 shadow-xl">
-          High-tech Tactical Dark GIS Map
+        <div className="bg-[#0b1222]/90 backdrop-blur-sm border border-slate-700/60 rounded-md px-2.5 py-1 text-xs font-mono text-slate-200 shadow-lg flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span className="font-bold tracking-wider">GUJARAT STATEWIDE GIS</span>
+          <span className="text-slate-500">•</span>
+          <span className="text-slate-400 text-[11px]">{visibleCameras.length} Feeds</span>
         </div>
       </div>
 
-      {/* Top-Right Map Tactical Toolbar Matching Mockup */}
-      <div className="absolute top-3 right-3 z-[1000] flex items-center gap-1.5 bg-[#0b1222]/85 backdrop-blur-md border border-slate-700/60 rounded-lg p-1 text-slate-400 pointer-events-auto">
-        <button type="button" className="px-1.5 py-0.5 text-xs hover:text-white rounded hover:bg-slate-800 transition-colors cursor-pointer" title="Toggle Panel">«</button>
-        <button type="button" className="p-1 hover:text-white rounded hover:bg-slate-800 transition-colors cursor-pointer" title="Layers">
+      {/* Top-Right Tactical Toolbar */}
+      <div className="absolute top-3 right-3 z-[1000] flex items-center gap-1.5 bg-[#0b1222]/90 backdrop-blur-md border border-slate-700/60 rounded-lg p-1 text-slate-400 pointer-events-auto">
+        <button
+          type="button"
+          onClick={() => {
+            window.dispatchEvent(new CustomEvent('map:fit'));
+          }}
+          className="p-1 hover:text-white rounded hover:bg-slate-800 transition-colors cursor-pointer"
+          title="Reset Statewide Bounds"
+        >
+          <LocateFixed className="w-3.5 h-3.5" />
+        </button>
+        <button
+          type="button"
+          className="p-1 hover:text-white rounded hover:bg-slate-800 transition-colors cursor-pointer"
+          title="Map Layers"
+        >
           <Layers className="w-3.5 h-3.5" />
         </button>
-        <button type="button" className="p-1 hover:text-white rounded hover:bg-slate-800 transition-colors cursor-pointer" title="Activity Wave">
-          <Activity className="w-3.5 h-3.5" />
-        </button>
-        <button type="button" className="p-1 hover:text-white rounded hover:bg-slate-800 transition-colors cursor-pointer" title="Fullscreen Map">
+        <button
+          type="button"
+          className="p-1 hover:text-white rounded hover:bg-slate-800 transition-colors cursor-pointer"
+          title="Maximize View"
+        >
           <Maximize2 className="w-3.5 h-3.5" />
         </button>
       </div>
 
-      {/* Bottom-Left Department Legend Matching Mockup */}
-      <div className="absolute bottom-4 left-4 z-[1000] bg-[#0b1222]/90 backdrop-blur-md border border-slate-700/60 rounded-xl p-3 text-xs font-mono text-slate-300 shadow-2xl pointer-events-auto min-w-[110px]">
-        <div className="text-slate-400 font-bold text-[10px] uppercase tracking-wider mb-2">
-          Department
+      {/* Bottom-Left Clean Horizontal Department Legend */}
+      <div className="absolute bottom-3 left-3 z-[1000] bg-[#0b1222]/90 backdrop-blur-md border border-slate-700/60 rounded-lg px-3 py-2 text-xs font-mono text-slate-300 shadow-xl pointer-events-auto">
+        <div className="text-slate-400 font-bold text-[10px] uppercase tracking-wider mb-1">
+          Surveillance Feeds
         </div>
-        <div className="space-y-1.5">
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#2563eb]"></span>
-            <span className="text-white font-semibold text-xs">Police</span>
+        <div className="flex items-center gap-3 text-xs">
+          <div className="flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#3b82f6]"></span>
+            <span className="text-slate-200 font-medium">Police</span>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#ea580c]"></span>
-            <span className="text-white font-semibold text-xs">RTO</span>
+          <div className="flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#f97316]"></span>
+            <span className="text-slate-200 font-medium">RTO</span>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#16a34a]"></span>
-            <span className="text-white font-semibold text-xs">GSRTC</span>
+          <div className="flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#10b981]"></span>
+            <span className="text-slate-200 font-medium">GSRTC</span>
           </div>
         </div>
       </div>
 
-      {/* Bottom-Right Attribution Matching Mockup */}
+      {/* Bottom-Right Attribution */}
       <div className="absolute bottom-2 right-3 z-[1000] pointer-events-none text-[10px] font-mono text-slate-500">
-        Map data ©2026 Sentinel GIS Grid
+        CartoDB Dark Matter &bull; Gujarat Police
       </div>
     </div>
   );
