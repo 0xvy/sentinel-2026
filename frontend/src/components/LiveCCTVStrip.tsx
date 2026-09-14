@@ -1,6 +1,6 @@
 import React from 'react';
 import { Camera } from '../types';
-import { Maximize2, CheckCircle2 } from 'lucide-react';
+import { MoreHorizontal } from 'lucide-react';
 
 interface LiveCCTVStripProps {
   cameras: Camera[];
@@ -11,6 +11,7 @@ interface LiveCCTVStripProps {
 
 interface DefaultCCTVFeed {
   id: string;
+  code: string;
   name: string;
   location: string;
   lat: number;
@@ -18,7 +19,9 @@ interface DefaultCCTVFeed {
   dept: string;
   boxes: Array<{
     label: string;
-    conf: string;
+    type: string;
+    color: string;
+    badgeBg: string;
     top: string;
     left: string;
     width: string;
@@ -29,40 +32,42 @@ interface DefaultCCTVFeed {
 const DEFAULT_FEEDS: DefaultCCTVFeed[] = [
   {
     id: 'cam04',
+    code: 'CAMERA 3:30',
     name: 'CAM-POL-AHM-04',
-    location: 'Paldi Circle • SG Highway, Ahmedabad',
+    location: 'Paldi Circle • SG Highway',
     lat: 23.0125,
     lng: 72.5620,
     dept: 'Police',
     boxes: [
-      { label: 'Car 96%', conf: '96%', top: '48%', left: '16%', width: '28%', height: '34%' },
-      { label: 'Auto 87%', conf: '87%', top: '56%', left: '52%', width: '18%', height: '24%' },
-      { label: 'Motorcycle 78%', conf: '78%', top: '64%', left: '74%', width: '12%', height: '20%' },
+      { label: 'YOLO', type: 'Car', color: 'border-orange-500', badgeBg: 'bg-orange-500', top: '48%', left: '16%', width: '28%', height: '34%' },
+      { label: 'YOLO', type: 'Auto', color: 'border-blue-500', badgeBg: 'bg-blue-500', top: '56%', left: '52%', width: '18%', height: '24%' },
     ],
   },
   {
     id: 'cam10',
+    code: 'CAMERA 2:00',
     name: 'CAM-MUN-JUN-10',
     location: 'Char Chowk Road • Junagadh',
     lat: 21.5190,
     lng: 70.4590,
     dept: 'Municipal Corp',
     boxes: [
-      { label: 'Bus 92%', conf: '92%', top: '42%', left: '44%', width: '38%', height: '42%' },
-      { label: 'Car 89%', conf: '89%', top: '60%', left: '18%', width: '24%', height: '28%' },
+      { label: 'YOLO', type: 'TARGET', color: 'border-red-500', badgeBg: 'bg-red-600', top: '44%', left: '42%', width: '28%', height: '38%' },
+      { label: 'YOLO', type: 'Car', color: 'border-red-400', badgeBg: 'bg-red-500', top: '62%', left: '18%', width: '22%', height: '26%' },
     ],
   },
   {
     id: 'cam13',
+    code: 'CAMERA 12:3',
     name: 'CAM-POL-AHM-13',
-    location: 'CN Vidhyalaya • Ambawadi, Ahmedabad',
+    location: 'CN Vidhyalaya • Ambawadi',
     lat: 23.0230,
     lng: 72.5480,
     dept: 'Police',
     boxes: [
-      { label: 'Car 94%', conf: '94%', top: '52%', left: '22%', width: '26%', height: '30%' },
-      { label: 'Auto 81%', conf: '81%', top: '58%', left: '58%', width: '16%', height: '22%' },
-      { label: 'Motorcycle 76%', conf: '76%', top: '62%', left: '78%', width: '14%', height: '24%' },
+      { label: 'YOLO', type: 'Car', color: 'border-emerald-500', badgeBg: 'bg-emerald-600', top: '50%', left: '20%', width: '26%', height: '32%' },
+      { label: 'YOLO', type: 'Car', color: 'border-emerald-500', badgeBg: 'bg-emerald-600', top: '44%', left: '56%', width: '22%', height: '28%' },
+      { label: 'YOLO', type: 'TARGET', color: 'border-red-500', badgeBg: 'bg-red-600', top: '58%', left: '76%', width: '18%', height: '26%' },
     ],
   },
 ];
@@ -94,33 +99,28 @@ export const LiveCCTVStrip: React.FC<LiveCCTVStripProps> = ({
     };
   });
 
-  return (
-    <div className="flex flex-col h-full bg-[#0a101f] border-t border-[#1e293b] p-3 overflow-hidden select-none">
-      {/* Top Strip Header */}
-      <div className="text-[10px] font-mono text-slate-400 uppercase tracking-widest mb-2 font-bold flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-          <span>LIVE CCTV FEEDS (3-CH INTERCEPT)</span>
-        </div>
+  const timestampDisplay = currentTime
+    ? `2026/09/14 ${currentTime.split('•')[1]?.trim() || '21:08:30'}`
+    : '2026/09/14 21:08:30';
 
-        <div className="flex items-center gap-3 text-xs font-mono font-normal">
-          <div className="hidden sm:flex items-center gap-1">
-            <span className="text-slate-400">STREAM:</span>
-            <span className="text-white font-bold">TCP LIVE</span>
-          </div>
-          <div className="hidden md:flex items-center gap-1">
-            <span className="text-slate-400">RECORDING:</span>
-            <span className="text-white font-bold">ACTIVE</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-            <span className="text-emerald-400 font-bold">25 FPS</span>
-          </div>
-        </div>
+  return (
+    <div className="flex flex-col h-full bg-[#070b14] border-t border-slate-800 p-3 overflow-hidden select-none">
+      {/* Top Strip Header matching Mockup */}
+      <div className="flex items-center justify-between mb-2 shrink-0">
+        <h2 className="text-xs font-mono font-bold text-slate-200 uppercase tracking-wider">
+          LIVE NIGHT CCTV VIDEO WALL
+        </h2>
+        <button
+          type="button"
+          className="text-slate-500 hover:text-slate-300 p-1 transition-colors cursor-pointer"
+          title="Video Wall Options"
+        >
+          <MoreHorizontal className="w-4 h-4" />
+        </button>
       </div>
 
       {/* 3-Camera Grid Strip */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 flex-1 min-h-0">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 flex-1 min-h-0">
         {feeds.map((item) => (
           <div
             key={item.id}
@@ -133,27 +133,27 @@ export const LiveCCTVStrip: React.FC<LiveCCTVStripProps> = ({
                 onSelectCamera && onSelectCamera(item.camera);
               }
             }}
-            className="group relative bg-[#040711] border border-[#1e293b] rounded-lg overflow-hidden flex flex-col h-full cursor-pointer transition-colors hover:border-slate-600"
+            className="group relative bg-[#040711] border border-slate-800 rounded-lg overflow-hidden flex flex-col h-full cursor-pointer transition-colors hover:border-slate-600"
             title={`Click to focus map on ${item.name}`}
           >
             {/* Video Viewport Container */}
-            <div className="relative w-full h-full bg-[#040711] flex items-center justify-center overflow-hidden">
-              {/* MJPEG Stream */}
+            <div className="relative w-full h-full bg-black flex items-center justify-center overflow-hidden">
+              {/* Grayscale Night CCTV Surveillance MJPEG Stream */}
               <img
                 src={`/api/streams/${item.id}/feed`}
                 alt={item.name}
-                className="absolute inset-0 w-full h-full object-cover z-0"
+                className="absolute inset-0 w-full h-full object-cover z-0 filter grayscale contrast-125 brightness-90"
                 onError={(e) => {
                   (e.target as HTMLImageElement).style.opacity = '0.5';
                 }}
               />
 
-              {/* Bounding Box Overlays */}
+              {/* Bounding Box Overlays matching Mockup */}
               <div className="absolute inset-0 pointer-events-none z-[3]">
                 {item.boxes.map((box, bIdx) => (
                   <div
                     key={bIdx}
-                    className="absolute border border-emerald-400/80 bg-emerald-500/10"
+                    className={`absolute border-2 ${box.color} bg-black/10`}
                     style={{
                       top: box.top,
                       left: box.left,
@@ -161,53 +161,22 @@ export const LiveCCTVStrip: React.FC<LiveCCTVStripProps> = ({
                       height: box.height,
                     }}
                   >
-                    <span className="absolute -top-4 left-0 bg-[#0a101f] border border-[#1e293b] text-emerald-400 font-mono text-xs font-bold px-1 rounded whitespace-nowrap">
+                    <span
+                      className={`absolute -top-4 left-0 ${box.badgeBg} text-white font-mono text-[9px] font-extrabold px-1 rounded-xs tracking-wider uppercase shadow-sm`}
+                    >
                       {box.label}
                     </span>
                   </div>
                 ))}
               </div>
 
-              {/* Corner Reticles */}
-              <div className="absolute inset-0 pointer-events-none opacity-40 z-[4]">
-                <div className="absolute top-1.5 left-1.5 w-2 h-2 border-t border-l border-cyan-400"></div>
-                <div className="absolute top-1.5 right-1.5 w-2 h-2 border-t border-r border-cyan-400"></div>
-                <div className="absolute bottom-1.5 left-1.5 w-2 h-2 border-b border-l border-cyan-400"></div>
-                <div className="absolute bottom-1.5 right-1.5 w-2 h-2 border-b border-r border-cyan-400"></div>
-              </div>
-
-              {/* Top Bar inside Viewport */}
-              <div className="absolute top-1.5 left-1.5 right-1.5 flex items-center justify-between z-10 font-mono text-xs">
-                <div className="flex items-center gap-1.5 bg-[#0a101f]/90 px-2 py-0.5 rounded border border-[#1e293b] text-white font-bold">
-                  <span>{item.name}</span>
-                  <span className="text-emerald-400">[LIVE]</span>
-                </div>
-
-                <div className="flex items-center gap-1">
-                  <span className="hidden xl:inline bg-[#0a101f]/90 px-1.5 py-0.5 rounded border border-[#1e293b] text-slate-400 text-xs">
-                    {currentTime ? currentTime.split('•')[1]?.trim() : 'LIVE'}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onSelectCamera && onSelectCamera(item.camera);
-                    }}
-                    className="p-1 bg-[#0a101f]/90 hover:bg-[#1e293b] text-slate-300 hover:text-white rounded border border-[#1e293b] transition-colors"
-                    title="Focus on Map"
-                  >
-                    <Maximize2 className="w-3 h-3" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Bottom Metadata Bar */}
-              <div className="absolute bottom-0 left-0 right-0 p-2 bg-[#0a101f]/90 border-t border-[#1e293b] z-10 font-mono flex items-center justify-between text-xs">
-                <span className="text-white font-bold truncate">
-                  {item.location}
+              {/* Top Bar inside Viewport: CAMERA 3:30 and Timestamp matching Mockup */}
+              <div className="absolute top-2 left-2 right-2 flex items-center justify-between z-10 font-mono text-[10px] pointer-events-none">
+                <span className="text-white font-bold tracking-wider drop-shadow-md">
+                  {item.code}
                 </span>
-                <span className="text-emerald-400 font-bold shrink-0 ml-2">
-                  LIVE
+                <span className="text-slate-300 drop-shadow-md">
+                  {timestampDisplay}
                 </span>
               </div>
             </div>

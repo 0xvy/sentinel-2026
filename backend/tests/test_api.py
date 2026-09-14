@@ -199,7 +199,7 @@ async def test_alerts_endpoint(client, load_contract_schema, db_conn):
         assert persisted["watchlist_match_flag"] == 1
 
     # Verify GET /api/alerts returns recent alerts
-    resp_recent = await client.get("/api/alerts")
+    resp_recent = await client.get("/api/alerts?limit=500")
     assert resp_recent.status_code == 200
     alerts_list = resp_recent.json()
     assert any(a["alert_id"] == "ALT-2026-0905-0099" for a in alerts_list)
