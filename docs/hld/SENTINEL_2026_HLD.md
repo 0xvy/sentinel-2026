@@ -125,7 +125,7 @@ graph TD
 1. **`StreamManager`:** Enforces TCP RTSP transport (`rtsp_transport;tcp`) preventing UDP packet tearing; implements exponential backoff reconnection (2,000ms initial to 30,000ms max) and H.264/H.265 SPS/PPS join-frame decode suppression.
 2. **`IngestionScheduler`:** Implements round-robin batch rotation (batch size: 5, rotation interval: 60s); regulates camera frame intake to exactly 1.0 FPS using presentation timestamps; maintains a bounded frame queue (max size 100) with `drop_oldest` backpressure; auto-scales batch size dynamically if free VRAM drops below 2,048 MB.
 3. **`DualModePipeline`:** 
-   - *Deep Learning Mode:* YOLOv8 plate detector paired with EasyOCR neural text recognizer tuned for Indian High Security Registration Plates (HSRP).
+   - *Deep Learning Mode:* 5-stage hierarchical cascade featuring YOLOv8n vehicle localization, YOLOv11n-Plate zoom detector (`morsetechlab/yolov11-license-plate-detection`), Lanczos4/CLAHE glare-crushing filter, Fast-Plate-OCR CCT-S-v2 Transformer (with per-character probabilities), and EasyOCR secondary fallback tuned for Indian High Security Registration Plates (HSRP).
    - *Deterministic Mode:* Regex-based synthetic stream processor for zero-GPU continuous integration testing.
 4. **`KalmanTracker`:** PTS-synchronized linear quadratic estimator operating on a 6-dimensional kinematic state vector $\mathbf{x} = [x, y, w, h, v_x, v_y]^T$. Discards wall-clock arrival times to eliminate RTSP keyframe burst jitter; resets state instantaneously upon detecting 12-hour video loop cuts ($|\Delta \text{PTS}| > 5,000\text{ ms}$).
 5. **`AlertEmitter`:** Formats edge detections into strict `contracts/alert_event.json` payloads, computes SHA-256 snapshot hashes, and dispatches HTTP POST payloads to the central backend.
@@ -547,11 +547,12 @@ CONTAINER ECOSYSTEM:
 ### 13.1 The Benchmark Suspect: Vikram Solanki
 To demonstrate complete cross-department trajectory reconstruction under evaluation conditions, Sentinel seeds a verified 7-sighting statewide flight path for suspect **Vikram Solanki**:
 
-- **Target Vehicle:** White Maruti Swift, Registration: `GJ01ER8842`
-- **Suspect Identity:** Vikram Solanki (Alias: *Vicky Langdo*)
-- **Active Police Record:** **FIR-892/2026/CRIME-BR**, Navrangpura PS, Ahmedabad City
-- **Crime Head:** Armed Robbery & Escaped Custody
+- **Target Vehicle:** Polar White Hyundai Creta (2023), Registration: `GJ01ER8842` (Reported Stolen)
+- **Suspect Identity:** Vikramaditya Solanki (Alias: *Vicky Langdo*, Age: 34)
+- **Active Police Record:** **FIR-892/2026/CRIME-BR** (Navrangpura PS) & **FIR-2026/0412** (Ahmedabad City Crime Branch)
+- **Crime Head:** WANTED — Sec 302 IPC / Sec 103 BNS (Murder) & Sec 392 (Armed Robbery / Escaped Custody)
 - **Biometric Link:** State AFIS ID: `AFIS-GJ-2026-004512` (Confidence: 98%), Interstate NAFIS Red Notice: `NFN-2026-9948123`
+- **Tactical Intercept Target:** Patrol Unit **PCR-09** (SG Highway North Division / Rajkot Interceptor) with ETA ~3 mins
 
 ### 13.2 Verified 7-Camera Trajectory Timeline
 
