@@ -205,6 +205,11 @@ async def test_alerts_endpoint(client, load_contract_schema, db_conn):
     alerts_list = resp_recent.json()
     assert any(a["alert_id"] == "ALT-2026-0905-0099" for a in alerts_list)
 
+    # Clean up test artifact from database so it doesn't affect UI corridor
+    await db_conn.execute("DELETE FROM sightings WHERE pts_timestamp_ms = 135400 AND plate_number = 'GJ01ER8842'")
+    await db_conn.execute("DELETE FROM alerts WHERE alert_id = 'ALT-2026-0905-0099'")
+    await db_conn.commit()
+
 
 @pytest.mark.asyncio
 async def test_export_csv_endpoint(client, load_contract_schema):

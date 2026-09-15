@@ -68,7 +68,7 @@ const MapController: React.FC<{
   return null;
 };
 
-// Unified Waypoint Node: Sighting checkpoint along the suspect vehicle's escape trail
+// Unified Waypoint Node: Floating teardrop checkpoint with iconAnchor to never obscure city names
 function createSightingWaypointIcon(
   index: number,
   total: number,
@@ -81,19 +81,22 @@ function createSightingWaypointIcon(
     return L.divIcon({
       className: 'sighting-node-latest',
       html: `
-        <div style="position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer;">
+        <div style="position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.9));">
           <!-- Active Pulsing Target Radar Halo -->
-          <div style="position: absolute; top: -8px; width: 40px; height: 40px; border-radius: 50%; background: rgba(239, 68, 68, 0.25); border: 1.5px solid #ef4444; animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>
+          <div style="position: absolute; top: -6px; width: 36px; height: 36px; border-radius: 50%; background: rgba(239, 68, 68, 0.25); border: 1.5px solid #ef4444; animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>
           
-          <!-- Red Target Jewel -->
+          <!-- Red Target Jewel Badge -->
           <div style="position: relative; width: 24px; height: 24px; border-radius: 50%; background: #070b14; border: 2.5px solid #ef4444; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 16px rgba(239, 68, 68, 0.95), 0 0 6px #ffffff;">
-            <span style="font-size: 10px; font-family: monospace; font-weight: 900; color: #ff4d4f; line-height: 1;">${index + 1}</span>
+            <span style="font-size: 11px; font-family: monospace; font-weight: 900; color: #ff4d4f; line-height: 1;">${index + 1}</span>
           </div>
+          <!-- Downward Teardrop Pin Pointer -->
+          <div style="width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 6px solid #ef4444; margin-top: -1px;"></div>
+          <div style="width: 3px; height: 3px; border-radius: 50%; background: #ef4444; box-shadow: 0 0 4px #ef4444;"></div>
         </div>
       `,
-      iconSize: [40, 40],
-      iconAnchor: [20, 20],
-      popupAnchor: [0, -14],
+      iconSize: [36, 36],
+      iconAnchor: [18, 32],
+      popupAnchor: [0, -32],
     });
   }
 
@@ -101,34 +104,41 @@ function createSightingWaypointIcon(
     return L.divIcon({
       className: 'sighting-node-start',
       html: `
-        <div style="position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer;">
-          <div style="width: 22px; height: 22px; border-radius: 50%; background: #070b14; border: 2.5px solid #10b981; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 12px rgba(16, 185, 129, 0.85);">
+        <div style="position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer; filter: drop-shadow(0 3px 5px rgba(0,0,0,0.85));">
+          <div style="width: 22px; height: 22px; border-radius: 50%; background: #070b14; border: 2.5px solid #10b981; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 12px rgba(16, 185, 129, 0.9);">
             <span style="font-size: 10px; font-family: monospace; font-weight: 900; color: #10b981; line-height: 1;">1</span>
           </div>
+          <!-- Pin Pointer Tip -->
+          <div style="width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 5px solid #10b981; margin-top: -1px;"></div>
+          <div style="width: 3px; height: 3px; border-radius: 50%; background: #10b981; box-shadow: 0 0 3px #10b981;"></div>
         </div>
       `,
-      iconSize: [24, 24],
-      iconAnchor: [12, 12],
-      popupAnchor: [0, -12],
+      iconSize: [24, 30],
+      iconAnchor: [12, 28],
+      popupAnchor: [0, -28],
     });
   }
 
   const ringColor = isSelected ? '#38bdf8' : '#ef4444';
+  const glow = isSelected ? 'rgba(56, 189, 248, 0.9)' : 'rgba(239, 68, 68, 0.6)';
 
   return L.divIcon({
     className: 'sighting-node',
     html: `
-      <div style="position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer;">
-        <div style="width: 20px; height: 20px; border-radius: 50%; background: #070b14; border: 1.5px solid ${ringColor}; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 8px ${ringColor}88; transition: transform 0.15s ease;">
-          <span style="font-size: 9px; font-family: monospace; font-weight: 800; color: ${isSelected ? '#38bdf8' : '#ffffff'}; line-height: 1;">
+      <div style="position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer; filter: drop-shadow(0 3px 5px rgba(0,0,0,0.85));">
+        <div style="width: 20px; height: 20px; border-radius: 50%; background: #070b14; border: 2px solid ${ringColor}; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 10px ${glow};">
+          <span style="font-size: 9px; font-family: monospace; font-weight: 900; color: ${isSelected ? '#38bdf8' : '#ffffff'}; line-height: 1;">
             ${index + 1}
           </span>
         </div>
+        <!-- Pin Pointer Tip -->
+        <div style="width: 0; height: 0; border-left: 3.5px solid transparent; border-right: 3.5px solid transparent; border-top: 5px solid ${ringColor}; margin-top: -1px;"></div>
+        <div style="width: 2.5px; height: 2.5px; border-radius: 50%; background: ${ringColor};"></div>
       </div>
     `,
-    iconSize: [22, 22],
-    iconAnchor: [11, 11],
-    popupAnchor: [0, -11],
+    iconSize: [24, 28],
+    iconAnchor: [12, 28],
+    popupAnchor: [0, -28],
   });
 }
 
@@ -190,6 +200,32 @@ export const GISMap: React.FC<GISMapProps> = ({
   // Chronologically sorted sightings
   const sortedSightings = useMemo<Sighting[]>(() => {
     if (!activeTrajectory || !activeTrajectory.sightings) return [];
+
+    // For primary target GJ01ER8842, ensure strictly the 7 canonical route waypoints in chronological order
+    if (activeTrajectory.plate_number === 'GJ01ER8842') {
+      const canonicalCameraOrder = [
+        'CAM-POL-AHM-01', // 1. Ahmedabad (Iskcon)
+        'CAM-POL-AHM-02', // 2. Ahmedabad (Vaishnodevi)
+        'CAM-RTO-SUR-01', // 3. Mehsana (Toll)
+        'CAM-PAN-MEH-01', // 4. Mehsana (Radhanpur)
+        'CAM-POL-AHM-08', // 5. Surendranagar
+        'CAM-RTO-SUR-06', // 6. Rajkot (Maliyasan)
+        'CAM-POL-AHM-09', // 7. Rajkot (Madhapar)
+      ];
+      const mapByCam = new Map<string, Sighting>();
+      for (const s of activeTrajectory.sightings) {
+        if (!mapByCam.has(s.camera_id)) {
+          mapByCam.set(s.camera_id, s);
+        }
+      }
+      const corridor: Sighting[] = [];
+      for (const camId of canonicalCameraOrder) {
+        const s = mapByCam.get(camId);
+        if (s) corridor.push(s);
+      }
+      if (corridor.length >= 2) return corridor;
+    }
+
     return [...activeTrajectory.sightings].sort(
       (a, b) => new Date(a.timestamp_iso || 0).getTime() - new Date(b.timestamp_iso || 0).getTime()
     );

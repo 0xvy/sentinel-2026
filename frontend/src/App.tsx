@@ -14,16 +14,15 @@ import { ForensicDrawer } from './components/ForensicDrawer';
 import { PCRDispatchModal } from './components/PCRDispatchModal';
 import { ArchitectureModal } from './components/ArchitectureModal';
 import { LiveCCTVStrip } from './components/LiveCCTVStrip';
+import { HSRPPlate } from './components/HSRPPlate';
 import enhancedPlateImg from './assets/crops/enhanced_plate.jpg';
 import { 
+  Bell,
   Shield, 
   Radio, 
   FileText, 
-  Layers, 
   CheckCircle2, 
   Filter,
-  LayoutGrid,
-  Folder,
   Activity,
   Scan,
   MoreHorizontal,
@@ -148,86 +147,23 @@ export const App: React.FC = () => {
 
   return (
     <div className="flex h-screen w-screen bg-[#050811] text-slate-100 font-sans select-none overflow-hidden">
-      {/* 1. LEFT SLIM ICON NAVIGATION RAIL matching Mockup */}
-      <nav className="w-14 shrink-0 bg-[#050811] border-r border-slate-800/80 flex flex-col items-center py-3 justify-between z-40">
-        {/* Top Brand Emblem Icon */}
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-cyan-950/80 border border-cyan-500/60 flex items-center justify-center text-cyan-400 shadow-md shadow-cyan-950/60">
-            <Shield className="w-5 h-5 text-cyan-400" />
-          </div>
-        </div>
-
-        {/* Center Navigation Icon Stack */}
-        <div className="flex flex-col items-center gap-2.5">
-          <button
-            type="button"
-            className="w-9 h-9 rounded-lg bg-[#0f172a] text-cyan-400 border border-cyan-500/40 flex items-center justify-center hover:bg-cyan-950 transition-colors cursor-pointer"
-            title="Tactical Command Grid"
-          >
-            <LayoutGrid className="w-4 h-4" />
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              const latest = activeTrajectory?.sightings?.[activeTrajectory.sightings.length - 1] || null;
-              setForensicSighting(latest);
-              setForensicAlert(null);
-              setForensicPlate(activePlate);
-              setIsForensicOpen(true);
-            }}
-            className="w-9 h-9 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/80 flex items-center justify-center transition-colors cursor-pointer"
-            title="Forensic Dossier (BSA 2023 §63)"
-          >
-            <Folder className="w-4 h-4" />
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setIsDispatchModalOpen(true)}
-            className="w-9 h-9 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-950/50 flex items-center justify-center transition-colors cursor-pointer"
-            title="PCR Intercept Dispatch"
-          >
-            <Radio className="w-4 h-4" />
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setShowFilterModal(!showFilterModal)}
-            className="w-9 h-9 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/80 flex items-center justify-center transition-colors cursor-pointer"
-            title="Filter Surveillance Grid"
-          >
-            <Filter className="w-4 h-4" />
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setIsArchModalOpen(true)}
-            className="w-9 h-9 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/80 flex items-center justify-center transition-colors cursor-pointer"
-            title="System Architecture"
-          >
-            <Layers className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* Bottom Actions Stack */}
-        <div className="flex flex-col items-center gap-2">
-          <ExportButton currentPlate={activePlate} />
-        </div>
-      </nav>
-
-      {/* 2. MAIN CONTENT AREA */}
+      {/* MAIN COMMAND CENTER VIEW */}
       <div className="flex-1 flex flex-col h-full overflow-hidden">
         {/* TOP COMMAND HEADER matching Mockup */}
         <header className="h-14 bg-[#070b14] border-b border-slate-800/80 px-4 flex items-center justify-between z-30 shrink-0 gap-4">
-          {/* Left Title */}
-          <div className="flex flex-col">
-            <h1 className="font-heading font-black text-sm tracking-wider text-white">
-              SENTINEL <span className="text-cyan-400 font-mono">2026</span>
-            </h1>
-            <span className="text-[10px] text-slate-400 font-mono tracking-wide">
-              Gujarat Police Command Center
-            </span>
+          {/* Left Title & Official Emblem */}
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-cyan-950/80 border border-cyan-500/60 flex items-center justify-center text-cyan-400 shadow-md shadow-cyan-950/60 shrink-0">
+              <Shield className="w-5 h-5 text-cyan-400" />
+            </div>
+            <div className="flex flex-col">
+              <h1 className="font-heading font-black text-sm tracking-wider text-white">
+                SENTINEL <span className="text-cyan-400 font-mono">2026</span>
+              </h1>
+              <span className="text-[10px] text-slate-400 font-mono tracking-wide">
+                Gujarat Police Command Center
+              </span>
+            </div>
           </div>
 
           {/* Center Search Container */}
@@ -329,15 +265,37 @@ export const App: React.FC = () => {
               )}
             </div>
 
-            {/* System Status */}
+            {/* System Status & Department Filter */}
             <div className="flex flex-col items-end">
               <span className="text-[9px] font-mono text-slate-400 font-bold uppercase tracking-widest mb-0.5">
                 SYSTEM STATUS
               </span>
-              <div className="bg-[#0b1222] border border-slate-700/80 text-white font-mono text-xs font-bold px-3 py-1 rounded-lg flex items-center gap-2 shadow-sm">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span>28/30 CAMS LIVE</span>
+              <div className="flex items-center gap-1.5">
+                <div className="bg-[#0b1222] border border-slate-700/80 text-white font-mono text-xs font-bold px-2.5 py-1 rounded-lg flex items-center gap-2 shadow-sm">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>28/30 CAMS LIVE</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowFilterModal(!showFilterModal)}
+                  className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
+                    showFilterModal
+                      ? 'bg-cyan-950 border-cyan-500 text-cyan-400'
+                      : 'bg-[#0b1222] border-slate-700 text-slate-400 hover:text-white'
+                  }`}
+                  title="Filter Surveillance Grid by Department"
+                >
+                  <Filter className="w-3.5 h-3.5" />
+                </button>
               </div>
+            </div>
+
+            {/* Export Evaluation CSV Button */}
+            <div className="flex flex-col items-end">
+              <span className="text-[9px] font-mono text-slate-400 font-bold uppercase tracking-widest mb-0.5">
+                JURY AUDIT
+              </span>
+              <ExportButton currentPlate={activePlate} className="px-3 py-1.5" />
             </div>
           </div>
         </header>
@@ -375,9 +333,9 @@ export const App: React.FC = () => {
           </div>
 
           {/* Right Intelligence Column: Real time ML Pipeline Telemetry matching Mockup */}
-          <div className="w-[340px] shrink-0 h-full bg-[#080d1a] flex flex-col p-3.5 gap-3 overflow-y-auto tactical-scrollbar select-none">
+          <div className="w-[360px] shrink-0 h-full bg-[#080d1a] flex flex-col p-3 space-y-2.5 overflow-hidden select-none">
             {/* Header */}
-            <div className="flex items-center justify-between pb-1 border-b border-slate-800/80">
+            <div className="flex items-center justify-between pb-1 border-b border-slate-800/80 shrink-0">
               <h2 className="text-xs font-bold text-white tracking-wide">
                 Real time ML Pipeline Telemetry
               </h2>
@@ -392,9 +350,9 @@ export const App: React.FC = () => {
             </div>
 
             {/* Live Inference Metrics */}
-            <div>
+            <div className="shrink-0">
               <div className="text-xs text-slate-400 font-mono mb-1.5">Live Inference</div>
-              <div className="flex items-center justify-between bg-[#040711] border border-slate-800 rounded-lg p-3">
+              <div className="flex items-center justify-between bg-[#040711] border border-slate-800 rounded-lg p-2.5">
                 <div className="flex items-center gap-2">
                   <Activity className="w-4 h-4 text-cyan-400" />
                   <span className="text-xl font-bold font-mono text-white">21ms</span>
@@ -406,23 +364,30 @@ export const App: React.FC = () => {
               </div>
             </div>
 
-            {/* Cropped Preview matching Mockup */}
-            <div>
-              <div className="text-xs text-slate-400 font-mono mb-1.5">Cropped Preview</div>
-              <div className="bg-[#040711] border border-slate-800 rounded-lg p-2 flex items-center justify-center">
-                <img
-                  src={enhancedPlateImg}
-                  alt="Cropped Preview"
-                  className="h-12 w-full object-contain rounded border border-slate-700/60 filter contrast-125"
-                />
+            {/* Side-by-side: CCTV Crop -> AI Extracted HSRP */}
+            <div className="shrink-0">
+              <div className="text-[11px] font-mono text-slate-400 uppercase tracking-wider mb-1.5 flex justify-between">
+                <span>AI Plate Extraction</span>
+                <span className="text-emerald-400 font-bold">CONFIDENCE: 98.4%</span>
+              </div>
+              <div className="bg-[#030712] border border-slate-800 rounded-lg p-2 flex items-center justify-between gap-2.5">
+                <div className="flex flex-col items-center">
+                  <span className="text-[9px] text-slate-500 font-mono mb-1">OPTICAL CROP</span>
+                  <img src={enhancedPlateImg} alt="CCTV Crop" className="h-7 w-20 object-cover rounded border border-slate-700" />
+                </div>
+                <div className="text-slate-600 font-bold">&rarr;</div>
+                <div className="flex-1 flex flex-col items-center">
+                  <span className="text-[9px] text-slate-500 font-mono mb-1">RESTORED HSRP</span>
+                  <HSRPPlate plate={activePlate} size="sm" showHologram={true} showHsrpStrip={true} />
+                </div>
               </div>
             </div>
 
             {/* Correlation Status with Status Badges matching Mockup */}
-            <div>
-              <div className="text-xs text-slate-400 font-mono mb-2">Correlation Status</div>
-              <div className="space-y-1.5 text-xs font-mono">
-                <div className="flex justify-between items-center bg-[#040711] border border-slate-800/80 px-2.5 py-1.5 rounded-lg">
+            <div className="shrink-0">
+              <div className="text-xs text-slate-400 font-mono mb-1.5">Correlation Status</div>
+              <div className="space-y-1 text-xs font-mono">
+                <div className="flex justify-between items-center bg-[#040711] border border-slate-800/80 px-2 py-1 rounded-lg">
                   <span className="text-slate-300">VAHAN</span>
                   <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
                     isCriticalTarget
@@ -433,28 +398,28 @@ export const App: React.FC = () => {
                   </span>
                 </div>
 
-                <div className="flex justify-between items-center bg-[#040711] border border-slate-800/80 px-2.5 py-1.5 rounded-lg">
+                <div className="flex justify-between items-center bg-[#040711] border border-slate-800/80 px-2 py-1 rounded-lg">
                   <span className="text-slate-300">SARTHI</span>
                   <span className="bg-amber-950/80 text-amber-400 border border-amber-800/60 px-2 py-0.5 rounded text-[10px] font-bold">
                     Correlated
                   </span>
                 </div>
 
-                <div className="flex justify-between items-center bg-[#040711] border border-slate-800/80 px-2.5 py-1.5 rounded-lg">
+                <div className="flex justify-between items-center bg-[#040711] border border-slate-800/80 px-2 py-1 rounded-lg">
                   <span className="text-slate-300">eGujCop</span>
                   <span className="bg-emerald-950/80 text-emerald-400 border border-emerald-800/60 px-2 py-0.5 rounded text-[10px] font-bold">
                     Correlated
                   </span>
                 </div>
 
-                <div className="flex justify-between items-center bg-[#040711] border border-slate-800/80 px-2.5 py-1.5 rounded-lg">
+                <div className="flex justify-between items-center bg-[#040711] border border-slate-800/80 px-2 py-1 rounded-lg">
                   <span className="text-slate-300">AFIS</span>
                   <span className="bg-emerald-950/80 text-emerald-400 border border-emerald-800/60 px-2 py-0.5 rounded text-[10px] font-bold">
                     Correlated
                   </span>
                 </div>
 
-                <div className="flex justify-between items-center bg-[#040711] border border-slate-800/80 px-2.5 py-1.5 rounded-lg">
+                <div className="flex justify-between items-center bg-[#040711] border border-slate-800/80 px-2 py-1 rounded-lg">
                   <span className="text-slate-300">NAFIS</span>
                   <span className="bg-emerald-950/80 text-emerald-400 border border-emerald-800/60 px-2 py-0.5 rounded text-[10px] font-bold">
                     Correlated
@@ -464,7 +429,7 @@ export const App: React.FC = () => {
             </div>
 
             {/* Route Reconstruction Summary */}
-            <div className="bg-[#040711] border border-slate-800 rounded-lg p-2.5 text-xs font-mono space-y-1">
+            <div className="bg-[#040711] border border-slate-800 rounded-lg p-2 text-xs font-mono space-y-0.5 shrink-0">
               <div className="flex justify-between text-slate-400">
                 <span>Corridor:</span>
                 <span className="text-white font-bold">Ahmedabad &rarr; Rajkot (221 km)</span>
@@ -479,12 +444,35 @@ export const App: React.FC = () => {
               </div>
             </div>
 
+            {/* Live Alerts Stream filling the vertical space */}
+            <div className="flex-1 flex flex-col min-h-0 bg-[#040711] border border-slate-800 rounded-lg p-2 overflow-hidden">
+              <div className="text-[11px] font-mono text-cyan-400 uppercase tracking-wider mb-1.5 flex items-center justify-between shrink-0">
+                <span className="flex items-center gap-1.5"><Bell className="w-3.5 h-3.5" /> Live Alerts Grid</span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/20 text-red-400 font-bold">{alerts.length} ACTIVE</span>
+              </div>
+              <div className="flex-1 overflow-y-auto space-y-1.5 pr-1 tactical-scrollbar">
+                {alerts.slice(0, 6).map((alert, i) => (
+                  <div key={i} className="p-1.5 rounded bg-[#070d1a] border border-slate-800/80 flex items-center justify-between text-xs font-mono">
+                    <div>
+                      <div className="text-white font-bold text-[11px]">{alert.detected_plate}</div>
+                      <div className="text-[9px] text-slate-500">{alert.camera_id} &bull; {alert.camera_dept || 'Police'}</div>
+                    </div>
+                    <div className="text-right">
+                      <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${alert.threat_level === 'CRITICAL' ? 'bg-red-950 text-red-400 border border-red-800' : 'bg-amber-950 text-amber-400 border border-amber-800'}`}>
+                        {alert.threat_level}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             {/* Tactical Action Buttons */}
-            <div className="grid grid-cols-2 gap-2 mt-auto pt-2">
+            <div className="grid grid-cols-2 gap-2 pt-0.5 shrink-0">
               <button
                 type="button"
                 onClick={() => setIsDispatchModalOpen(true)}
-                className="p-2.5 bg-red-600 hover:bg-red-500 rounded-lg text-white font-mono text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-lg shadow-red-950/50"
+                className="p-2 bg-red-600 hover:bg-red-500 rounded-lg text-white font-mono text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-lg shadow-red-950/50"
               >
                 <Radio className="w-3.5 h-3.5" />
                 <span>PCR Dispatch</span>
@@ -499,7 +487,7 @@ export const App: React.FC = () => {
                   setForensicPlate(activePlate);
                   setIsForensicOpen(true);
                 }}
-                className="p-2.5 bg-[#0b1222] hover:bg-[#131d36] border border-cyan-500/40 rounded-lg text-cyan-300 font-mono text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                className="p-2 bg-[#0b1222] hover:bg-[#131d36] border border-cyan-500/40 rounded-lg text-cyan-300 font-mono text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
               >
                 <FileText className="w-3.5 h-3.5 text-cyan-400" />
                 <span>Forensic Dossier</span>
