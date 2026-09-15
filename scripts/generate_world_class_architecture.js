@@ -1,4 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?>
+// scripts/generate_world_class_architecture.js
+const fs = require('fs');
+const path = require('path');
+const { chromium } = require(path.resolve(__dirname, '../frontend/node_modules/@playwright/test'));
+
+const svgContent = `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" style="background:#030712; font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
   <defs>
     <linearGradient id="headerGradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -435,3 +440,40 @@
     <text x="1350" y="0" fill="#94a3b8">VERIFIED SUITE: <tspan fill="#34d399" font-weight="700">132/132 Pytest Green &bull; Zero Invariant Violations</tspan></text>
   </g>
 </svg>
+`;
+
+async function render() {
+  const svgPath = path.resolve('docs/hld/sentinel_architecture_workflow.svg');
+  const pngPath = path.resolve('docs/hld/sentinel_architecture_workflow.png');
+  
+  fs.writeFileSync(svgPath, svgContent, 'utf8');
+  console.log('Wrote clean SVG to:', svgPath);
+
+  const browser = await chromium.launch();
+  const page = await browser.newPage({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 2 });
+  
+  await page.setContent(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8">
+        <style>
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body, html { width: 1920px; height: 1080px; overflow: hidden; background: #030712; }
+          svg { width: 1920px; height: 1080px; display: block; }
+        </style>
+      </head>
+      <body>
+        ${svgContent}
+      </body>
+    </html>
+  `);
+
+  await page.screenshot({ path: pngPath, clip: { x: 0, y: 0, width: 1920, height: 1080 } });
+  await browser.close();
+
+  const stats = fs.statSync(pngPath);
+  console.log('Rendered 1920x1080 PNG successfully! Size:', stats.size, 'bytes');
+}
+
+render().catch(console.error);
