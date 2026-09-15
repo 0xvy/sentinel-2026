@@ -3,6 +3,7 @@ import re
 import json
 import csv
 import io
+from datetime import datetime, timezone
 import pytest
 import jsonschema
 from pathlib import Path
@@ -164,7 +165,7 @@ async def test_alerts_endpoint(client, load_contract_schema, db_conn):
     sample_alert = {
         "alert_id": "ALT-2026-0905-0099",
         "timestamp_pts_ms": 135400,
-        "timestamp_iso": "2026-09-05T14:10:00Z",
+        "timestamp_iso": datetime.now(timezone.utc).isoformat(),
         "camera_id": "CAM-POL-AHM-04",
         "camera_dept": "Police",
         "camera_lat": 23.0365,
